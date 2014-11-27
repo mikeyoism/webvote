@@ -68,7 +68,7 @@ define("CONST_SETTING_VOTES_PER_CATEGORY",3);
 //röstnamn är den label som presenteras för användarna på röstsidan
 //OBS ordningen motsvarar vote_1, vote_2, Vote_3 i respektive kategori-tabell i SQL
 //OBS att antal labels och poäng MÅSTE stämma överens med inställningen CONST_SETTING_VOTES_PER_CATEGORY
-//Om denna inställning inte används lämna tom (serialize (array ('')));) då kommer lablar "Röst 1, Röst 2 etc"
+//Om denna inställning inte används lämna tom (serialize (array ()));) då kommer lablar "Röst 1, Röst 2 etc"
 //automatiskt presenteras för användarna på röstsidan och varje röst ge en poäng (som SM2014)
 //(du KAN INTE fylla i poäng '1' rakt igenom för att få andra lablar (ej testat))
 //exempel define ("CONST_SETTING_VOTE_WEIGHT", serialize (array ('Guld'=>5,'Silver'=>4,'Brons'=>3,'Sten'=>2,'Lera'=>1,'Mögel'=>0,'Avföring'=>-1)));

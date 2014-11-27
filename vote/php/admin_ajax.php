@@ -163,7 +163,7 @@ function ax_getvotes($inCat){
 		//FB::warn("no","sql getvotes");
 		//select each vote_column, and sum up votes per beer
 		$select = "SELECT vote_{$votePos} AS beer, COUNT( vote_{$votePos} ) AS votes
-			   FROM  `vote_cat_summerbeer`
+			   FROM  `vote_cat_{$inCat}`
 			   WHERE vote_{$votePos} IS NOT NULL 
 			   GROUP BY vote_{$votePos}
 			   ORDER BY votes DESC , beer ASC";
