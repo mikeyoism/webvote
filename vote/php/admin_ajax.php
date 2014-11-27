@@ -348,9 +348,9 @@ function ax_votecode_generate($NrofCodes){
 	}
 	$insert = rtrim($insert,",");
 	
-	include 'sqlopen._pdophp'; //global conn
+	include 'sqlopen_pdo.php'; //global conn
 	//if (mysql_query($insert))
-	if (($affected_rows = $db->exec($sqls)))	
+	if (($affected_rows = $db->exec($insert)))	
 	    echo "OK -" . $affected_rows . " koder tillagda";
 	else
 	    echo "Failure - " ; //. mysql_error();

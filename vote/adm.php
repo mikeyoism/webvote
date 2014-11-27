@@ -81,7 +81,8 @@ Maximalt antal möjliga kombinationer med 3 teckens röstkod är ca 39.000 unika
 <br>
 <br>
 
-<h4>Nedanstående ska bara användas för att förbereda innan ny tävling. De får absolut INTE användas under pågående tävling, och INTE förrän resultatet är klart och undansparat/redovisat</h4>    
+<h4>Nedanstående ska bara användas för att förbereda innan ny tävling. De får absolut INTE användas under pågående tävling, och INTE förrän resultatet är klart och undansparat/redovisat
+EJ ÄNNU IMPLEMENTEREADE KNAPPAR!</h4>    
 <button data-inline="true" data-mini="false" id="votecode_erase">Radera alla befintliga röstkoder</button>
 <button data-inline="true" data-mini="false" id="votecode_erase">Radera alla tävlingsresultat</button>
 

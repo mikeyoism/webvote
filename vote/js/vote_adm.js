@@ -20,7 +20,7 @@
  *home brewing events arranged by the swedish home brewing association (www.SHBF.se)
 */
 $(document).on('pageinit',function(event) {
-    
+    var DEBUGMODE = false;
     votejs.getVote_count();
     $('#votecode_gen500').on('click',function(e) {
     
@@ -55,7 +55,7 @@ $(document).on('pageinit',function(event) {
 
 //model for client vote logic
 votejs = function(){
-    var DEBUGMODE = true;
+    var DEBUGMODE = false;
     
     function getVote_count()
     {
