@@ -31,6 +31,7 @@ if (!isset($_SESSION["authenticated_level"]) ||  $_SESSION["authenticated_level"
     $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
     
     header("Location: http://$host$uri/$redir"); 
+    exit;
 }
 
 include 'php/_config.php';
