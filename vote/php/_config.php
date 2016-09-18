@@ -35,6 +35,7 @@ define("SETTING_OPEN_DATE_CLOSE","2014-06-27 21:00:00");
 
 //innan categories ändras måste tabeller i databas skapas som stämmer överens:
 //tabellerna ska heta "vote_cat_xxx" och "vote_cat_xxx_history" där xxx motsvarar CONST_SETTING_CATEGORIES_SYS
+//om rena nummerserier inte ska användas per kategori så måste även tabeller "vote_cat_xxx_list" skapas för varje kategori där xxx motsvarar CONST_SETTING_CATEGORIES_SYS
 //MER INFO om hur systemet sätts upp i sin helhet finns i readme.md
 
 //publika namn på kategorier  - svenska tecken och dyl är OK här
@@ -49,6 +50,9 @@ define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('example')));
 //publik extra info för respektive kategori,måste stämma i antal och i sekvens med tekniska
 //define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('lågalkoholöl 0-3,5%','sessionöl 3,6-5,5%','medelkraftig öl 5,6-7%','kraftfull öl 7-∞%','')));
 define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('0-100% ABV')));
+
+//Ska vi ha nummerserier för röster för respektive kategori, ex klass 1: 101-199 (true), eller har vi löpande numrering oavsett klass (false)
+define("CONST_SETTING_SERIALIZED_NUMBERS", true);
 
 //Nummerserier för röster för respektive kategori, krav: positiva heltal (ej noll) min-max separarade med bindestreck, nycklar = lika CATEGORIES_SYS
 //define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('gul'=>'101-199','gron'=>'201-299','bla'=>'301-399','rod'=>'401-499','etikett'=>'501-599')));
@@ -109,7 +113,7 @@ define ("SETTING_LOG_ALLOCATED_VOTE_CODES", true);
 //spara ändrade röster i historytabeller, eller ej
 define ("SETTING_LOG_CHANGED_VOTES", true);
 //visa användararstatistik som möjliggör ange användare ange kön, ort etc
-define("CONST_SETTING_ENABLE_VISITOR_STATISTICS",true);
+define("CONST_SETTING_ENABLE_VISITOR_STATISTICS",false);
 
 //----END OF COMPETITION SETTINGS-----
 
