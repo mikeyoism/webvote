@@ -172,7 +172,8 @@ function check_vote_code_sql($vote_code,$manreg_paper_vote = null,$vote_code_old
 }
 
 function generateRandomString($length = 3) {
-    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    #$characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
     $randomString = '';
     for ($i = 0; $i < $length; $i++) {
 	$randomString .= $characters[mt_rand(0, strlen($characters) - 1)];
