@@ -172,7 +172,7 @@ votejs = function() {
 		},
 
 	    ],
-	    pageSize: 5
+	    pageSize: 50
 	};
 	self.init = function() {
 	    if (getObjectSize(VOTE_WEIGHT_AND_LABELS) > 0) {
