@@ -208,7 +208,7 @@ function ax_reread($userStored_vote_code)
     $jsonReply = array();
     
     //dubblekolla kod mod sql, returnera meddelande till user, utför bara om kod-in ändrats mot vad vi har serverside.
-    if (($_SESSION["vote_code_approved"] !== true || $_SESSION['vote_code'] != $userStored_vote_code)  && strlen($userStored_vote_code) == 3){
+    if (($_SESSION["vote_code_approved"] !== true || $_SESSION['vote_code'] != $userStored_vote_code)  && strlen($userStored_vote_code) == 6){
 	$jsonReply = codeCheck2($userStored_vote_code);
     }
     else if ($_SESSION["vote_code_approved"] === true){
@@ -308,7 +308,7 @@ function ax_reread($userStored_vote_code)
 function ax_post_stat($vote_code,$gender,$age,$location,$firstSM)
 {
 
-    if(strlen($vote_code) < 3){
+    if(strlen($vote_code) < 6){
 	echo "Felaktig röstkod!, ange din röstkod längst upp innan du registrerar";
 	return;
     }
@@ -343,7 +343,7 @@ function ax_post_vote($category,$vote_code){
 	 echo "Röstningen är STÄNGD!";
 	 return;
     }
-    if(strlen($vote_code) != 3){
+    if(strlen($vote_code) != 6){
 	echo "Felaktig röstkod!, ange din röstkod längst upp innan du röstar";
 	return;
     }
@@ -550,7 +550,7 @@ function codeCheck2($stored_client_code = "")
 
 	$count = 0;
 	$vote_code_old = $_SESSION['vote_code'];
-	if (strlen($stored_client_code) == 3)
+	if (strlen($stored_client_code) == 6)
 	    $vote_code = $stored_client_code;
 	else
 	    $vote_code =$_GET["vote_code"];

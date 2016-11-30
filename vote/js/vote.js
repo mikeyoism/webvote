@@ -46,7 +46,7 @@ $(document).on('pageinit',"#votepage",function(event) {
         
         var vote_code = $(this).val();
         
-        if (vote_code.length < 3) {
+        if (vote_code.length < 6) {
             
             statusDiv.html('<div class="infobar infobar-neutral" data-mini="true">Välkommen! ange först din röstkod.</div>');
             return false;

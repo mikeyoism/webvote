@@ -136,7 +136,7 @@ function check_vote_code_sql($vote_code,$manreg_paper_vote = null,$vote_code_old
 {
     $count = 0;
     
-    if(strlen($vote_code) != 3){
+    if(strlen($vote_code) != 6){
 	return  -1;
     }
     else{
@@ -150,7 +150,7 @@ function check_vote_code_sql($vote_code,$manreg_paper_vote = null,$vote_code_old
 		{
 		    $count = 1;
 		    //manreg_paper_vote=2 = röstat via publik dator, 1= röst reggad av funktionär (manreg_adm)
-		    if (strlen($vote_code_old) == 3 && $vote_code_old != $vote_code) //indikera att koden ändrats = statistik för om flera användare delar enhet
+		    if (strlen($vote_code_old) == 6 && $vote_code_old != $vote_code) //indikera att koden ändrats = statistik för om flera användare delar enhet
 		    {
 			$stmt = $db->prepare("INSERT INTO vote_codes_allocation_log  (vote_code,allocation_DT,old_code,manreg_paper_vote) VALUES(:vote_code, :date ,:vote_code_old, :manreg_paper_vote)");
 			$stmt->execute(array(':vote_code' => $vote_code, ':date' => date("Y-m-d H:i:s"), ':vote_code_old' => $vote_code_old, ':manreg_paper_vote' => $manreg_paper_vote));
@@ -172,7 +172,8 @@ function check_vote_code_sql($vote_code,$manreg_paper_vote = null,$vote_code_old
 }
 
 function generateRandomString($length = 3) {
-    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    #$characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
     $randomString = '';
     for ($i = 0; $i < $length; $i++) {
 	$randomString .= $characters[mt_rand(0, strlen($characters) - 1)];

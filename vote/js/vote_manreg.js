@@ -34,11 +34,11 @@
 	    
 	    var vote_code = $(this).val();
 	    
-	    if (e.type == "keyup" && vote_code.length < 3) {
+	    if (e.type == "keyup" && vote_code.length < 6) {
 		return false;
 	    }
-	    else if (e.type == "focusout" && vote_code.length < 3) {
-		statusDiv.html('<div class="infobar infobar-warning" data-mini="true">Kod ska vara 3 tecken!</div>');
+	    else if (e.type == "focusout" && vote_code.length < 6) {
+		statusDiv.html('<div class="infobar infobar-warning" data-mini="true">Kod ska vara 6 tecken!</div>');
 		statusDiv.fadeIn();
 	    }
 	    else{
