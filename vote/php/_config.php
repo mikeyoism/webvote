@@ -25,13 +25,13 @@
 
 //tvälingsnamn, visas som header på röstsida (och övriga sidor)
 //håll namnet KORT, annars trunkeras namnet (framförallt i mobila enheter, testa)
-define("SETTING_COMPETITION_NAME","SM 2015");  
+define("SETTING_COMPETITION_NAME","SM 2016");  
 
 //tävlingens öppettider format ex : 2014-01-22 20:00:00"
 //SETTING_OPEN_DEBUG_ALWAYS_OPEN = bara true vid test, överskrider inställa öppettider
-define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true);
-define("SETTING_OPEN_DATE_OPEN", "2014-06-27 18:00:00");
-define("SETTING_OPEN_DATE_CLOSE","2014-06-27 21:00:00");
+define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",false);
+define("SETTING_OPEN_DATE_OPEN", "2016-04-30 13:00:00");
+define("SETTING_OPEN_DATE_CLOSE","2016-04-30 16:00:00");
 
 //innan categories ändras måste tabeller i databas skapas som stämmer överens:
 //tabellerna ska heta "vote_cat_xxx" och "vote_cat_xxx_history" där xxx motsvarar CONST_SETTING_CATEGORIES_SYS
@@ -39,20 +39,20 @@ define("SETTING_OPEN_DATE_CLOSE","2014-06-27 21:00:00");
 
 //publika namn på kategorier  - svenska tecken och dyl är OK här
 //ex define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Gul','Grön','Blå','Röd','Etikett')));
-define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Den enda tävlingsklassen')));
+define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Folkets val klass A', 'Folkets val klass B', 'Folkets val klass C', 'Folkets val klass D', 'Etikettävlingen')));
 
 //tekniska namn på kategorier (databasnamn etc) - svenska, mellanslag etc är förbjudna här! måste stämma i antal och i sekvens med publika
 //(en databastabell skall finns för varje kategori med samman man som här och prefix vote_cat_)
 //ex define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('gul','gron','bla','rod','etikett')));
-define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('example')));
+define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('fv1', 'fv2', 'fv3', 'fv4', 'label')));
 
 //publik extra info för respektive kategori,måste stämma i antal och i sekvens med tekniska
 //define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('lågalkoholöl 0-3,5%','sessionöl 3,6-5,5%','medelkraftig öl 5,6-7%','kraftfull öl 7-∞%','')));
-define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('0-100% ABV')));
+define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('0 - 3,5 % vol', '3,6 - 5,4 % vol', '5,5 - 6,8 % vol', '6,9 % vol och över', '')));
 
 //Nummerserier för röster för respektive kategori, krav: positiva heltal (ej noll) min-max separarade med bindestreck, nycklar = lika CATEGORIES_SYS
 //define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('gul'=>'101-199','gron'=>'201-299','bla'=>'301-399','rod'=>'401-499','etikett'=>'501-599')));
-define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('example'=>'101-199')));
+define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('fv1'=>'100-499', 'fv2'=>'100-499', 'fv3'=>'100-499', 'fv4'=>'100-499', 'label'=>'500-999')));
 
 //Sparaknapparnas bakgrundsfärger, för ökat visuell känsla av vad man håller på att rösta på. CCCCCC är defaultfärgen grå som matchar övrig bakgrund
 //define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('gul'=>'#D8C704','gron'=>'#75AF6A','bla'=>'#6A8EAF','rod'=>'#D83737','etikett'=>'#CCCCCC')));
