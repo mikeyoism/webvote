@@ -216,3 +216,5 @@ pip-log.txt
 
 #sensitive files
 *.gitignore.*
+vote/error_log
+vote/php/error_log
