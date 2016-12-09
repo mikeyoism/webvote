@@ -7,15 +7,12 @@
  */
 
 session_start();
-include 'php/_config.php';
-//for server-side build-up of page...
-//you may produce a static version if you wish
-$sys_cat  = unserialize(CONST_SETTING_CATEGORIES_SYS);
-$user_cat  = unserialize(CONST_SETTING_CATEGORIES_PUBLIC);
-$user_cat_extra  = unserialize(CONST_SETTING_CATEGORIES_PUBLIC_SUB);
-$cat_col = unserialize(CONST_SETTING_CATEGORIES_COLORS);
-$votes_per_cat = CONST_SETTING_VOTES_PER_CATEGORY;
-$vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
+include 'php/common.inc';
+$dbAccess = new DbAccess();
+
+$categories= $dbAccess->getCurrentCategories();
+$vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
+
 ?>
 
 <!DOCTYPE html>
@@ -26,9 +23,9 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
     <meta name="generator" content="Notepad" />
     <meta name="author" content="Micke Josefsson">
     <meta http-equiv="content-language" content="sv">
-    <title>Webröstning</title>
+    <title>Webbröstning</title>
     
-    <link rel="stylesheet" href="css/themes/shbf.min.css" />
+    <link rel="stylesheet" href="css/themes/shbf.css" />
     <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.3.2/jquery.mobile.structure-1.3.2.min.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
@@ -38,7 +35,6 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
         width  : 100%;
         height : auto;
         max-width:1300px; /*ovackert om för stor*/
-        
     }
     .infobar {
 	padding: 0.35em 0.5em;
@@ -68,7 +64,7 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
 	}
     }
     </style>    
-    <script src="js/vote.min.js" type="text/javascript"></script> 
+    <script src="js/vote.js" type="text/javascript"></script> 
 </head>
 <body>
     
@@ -102,18 +98,14 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
 <div data-role="header" data-theme="a" class="ui-corner-top ui-header ui-bar-a" role="banner">
     <h1 class="ui-title" role="heading" aria-level="1">Hjälp</h1>
 </div>
-	
 	<div style="padding:0.5em 1em;" id="helpform">
-	    <p>Börja med att fylla i din personliga röstkod (se programbladet), den måste <b>alltid</b> vara ifylld när du röstar. </p>
+	    <p>Börja med att fylla i din personliga röstkod (se programbladet), den måste <b>alltid</b> vara ifylld när du röstar.</p>
 	    <p>Tävlande öl är indelade i olika tävlingsklasser efter alkoholhalt.</p>
 	    <p>Rösta på dina favoritöl i en klass genom att först ange ölens tävlingsnummer, <b>rösterna registreras när du trycker på SPARA-knappen</b>.
 	    Du får alltid en bekräftelse tillbaka. Röster kan uppdateras/ändras obegränsat fram till tävlingen stänger med spara-knapparna.</p>
 	    <p><b>Observera att varje tävlingsklass har sin egen spara-knapp</b>, du sparar alltså röster inividuellt per klass.</p>
-	    <p>Du väljer själv i vilka klasser du vill rösta och hur många röster du vill avge. Varje röst ger en (1) poäng och du kan rösta på upp till tre olika öl per klass.
-	    Max två röster kan ges på samma öl och då måste du även ge en 3:e röst på en annan öl i den klassen</p>
+	    <p>Du väljer själv i vilka klasser du vill rösta.</p>
 	</div>
-
-
 </div>  
 
 <!--logo-->
@@ -137,7 +129,6 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
     <div class="ui-block-b" data-mini="true">
      	    <ul data-role="listview" data-inset="true">
 		<li data-role="fieldcontain">
-		    
 		    <input type="text" id="vote_code" name="vote_code"  placeholder="Din röstkod" value="" maxlength="6" data-mini="true" size="5"  >
 		</li>
 	    </ul>
@@ -153,127 +144,65 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
     </div>
 </div> 
     
-  
-    
 <!--röster-->
 <div data-role="collapsible-set" data-theme="a" data-content-theme="a">
 
 <?php
-    function htmlVoteRow($cat, $voteNr, $voteLabel)
-    {
-	$ret;
-	$label = "Röst " . $voteNr; //default, röst 1, röst 2 etc
-	if ($voteLabel != "")
-	    $label = $voteLabel; //user defined, guld, silver etc...
-	    
-	$ret = '		    <label for="' . $cat . '_vote' . $voteNr . '" id="' . $cat . '_vote' . $voteNr . '_label">' . $label . ':</label>' .
-	       '		    <input class="voteval' . $voteNr . '" type="number" name="' . $cat . '_vote' . $voteNr . '" id="' . $cat . '_vote' . $voteNr . '" value="" data-clear-btn="true" maxlength="3">' .
-	       '		    <div class="position-rightalign-right-to-label">' .
-	       '			<div id ="' . $cat . '_vote' . $voteNr . '_status" class="error infobar infobar-error infobar-drop" data-mini="true"></div>' .
-	       '		    </div>';	
-	
-	return $ret;
-    }
+function htmlVoteRow($cat, $voteNr, $voteLabel)
+{
+    $ret;
+    $label = "Röst " . $voteNr; //default, röst 1, röst 2 etc
+    if ($voteLabel != "")
+        $label = $voteLabel; //user defined, guld, silver etc...
+    
+    $ret = '		    <label for="' . $cat . '_vote' . $voteNr . '" id="' . $cat . '_vote' . $voteNr . '_label">' . $label . ':</label>' .
+         '		    <input class="voteval' . $voteNr . '" type="number" name="' . $cat . '_vote' . $voteNr . '" id="' . $cat . '_vote' . $voteNr . '" value="" data-clear-btn="true" maxlength="3">' .
+         '		    <div class="position-rightalign-right-to-label">' .
+         '			<div id ="' . $cat . '_vote' . $voteNr . '_status" class="error infobar infobar-error infobar-drop" data-mini="true"></div>' .
+         '		    </div>';	
+    
+    return $ret;
+}
+    
+$labelc = count($vote_weight_and_labels);
+if ($labelc > 0) {
+    $vote_labels = array_keys($vote_weight_and_labels);
+}
 
-    $p = 0;
-    $labelc = count($vote_weight_and_labels);
-    if ($labelc > 0)
-	$vote_labels = array_keys($vote_weight_and_labels);
-    foreach ($sys_cat as $cc)
-    {
-	$extra = "";
-	if (strlen($user_cat_extra[$p]) > 0)
-	    $extra = " (" . $user_cat_extra[$p] . ")";
-	$cColor = $cat_col[$cc];
-	if ($cColor == "")
-	    $cColor  = "#cccccc";
-	
-	echo '<div data-role="collapsible" id="vote_' . $cc . '">';
-	echo '	<h3>' . $user_cat[$p] . '<small>' . $extra . '</small>' . '</h3><div id="head_' . $cc . '" ></div>';
-	echo '	<form name="' . $cc . '_vote" id="' . $cc . '_vote" class="voteform_trigger" data-ajax="false" >';
-	echo '	    <div class="vote_category" id="' . $cc . '"></div>';
-	echo '	    <ul data-role="listview" data-inset="true">';
-        //sup3
-	
-	for ($voteNr = 1; $voteNr <= $votes_per_cat; $voteNr++){
-	    echo '		<li data-role="fieldcontain">';
-	    echo 			htmlVoteRow($cc,$voteNr, ($labelc > 0 ? $vote_labels[$voteNr-1] : ""));
-	    echo '		</li>';
-	}
+$votes_per_cat = $labelc;
 
-			
-	echo '		<li data-role="fieldcontain" style="background:' . $cColor . '">';
-	echo '			<div class="position-rightalign-right-to-label">';
-	echo '			<div id ="form_' . $cc . '_status" class="error infobar infobar-error formstatus_trigger" style="margin-bottom: 1em" data-mini="true"></div>';
-	echo '			<button id="submit_' . $cc . '" type="submit" data-role="button" data-mini="false"data-theme="a" data-icon="check" >Spara</button>';
-	echo '			</div>';
-	echo '		</li>';
-			
-	echo '	    </ul>';
-	echo '	</form>';    
-	echo '</div>';
-	
-	$p++;
+foreach ($categories as $c)
+{
+    $extra = isset($c['description']) ? ' (' . $c['description'] . ')' : '';
+    $cColor = isset($c['color']) ? $c['color'] : '#cccccc';
+    $id = $c['id'];
+    
+    echo '<div data-role="collapsible" id="vote_' . $id . '">';
+    echo '	<h3>' . $c['name'] . '<small>' . $extra . '</small>' . '</h3><div id="head_' . $id . '" ></div>';
+    echo '	<form name="' . $id . '_vote" id="' . $id . '_vote" class="voteform_trigger" data-ajax="false" >';
+    echo '	    <div class="vote_category" id="' . $id . '"></div>';
+    echo '	    <ul data-role="listview" data-inset="true">';
+    //sup3
+    
+    for ($voteNr = 1; $voteNr <= $votes_per_cat; $voteNr++){
+        echo '		<li data-role="fieldcontain">';
+        echo 			htmlVoteRow($id, $voteNr, ($labelc > 0 ? $vote_labels[$voteNr-1] : ''));
+        echo '		</li>';
     }
     
-    $p = 0;
-    
-    if (CONST_SETTING_ENABLE_VISITOR_STATISTICS)
-    {
-?>  
-	    
-    <div data-role="collapsible" id="div_stat">
-	<h3> Statistik <small> (frivillig & anonym)</small></h3>
-	<form name="stat_stat" id="statform_trigger" class="statform_trigger" data-ajax="false">
-	    <div class="stat_category" id="stat_category"></div>
-	    <ul data-role="listview" data-inset="true">
-
-		<li data-role="fieldcontain">
-		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    <legend>Kön:</legend>
-		    <input type="radio" name="stat1" id="stat1man" value="M" checked="checked" />
-		    <label for="stat1man">Man</label>
-		    <input type="radio" name="stat1" id="stat1woman" value="K"/>
-		    <label for="stat1woman">Kvinna</label>
-		    </fieldset>
-		</li>
-    
-		<li data-role="fieldcontain">
-		    <label for="stat2">Ålder:</label>
-		    <input type="range" name="slider-mini" id="stat2" value="35" min="20" max="100" data-highlight="true" data-mini="true" />
-		</li>
-		<li data-role="fieldcontain">
-		    
-			<label for="stat3" id="stat3_label">Hemort:</label>
-			<input class="statval3" type="text" name="stat3" id="stat3" maxlength="49"  value="">
-		    
-		<li>
+    echo '		<li data-role="fieldcontain" style="background:' . $cColor . '">';
+    echo '			<div class="position-rightalign-right-to-label">';
+    echo '			<div id ="form_' . $id . '_status" class="error infobar infobar-error formstatus_trigger" style="margin-bottom: 1em" data-mini="true"></div>';
+    echo '			<button id="submit_' . $id . '" type="submit" data-role="button" data-mini="false"data-theme="a" data-icon="check" >Spara</button>';
+    echo '			</div>';
+    echo '		</li>';
 	
-		<li data-role="fieldcontain">
-		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    <legend>Är du på gång?:</legend>
-		    <input type="radio" name="stat4" id="stat4yes" value="1" />
-		    <label for="stat4yes">Ja</label>
-		    <input type="radio" name="stat4" id="stat4no" value="0"/>
-		    <label for="stat4no">Nej</label>
-		    <input type="radio" name="stat4" id="stat4dunno" value="2" checked="checked"/>
-		    <label for="stat4dunno">Vet ej</label>
-		    </fieldset>
-		</li>    
-		<li data-role="fieldcontain" style="background: #cccccc">
-		    <div class="position-rightalign-right-to-label">
-		    <div id ="form_stat_status" class="error infobar infobar-error formstatus_trigger" style="margin-bottom: 1em" data-mini="true"></div>
-		    <button id="submit_stat" type="submit" data-role="button" data-mini="false"data-theme="a" data-icon="check" >Spara</button>
-		    </div>
-		</li>
-			
-	    </ul>
-	</form>    
-    </div>
-<?php
-    }
+    echo '	    </ul>';
+    echo '	</form>';    
+    echo '</div>';
+}
 ?>
-
+        
 </div> <!-- collapsible-set-->
 
 
@@ -283,5 +212,3 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
 
 </body>
 </html>
-
-

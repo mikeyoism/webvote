@@ -1,135 +1,156 @@
--- phpMyAdmin SQL Dump
--- version 3.5.8.1
--- http://www.phpmyadmin.net
+-- MySQL dump 10.13  Distrib 5.6.30, for FreeBSD10.1 (amd64)
 --
--- Host: 10.246.16.193:3306
--- Generation Time: Nov 02, 2014 at 08:10 PM
--- Server version: 5.5.38-MariaDB-1~wheezy
--- PHP Version: 5.3.3-7+squeeze15
-
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-
+-- Host: localhost    Database: webvote
+-- ------------------------------------------------------
+-- Server version	5.6.30
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Database: replace with your database server name
---
-use `NameOfYourDatabase`;
--- --------------------------------------------------------
-
---
--- Table structure for table `vote_cat_example`
+-- Table structure for table `categories`
 --
 
-CREATE TABLE IF NOT EXISTS `vote_cat_example` (
-  `vote_code` char(3) NOT NULL,
-  `vote_1` int(11) DEFAULT NULL,
-  `vote_1_dt` datetime DEFAULT NULL,
-  `vote_2` int(11) DEFAULT NULL,
-  `vote_2_dt` datetime DEFAULT NULL,
-  `vote_3` int(11) DEFAULT NULL,
-  `vote_3_dt` datetime DEFAULT NULL,
-  `vote_4` int(11) DEFAULT NULL,
-  `vote_4_dt` datetime DEFAULT NULL,
-  `vote_5` int(11) DEFAULT NULL,
-  `vote_5_dt` datetime DEFAULT NULL,
-  `vote_6` int(11) DEFAULT NULL,
-  `vote_6_dt` datetime DEFAULT NULL,
-  `vote_7` int(11) DEFAULT NULL,
-  `vote_7_dt` datetime DEFAULT NULL,
-  `manreg_paper_vote` int(11) DEFAULT NULL,
-  PRIMARY KEY (`vote_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
+DROP TABLE IF EXISTS `categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `competitionId` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `description` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `competitionId` (`competitionId`),
+  CONSTRAINT `categories_ibfk_1` FOREIGN KEY (`competitionId`) REFERENCES `competitions` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `vote_cat_example_history`
+-- Table structure for table `competitions`
 --
 
-CREATE TABLE IF NOT EXISTS `vote_cat_example_history` (
-  `vote_code` char(3) NOT NULL,
-  `vote_1` int(11) DEFAULT NULL,
-  `vote_1_Dt` datetime DEFAULT NULL,
-  `vote_2` int(11) DEFAULT NULL,
-  `vote_2_dt` datetime DEFAULT NULL,
-  `vote_3` int(11) DEFAULT NULL,
-  `vote_3_dt` datetime DEFAULT NULL,
-  `vote_4` int(11) DEFAULT NULL,
-  `vote_4_dt` datetime DEFAULT NULL,
-  `vote_5` int(11) DEFAULT NULL,
-  `vote_5_dt` datetime DEFAULT NULL,
-  `vote_6` int(11) DEFAULT NULL,
-  `vote_6_dt` datetime DEFAULT NULL,
-  `vote_7` int(11) DEFAULT NULL,
-  `vote_7_dt` datetime DEFAULT NULL,
-  `dt` datetime DEFAULT NULL,
-  `manreg_paper_vote` int(11) DEFAULT NULL,
-  KEY `vote_code` (`vote_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-
--- --------------------------------------------------------
+DROP TABLE IF EXISTS `competitions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `competitions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `openTime` datetime NOT NULL,
+  `closeTime` datetime NOT NULL,
+  `testingOpenUntilTime` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `vote_codes`
+-- Table structure for table `config`
 --
 
-CREATE TABLE IF NOT EXISTS `vote_codes` (
-  `vote_code` char(3) NOT NULL,
-  `generated_DT` datetime DEFAULT NULL,
-  PRIMARY KEY (`vote_code`),
-  KEY `vote_code` (`vote_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `vote_codes_allocation_log`
---
-
-CREATE TABLE IF NOT EXISTS `vote_codes_allocation_log` (
-  `vote_code` char(3) NOT NULL,
-  `allocation_DT` datetime DEFAULT NULL,
-  `old_code` char(3) DEFAULT NULL COMMENT '!=NULL, kod ändrad från detta, indikerar att enhet delas av flera användare',
-  `illegal_attempt` int(11) DEFAULT NULL COMMENT '1 = ogiltig kod någon försöker spara röst med',
-  `manreg_paper_vote` int(11) DEFAULT NULL COMMENT 'om allokerad vid reg av pappersröst',
-  KEY `vote_code` (`vote_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Log som visar varje förfrågan mot vote_codes. använd distinc';
-
--- --------------------------------------------------------
+DROP TABLE IF EXISTS `config`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `config` (
+  `currentCompetitionId` int(11) DEFAULT NULL,
+  KEY `currentCompetitionId` (`currentCompetitionId`),
+  CONSTRAINT `config_ibfk_1` FOREIGN KEY (`currentCompetitionId`) REFERENCES `competitions` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `vote_users`
+-- Table structure for table `entries`
 --
 
-CREATE TABLE IF NOT EXISTS `vote_users` (
-  `username` varchar(20) NOT NULL,
-  `password` varchar(20) NOT NULL,
-  `priviledge` int(11) DEFAULT NULL,
+DROP TABLE IF EXISTS `entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `entries` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `categoryId` int(11) DEFAULT NULL,
+  `entryCode` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `categoryCodeUniqueIndex` (`categoryId`,`entryCode`),
+  KEY `categoryCodeIndex` (`categoryId`,`entryCode`),
+  CONSTRAINT `entries_ibfk_1` FOREIGN KEY (`categoryId`) REFERENCES `categories` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=144 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users` (
+  `username` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL,
+  `privilege` int(11) NOT NULL,
   PRIMARY KEY (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='admin users';
-
--- --------------------------------------------------------
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `vote_visitor_stat`
+-- Table structure for table `voteCodes`
 --
 
-CREATE TABLE IF NOT EXISTS `vote_visitor_stat` (
-  `vote_code` char(3) NOT NULL,
-  `gender` varchar(1) DEFAULT NULL,
-  `age` varchar(3) DEFAULT NULL,
-  `location` varchar(50) DEFAULT NULL,
-  `firstSM` int(11) DEFAULT NULL,
-  PRIMARY KEY (`vote_code`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='användarstatistik för skojs skull, valfritt';
+DROP TABLE IF EXISTS `voteCodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `voteCodes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `competitionId` int(11) NOT NULL,
+  `code` char(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `competitionId` (`competitionId`),
+  CONSTRAINT `voteCodes_ibfk_1` FOREIGN KEY (`competitionId`) REFERENCES `competitions` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=606 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `votes`
+--
+
+DROP TABLE IF EXISTS `votes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `votes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `voteCodeId` int(11) NOT NULL,
+  `categoryId` int(11) NOT NULL,
+  `vote1` int(11) DEFAULT NULL,
+  `vote2` int(11) DEFAULT NULL,
+  `vote3` int(11) DEFAULT NULL,
+  `votingMethod` enum('web','manual') NOT NULL,
+  `creationTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `categoryId` (`categoryId`),
+  KEY `vodeCodeId` (`voteCodeId`),
+  KEY `categoryId_2` (`categoryId`,`vote1`),
+  KEY `categoryId_3` (`categoryId`,`vote2`),
+  KEY `categoryId_4` (`categoryId`,`vote3`),
+  CONSTRAINT `votes_ibfk_1` FOREIGN KEY (`categoryId`) REFERENCES `categories` (`id`),
+  CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`voteCodeId`) REFERENCES `voteCodes` (`id`),
+  CONSTRAINT `votes_ibfk_3` FOREIGN KEY (`categoryId`, `vote1`) REFERENCES `entries` (`categoryId`, `entryCode`),
+  CONSTRAINT `votes_ibfk_4` FOREIGN KEY (`categoryId`, `vote2`) REFERENCES `entries` (`categoryId`, `entryCode`),
+  CONSTRAINT `votes_ibfk_5` FOREIGN KEY (`categoryId`, `vote3`) REFERENCES `entries` (`categoryId`, `entryCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-12-09  1:38:50
