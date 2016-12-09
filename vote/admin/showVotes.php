@@ -7,7 +7,7 @@ list($privilegeLevel, $username) = requireLoggedIn(1, true);
 
 $dbAccess = new DbAccess();
 $competition = $dbAccess->getCompetition($_GET['competitionId']);
-
+$openTimes = dbAccess::calcCompetitionTimes($competition);
 ?>
 
 <head>
@@ -20,9 +20,21 @@ $competition = $dbAccess->getCompetition($_GET['competitionId']);
 
 <p>Senast uppdaterad <?=(new DateTime())->format('Y-m-d H:i')?>.
 
-<p><?=$competition['openCloseText']?>
+<p><?=$openTimes['openCloseText']?>
 <?php
+$openTime = $competition['openTime'];
+$now = new DateTime();
+$timeBeforeOpen = date_diff($now, $openTime);
+if ($timeBeforeOpen->invert) {
+    $voteCountStartTime = $openTime;
+    print '<p>Endast röster avlagda efter '.$voteCountStartTime->format('Y-m-d H:i').' räknas med i röstresultatet.';
+} else {
+    $voteCountStartTime = null;
+    print '<p>Alla röster räknas med i röstresultatet.';
+}
+?>
 
+<?php
 $categories = $dbAccess->getCategories($competition['id']);
 
 foreach ($categories as $category) {
@@ -31,7 +43,7 @@ foreach ($categories as $category) {
 <table>
 <tr><th>Öl-nr</th><th>Antal guld</th><th>Antal silver</th><th>Antal brons</th><th>Poäng</th></tr>
 <?php
-    $voteResult = $dbAccess->getVoteResult($category['id']);
+    $voteResult = $dbAccess->getVoteResult($category['id'], $voteCountStartTime);
     foreach ($voteResult as $row) {
 ?>
         <tr>

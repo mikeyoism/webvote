@@ -2,17 +2,10 @@
 
 class DbAccess
 {
-    private $dbConn;
+    private $dbConn = null;
 
     function __construct()
     {
-        $settings = parse_ini_file('config.ini', true);
-        $db = $settings['db'];
-        
-        $this->dbConn = mysqli_connect($db['host'], $db['user'], $db['password'])
-                      or die('Unable to connect to database: ' . mysqli_connect_error());
-        $this->dbConn->select_db($db['database']);
-        $this->dbConn->set_charset('utf8');
     }
 
     function __descruct()
@@ -21,13 +14,27 @@ class DbAccess
         $this->dbConn = 0;
     }
 
+    private function getConnection()
+    {
+        if ($this->dbConn === null) {
+            $settings = parse_ini_file('config.ini', true);
+            $db = $settings['db'];
+            
+            $this->dbConn = mysqli_connect($db['host'], $db['user'], $db['password'])
+                          or die('Unable to connect to database: ' . mysqli_connect_error());
+            $this->dbConn->select_db($db['database']);
+            $this->dbConn->set_charset('utf8');
+        }
+        return $this->dbConn;
+    }
+
     public function login($user, $password)
     {
         $sql = 'SELECT privilege, username '
              .'FROM users '
              .'WHERE username="'.$this->escape($user).'" '
              .'AND password=password("'.$this->escape($password).'")';
-        $result = mysqli_query($this->dbConn, $sql) or die ("login: Query failed: $sql");
+        $result = mysqli_query($this->getConnection(), $sql) or die ("login: Query failed: $sql");
         
         if (mysqli_num_rows($result) != 1) {
             return;
@@ -42,33 +49,53 @@ class DbAccess
     public function getCompetition($id)
     {
         $sql = "SELECT count(*) as c FROM voteCodes WHERE competitionId=$id";
-        $result = $this->dbConn->query($sql) or die ("getCompetition: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getCompetition: Query failed: $sql");
 
         $voteCodeCount = $result->fetch_assoc()['c'];
 
         $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime '
              .'FROM competitions '
              .'WHERE competitions.id='.$this->escape($id);
-        $result = $this->dbConn->query($sql) or die ("getCompetition: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getCompetition: Query failed: $sql");
     
         if ($result->num_rows != 1)
             die("Invalid current competition.");
         $row = $result->fetch_assoc();
 
-        $now = new DateTime();
-
         $openTime = new DateTime($row['openTime']);
-        $timeBeforeOpen = date_diff($now, $openTime);
-
         $closeTime = new DateTime($row['closeTime']);
-        $timeBeforeClose = date_diff($now, $closeTime);
-
         if (is_null($row['testingOpenUntilTime'])) {
             $testingOpenUntilTime = null;
-            $timeBeforeTestingClose = null;
         } else {
             $testingOpenUntilTime = new DateTime($row['testingOpenUntilTime']);
-            $timeBeforeTestingClose = date_diff($now, $testingOpenUntilTime);
+        }
+
+        return array('id' => $id,
+                     'name' => $row['name'],
+                     'openTime' => $openTime,
+                     'closeTime' => $closeTime,
+                     'testingOpenUntilTime' => $testingOpenUntilTime,
+                     'voteCodeCount' => $voteCodeCount);
+    }
+
+    /*
+     * Computes some practical information from the competitino open and close times.
+     * This is separate from getting the competition information itself for the benefit of caching.
+     */
+    public static function calcCompetitionTimes($competition)
+    {
+        $openTime = $competition['openTime'];
+        $closeTime = $competition['closeTime'];
+        $testingOpenUntilTime = $competition['testingOpenUntilTime'];
+        
+        $now = new DateTime();
+        $timeBeforeOpen = date_diff($now, $openTime);
+        $timeBeforeClose = date_diff($now, $closeTime);
+
+        if ($testingOpenUntilTime === null) {
+            $timeBeforeTestingClose = null;
+        } else {
+            $timeBeforeTestingClose = date_diff($now, $competition['testingOpenUntilTime']);
         }
 
         if ($timeBeforeClose->invert) {
@@ -82,25 +109,25 @@ class DbAccess
             $open = true;
             $openCloseText = 'Röstningen öppen för test och stänger om '.
                            self::formatDateInterval($timeBeforeTestingClose).'.';
+            $timeBeforeClose = $timeBeforeTestingClose;
         } else {
             $open = false;
             $openCloseText = 'Röstningen öppnar om '.
                            self::formatDateInterval($timeBeforeOpen).'.';
         }
-        
-        return array('id' => $id,
-                     'name' => $row['name'],
-                     'openTime' => $openTime,
+
+        return array('openTime' => $openTime,
                      'closeTime' => $closeTime,
-                     'voteCodeCount' => $voteCodeCount,
                      'open'=> $open,
                      'openCloseText'=> $openCloseText,
+                     'timeBeforeOpen' => $timeBeforeOpen,
                      'timeBeforeClose' => $timeBeforeClose);
     }
+    
     public function getCurrentCompetition()
     {
         $sql = 'SELECT currentCompetitionId as id FROM config';
-        $result = $this->dbConn->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
         $id = $result->fetch_assoc()['id'];
     
         return $this->getCompetition($id);
@@ -111,14 +138,15 @@ class DbAccess
         $sql = 'update competitions '.
              'set testingOpenUntilTime="'.$time->format('Y-m-d G:i:s').'" '.
              'where id='.$this->escape($competitionId);
-        $stmt = $this->dbConn->prepare($sql) or die ("setCompetitionOpenForTestUntil: prepare failed: $sql");
+        $stmt = $this->getConnection()->prepare($sql)
+              or die ("setCompetitionOpenForTestUntil: prepare failed: $sql");
         $stmt->execute() or die ("setCompetitionOpenForTestUntil: Execute failed: $sql");
     }
 
     public function getCategories($competitionId) {
         $sql = 'select id, name, description from categories '.
              'where competitionId="'.$this->escape($competitionId).'"';
-        $result = $this->dbConn->query($sql) or die ("getCategories: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getCategories: Query failed: $sql");
 
         $categories = array();
         
@@ -128,7 +156,7 @@ class DbAccess
             $description = $row['description'];
 
             $sql = "select entryCode from entries where categoryId=$id order by entryCode";
-            $result2 = $this->dbConn->query($sql) or die ("getCategories: Query failed: $sql");
+            $result2 = $this->getConnection()->query($sql) or die ("getCategories: Query failed: $sql");
             $entries = array_map(function($a) { return $a[0]; }, $result2->fetch_all());
             
             $categories[$id] = array('id' => $id,
@@ -144,7 +172,7 @@ class DbAccess
     public function getCurrentCategories()
     {
         $sql = 'SELECT currentCompetitionId as id FROM config';
-        $result = $this->dbConn->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
         $id = $result->fetch_assoc()['id'];
 
         return $this->getCategories($id);
@@ -158,7 +186,7 @@ class DbAccess
                        array_map(
                            function($c) use ($catId) { return "(null, $catId, $c)"; },
                            $codes));
-        $stmt = $this->dbConn->prepare($sql) or die ("addCategoryEntries: prepare failed: $sql");
+        $stmt = $this->getConnection()->prepare($sql) or die ("addCategoryEntries: prepare failed: $sql");
         $stmt->execute() or die ("addCategoryEntries: Execute failed: $sql");
     }
 
@@ -166,7 +194,7 @@ class DbAccess
         $catId = $this->escape($categoryId);
         $sql = "DELETE FROM entries WHERE categoryId=$catId AND entryCode IN ("
              . implode(',', $codes) .')';
-        $stmt = $this->dbConn->prepare($sql) or die ("removeCategoryEntries: prepare failed: $sql");
+        $stmt = $this->getConnection()->prepare($sql) or die ("removeCategoryEntries: prepare failed: $sql");
         $stmt->execute() or die ("removeCategoryEntries: Execute failed: $sql");
     }
 
@@ -182,7 +210,7 @@ class DbAccess
         $sql = 'SELECT code FROM voteCodes '.
              'WHERE competitionId='.$this->escape($competitionId).' '.
              'ORDER BY code';
-        $result = $this->dbConn->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
 
         $array = $result->fetch_all(MYSQLI_NUM);
 
@@ -198,7 +226,7 @@ class DbAccess
                        array_map(
                            function($c) use ($compId) { return "(null, $compId, '$c')"; },
                            $codes));
-        $stmt = $this->dbConn->prepare($sql) or die ("insertVoteCodes: prepare failed: $sql");
+        $stmt = $this->getConnection()->prepare($sql) or die ("insertVoteCodes: prepare failed: $sql");
         $stmt->execute() or die ("insertVoteCodes: Execute failed: $sql");
     }
 
@@ -212,7 +240,7 @@ class DbAccess
              'JOIN voteCodes VC ON VC.competitionId=C.id '.
              'WHERE VC.code="'.$this->escape($voteCode).'"';
              
-        $result = $this->dbConn->query($sql) or die ("checkVoteCode: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("checkVoteCode: Query failed: $sql");
         if ($result->num_rows != 1) {
             return 0;
         }
@@ -227,10 +255,12 @@ class DbAccess
         $vote2 = count($votes) >= 2 ? $votes[1] : 'null';
         $vote3 = count($votes) >= 3 ? $votes[2] : 'null';
         
-        $sql = 'insert into votes (id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) '.
-             'values (null, '.$voteCodeId.', '.$this->escape($categoryId).', '.$vote1.', '.$vote2.', '.$vote3.', "web", null)';
+        $sql = 'insert into votes '.
+             '(id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) '.
+             'values (null, '.$voteCodeId.', '.
+                  $this->escape($categoryId).', '.$vote1.', '.$vote2.', '.$vote3.', "web", null)';
         
-        $stmt = $this->dbConn->prepare($sql) or die ("insertVote: prepare failed: $sql");
+        $stmt = $this->getConnection()->prepare($sql) or die ("insertVote: prepare failed: $sql");
         $stmt->execute() or die ("insertVote: Execute failed: $sql");
     }
 
@@ -243,7 +273,7 @@ class DbAccess
              '         group by voteCodeId, categoryId ) T '.
              '  on V.id=T.id';
 
-        $result = $this->dbConn->query($sql) or die ("getCurrentVotes: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getCurrentVotes: Query failed: $sql");
 
         $votes = array();
         while ($row = $result->fetch_assoc()) {
@@ -253,13 +283,19 @@ class DbAccess
         return $votes;
     }
 
-    public function getVoteResult($categoryId) {
+    public function getVoteResult($categoryId, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="'.$voteCountStartTime->format('Y-m-d G:i:s').'"';
+        }
         $sql = 'select vote1, vote2, vote3 '.
              '  from votes V '.
              '  join ( select max(id) id from votes where categoryId='.
-                                        $this->escape($categoryId).' group by voteCodeId ) T '.
+                       $this->escape($categoryId).$extraCond.' group by voteCodeId ) T '.
              '  on V.id=T.id';
-        $result = $this->dbConn->query($sql) or die ("getVoteResults: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getVoteResults: Query failed: $sql");
 
         $voteCounts = array();
         while ($row = $result->fetch_assoc()) {
@@ -291,7 +327,7 @@ class DbAccess
     
     private function escape($s)
     {
-        return $this->dbConn->real_escape_string($s);
+        return $this->getConnection()->real_escape_string($s);
     }
 
     private static function formatDateInterval($diff)

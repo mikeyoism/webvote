@@ -2,8 +2,14 @@
 
 session_start();
 include '../php/common.inc';
+
 $dbAccess = new DbAccess();
-$competition = $dbAccess->getCurrentCompetition();
+
+$competition = apc_fetch('competition');
+if ($competition === false) {
+    $competition = $dbAccess->getCurrentCompetition();
+    apc_store('competition', $competition, 30); // Cache for 30 seconds.
+}
 
 define("SETTING_SYSSTATUS_INTERVAL", 10000);
 
@@ -12,14 +18,13 @@ if (isset($_POST['operation']))
     $operation = $_POST['operation'];
     if ($operation == 'sysstatus')
     {
-        $source = filter_var($_POST['source'], FILTER_SANITIZE_STRING);
         $clientInterval = (int)$_POST['my_interval'];
-        return ax_sysstatus($source, $clientInterval);
+        ax_sysstatus($competition, $clientInterval);
     }
     else if ($operation == "reread")
     {
         $postedVoteCode = filter_var($_POST['vote_code'], FILTER_SANITIZE_STRING);
-        return ax_reread($postedVoteCode);
+        ax_reread($dbAccess, $competition, $postedVoteCode);
     }
     else if($operation == "post_vote" )
     {
@@ -27,7 +32,7 @@ if (isset($_POST['operation']))
         $postedVoteCode = filter_var($_POST['vote_code'], FILTER_SANITIZE_STRING);
 
         $category = $dbAccess->getCategories($competition['id'])[$categoryId];
-        return ax_post_vote($category, $postedVoteCode);
+        ax_post_vote($dbAccess, $competition, $category, $postedVoteCode);
     }
     else
     {
@@ -43,10 +48,8 @@ else
  * SYSSTATUS
  * meddelar klient om tävling är öppen, håller på att stänga etc
  */
-function ax_sysstatus($source, $clientInterval)
+function ax_sysstatus($competition, $clientInterval)
 {
-    global $competition;
-    
     header('Content-Type: application/json', true);
     $jsonReply = array();
     
@@ -66,7 +69,8 @@ function ax_sysstatus($source, $clientInterval)
     else if ($clientInterval == 0) {
 	    $jsonReply['msgtype'] = 'stop';
     } else {
-        $jsonReply['usrmsg'] = '<p>'.$competition['openCloseText'];
+        $openTimes = dbAccess::calcCompetitionTimes($competition);
+        $jsonReply['usrmsg'] = '<p>'.$openTimes['openCloseText'];
         $secondsToClose = $competition['closeTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
         if ($secondsToClose < 600) {
             $jsonReply['msgtype'] = 'error';
@@ -76,17 +80,14 @@ function ax_sysstatus($source, $clientInterval)
     }
 
     echo  json_encode($jsonReply);
-    return true;
 }
 
 
 /*
  * REREAD (votes)
  */
-function ax_reread($postedVoteCode)
+function ax_reread($dbAccess, $competition, $postedVoteCode)
 {
-    global $competition, $dbAccess;
-    
     $jsonReply = array();
 
     $voteCodeId = $dbAccess->checkVoteCode($postedVoteCode);
@@ -111,17 +112,15 @@ function ax_reread($postedVoteCode)
 
     header('Content-Type: application/json', true);
     echo  json_encode($jsonReply);
-    return true;
 }
 
 /*
  * POST_VOTE
  */
-function ax_post_vote($category, $voteCode)
+function ax_post_vote($dbAccess, $competition, $category, $voteCode)
 {
-    global $competition, $dbAccess;
-    
-    if (! $competition['open']) {
+    $openTimes = dbAccess::calcCompetitionTimes($competition);
+    if ($openTimes['open'] === false) {
         echo "Röstningen är STÄNGD!";
         return;
     }
@@ -170,5 +169,4 @@ function ax_post_vote($category, $voteCode)
     {
         if ($vote > 0) $_SESSION['vote_{$key}_{$category}'] = $vote;
     }
-    return true;
 }

@@ -14,6 +14,7 @@ if (isset($_POST['login'])) {
 
 list($privilegeLevel, $username) = requireLoggedIn(1, false);
 $competition = $dbAccess->getCurrentCompetition();
+$openTimes = dbAccess::calcCompetitionTimes($competition);
 
 if (isset($_POST['generateVoteCodes'])) {
     if ($privilegeLevel < 2) {
@@ -68,11 +69,11 @@ if ($privilegeLevel < 1) {
 }
 ?>
 
-<p>Aktuell tävling är <?= $competition['name'] ?>.  Tävlingen öppnar för röstning <?= $competition['openTime']->format('Y-m-d H:i') ?> och stänger <?= $competition['closeTime']->format('Y-m-d H:i') ?>.
+<p>Aktuell tävling är <?= $competition['name'] ?>.  Tävlingen öppnar för röstning <?= $openTimes['openTime']->format('Y-m-d H:i') ?> och stänger <?= $openTimes['closeTime']->format('Y-m-d H:i') ?>.
 
-<p><?=$competition['openCloseText']?>
+<p><?=$openTimes['openCloseText']?>
 <?php
-if (!$competition['open'] && !$competition['timeBeforeOpen']->invert) {
+if (!$openTimes['open'] && !$openTimes['timeBeforeOpen']->invert) {
     print "<form method='post'><button type='submit' name='openForTest'>".
         "Öppna 1 timme för test</button></form>";
 }

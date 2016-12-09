@@ -109,7 +109,6 @@ votejs = function()
             cache : false,
             data: {
                 operation: 		'reread', 
-                source:         	'index.php',
                 vote_code:		$('#vote_code').val()
             },
 
@@ -163,7 +162,6 @@ votejs = function()
             cache : false,
             data: {
                 operation: 	'sysstatus', 
-                source:    	'index.php',
                 my_interval: sysstatusInterval
             },
 	    
@@ -289,8 +287,7 @@ votejs = function()
         var vdata = {
             vote_code: 		vote_code,
             category: 		category,
-            operation: 		'post_vote',
-            source:         	'index.php'
+            operation: 		'post_vote'
         };
         $.each(votes, function (index, vote) { // append votes
             vdata['vote_' + (index+1)] = vote;
