@@ -112,7 +112,7 @@ class DbAccess
              'set testingOpenUntilTime="'.$time->format('Y-m-d G:i:s').'" '.
              'where id='.$this->escape($competitionId);
         $stmt = $this->dbConn->prepare($sql) or die ("setCompetitionOpenForTestUntil: prepare failed: $sql");
-        $stmt->execute() or die ("insertVote: Execute failed: $sql");
+        $stmt->execute() or die ("setCompetitionOpenForTestUntil: Execute failed: $sql");
     }
 
     public function getCategories($competitionId) {
@@ -221,8 +221,12 @@ class DbAccess
         return $id;
     }
 
-    public function insertVote($voteCodeId, $categoryId, $vote1, $vote2, $vote3)
+    public function insertVote($voteCodeId, $categoryId, $votes)
     {
+        $vote1 = count($votes) >= 1 ? $votes[0] : 'null';
+        $vote2 = count($votes) >= 2 ? $votes[1] : 'null';
+        $vote3 = count($votes) >= 3 ? $votes[2] : 'null';
+        
         $sql = 'insert into votes (id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) '.
              'values (null, '.$voteCodeId.', '.$this->escape($categoryId).', '.$vote1.', '.$vote2.', '.$vote3.', "web", null)';
         
@@ -274,14 +278,16 @@ class DbAccess
 
     private function addVote(&$voteCounts, $level, $vote)
     {
-        if (array_key_exists($vote, $voteCounts)) {
-            $count = $voteCounts[$vote];
-        } else {
-            $count = array('entryId' => $vote, 'vote1' => 0, 'vote2' => 0, 'vote3' => 0);
+        if (!is_null($vote)) {
+            if (array_key_exists($vote, $voteCounts)) {
+                $count = $voteCounts[$vote];
+            } else {
+                $count = array('entryId' => $vote, 'vote1' => 0, 'vote2' => 0, 'vote3' => 0);
+            }
+            $count[$level]++;
+            $voteCounts[$vote] = $count;
         }
-        $count[$level]++;
-        $voteCounts[$vote] = $count;
-}
+    }
     
     private function escape($s)
     {
@@ -371,22 +377,19 @@ function parseVote($categoryEntries, $vote)
  */
 function checkVoteRules($ivotes, $votesPerCategory)
 {
-    if (count($ivotes) != $votesPerCategory) {
-        return "Exakt $votesPerCategory röster krävs.";
+    if (count($ivotes) == 0) {
+        return "Minst en röst krävs.";
+    }
+
+    if (count($ivotes) > $votesPerCategory) {
+        return "Maximalt $votesPerCategory kan anges.";
     }
     
-    if (count(array_unique($ivotes)) != $votesPerCategory) {
+    if (count(array_unique($ivotes)) != count($ivotes)) {
         return "Max en röst per öl.";
     }
     
-    if (array_search(-1, $ivotes)) {
-        return "Tomma röster är ej tillåtna.";
-    }
-
     return ''; 
 }
-
-define("SETTING_SYSSTATUS_INTERVAL", 10000);
-define("CONST_SETTING_VOTES_PER_CATEGORY", 3);
 
 ?>

@@ -95,9 +95,8 @@ function printInfobar(elemId, msgtype, usrmsg)
 votejs = function()
 {
     var MAX_SAME_VOTES = 1;
-    var DUPE_VOTE_REQUIRE_ALL = true;
     var VOTES_PER_CAT = 3;
-    var VOTES_REQUIRE_ALL = true;
+    var VOTES_REQUIRE_ALL = false;
     var sysstatusInterval = 10000; //todo uppercase
     var sysstatustmr = null;
     
@@ -209,7 +208,7 @@ votejs = function()
         var votes = [];
         var checkfail = false;
         var votes_filled = 0;
-         
+        
         //kontrollera inputs längder i varje li (inputs är numeric så "om siffra" behöver inte kollas)
         //sätt dold .error div med text vid fel
         //annars lägg in värde i votes
@@ -239,70 +238,62 @@ votejs = function()
                     }
                     votes.push(voteval);
                 }
-
-           }
+		
+            }
         });
         
-        if (MAX_SAME_VOTES != -1 || VOTES_REQUIRE_ALL)
-	{
-            var arrcheck = votes.slice(0); //clone
-            var identicalmaxcount = 1;
-            var identicalmaxcount_max = 1;
-            var missrequired = false;
-            //check that identical votes doesn't exceed max allowed.
-            while (arrcheck.length > 0) {
-                var v = arrcheck.pop();
-                var cc;
-                if (v != ""){ //ignore empty votes
-                    //count & remove all identical
-                    while (arrcheck.length > 0 && (cc = arrcheck.indexOf(v)) != -1) {
-                        identicalmaxcount++;
-                        arrcheck.splice(cc,1); 
-                    }
-                    if (identicalmaxcount > identicalmaxcount_max)
-                        identicalmaxcount_max = identicalmaxcount;
-                    identicalmaxcount = 1; //ready for next vote-number
+        var arrcheck = votes.slice(0); // clone
+        var identicalCount = 1;
+        var identicalCount_max = 1;
+        var missrequired = false;
+	
+        //check that identical votes doesn't exceed max allowed.
+        while (arrcheck.length > 0) {
+            var v = arrcheck.pop();
+            var cc;
+            if (v != "") // ignore empty votes
+	    { 
+                //count & remove all identical
+                while (arrcheck.length > 0 && (cc = arrcheck.indexOf(v)) != -1)
+		{
+                    identicalCount++;
+                    arrcheck.splice(cc, 1); 
                 }
-                else if (VOTES_REQUIRE_ALL === true) {
-                    missrequired = true;
-                }
+                if (identicalCount > identicalCount_max)
+                    identicalCount_max = identicalCount;
+                identicalCount = 1; // ready for next vote-number
             }
-            if (missrequired) {
-                checkfail = true;
-                statusId.html('Alla röster måste fyllas i, försök igen');
-                statusId.fadeToggle();
-		
-            }
-            if (identicalmaxcount_max > MAX_SAME_VOTES && MAX_SAME_VOTES != -1){
-                checkfail = true;
-                if (MAX_SAME_VOTES == 1) { 
-                    statusId.html('Du kan bara rösta ' + MAX_SAME_VOTES + ' gång på samma öl');
-                }
-                else
-                    statusId.html('Du kan rösta max ' + MAX_SAME_VOTES + ' gånger på samma öl');
-                
-                statusId.fadeToggle();
-                
-                
-            }
-            else if (identicalmaxcount_max > 1 && votes_filled != VOTES_PER_CAT && DUPE_VOTE_REQUIRE_ALL) {
-                checkfail = true;
-                statusId.html('Alla ' + VOTES_PER_CAT + ' röster måste fyllas om du röstar +1 gång på samma öl');
-                statusId.fadeToggle();		    
-		
+            else if (VOTES_REQUIRE_ALL === true)
+	    {
+                missrequired = true;
             }
         }
-        
-        if (checkfail) 
+        if (missrequired)
+	{
+            checkfail = true;
+            statusId.html('Alla röster måste fyllas i, försök igen');
+            statusId.fadeToggle();
+        }
+        if (identicalCount_max > MAX_SAME_VOTES)
+	{
+            checkfail = true;
+            statusId.html('Max ' + MAX_SAME_VOTES + ' röster per öl');
+            statusId.fadeToggle();
+        }
+	
+        if (checkfail)
+	{
             return false;
+	}
+	
         var vdata = {
-                vote_code: 		vote_code,
-                category: 		category,
-                operation: 		'post_vote',
-                source:         	'index.php'
+            vote_code: 		vote_code,
+            category: 		category,
+            operation: 		'post_vote',
+            source:         	'index.php'
         };
-        $.each(votes, function (index, vote) { //append votes
-                 vdata['vote_' + (index+1)] = vote;
+        $.each(votes, function (index, vote) { // append votes
+            vdata['vote_' + (index+1)] = vote;
         });
         $.ajax({  
             type: "POST",  
@@ -310,20 +301,11 @@ votejs = function()
             dataType: 'html',
             cache : false,
             data : vdata,
-            //data: {
-            //    vote_code: 		vote_code,
-            //    vote_1:		votes[0], //sup3
-            //    vote_2:		votes[1],
-            //    vote_3:		votes[2],
-            //    category: 		category, 
-            //    operation: 		'post_vote',
-            //    source:         	'index.php'
-            //},
-
+	    
             success: function(response) {
                 statusId.html(response);
                 statusId.fadeToggle();
-
+		
             },
             error: function(xhr, status, thrown) {
                 statusId.html("serverfel: " + status);
@@ -331,10 +313,10 @@ votejs = function()
             }  
         });
         return false;  
-        
     };
     
-    function init(){
+    function init()
+    {
         reread();
         //uppdatera systemstatus kontinuerligt
         sysstatustmr = window.setInterval(sysstatus, sysstatusInterval);
@@ -343,9 +325,8 @@ votejs = function()
     
     return {
         init : init,
-        reread: reread,
+        reread : reread,
         sysstatus : sysstatus,
         voteFormEval : voteFormEval
     }    
-
 }();

@@ -5,6 +5,8 @@ include '../php/common.inc';
 $dbAccess = new DbAccess();
 $competition = $dbAccess->getCurrentCompetition();
 
+define("SETTING_SYSSTATUS_INTERVAL", 10000);
+
 if (isset($_POST['operation']))
 {
     $operation = $_POST['operation'];
@@ -160,7 +162,7 @@ function ax_post_vote($category, $voteCode)
         return;
     }
 
-    $dbAccess->insertVote($voteCodeId, $category['id'], $ivotes[0], $ivotes[1], $ivotes[2]);
+    $dbAccess->insertVote($voteCodeId, $category['id'], $ivotes);
     
     echo "Rösterna har registrerats";
 

@@ -18,16 +18,10 @@ $competition = $dbAccess->getCompetition($_GET['competitionId']);
 <body>
 <h1>Röstningsresultat för <?=$competition['name']?></h1>
 
-Senast uppdaterad <?=(new DateTime())->format('Y-m-d H:i')?>.
-<?php
+<p>Senast uppdaterad <?=(new DateTime())->format('Y-m-d H:i')?>.
 
-if ($competition['open']) {
-    print '<p>Tävlingen stänger om '.formatDateInterval($competition['timeBeforeClose']).'.';
-} else if ($competition['timeBeforeOpen'] == NULL) {
-    print '<p>Tävlingen har stängt.';
-} else {
-    print '<p>Tävlingen öppnar om '.formatDateInterval($competition['timeBeforeOpen']).'.';
-}
+<p><?=$competition['openCloseText']?>
+<?php
 
 $categories = $dbAccess->getCategories($competition['id']);
 
