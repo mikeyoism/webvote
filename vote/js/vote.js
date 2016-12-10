@@ -1,6 +1,6 @@
 /*Webvote -*- coding: utf-8 -*-
  *Copyright (C) 2014 Mikael Josefsson
- *Modified 2016 Staffan Ulfberg
+ *Modifications copyright 2016 Staffan Ulfberg
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,40 +25,28 @@
 
 $(document).on('pageinit',"#votepage",function(event)
 {
-    var statusDiv = $('#statusdiv');
-    var sysbar = $('#sysbar');
-    sysbar.hide();
+    $('#sysbar').hide();
     $('.error').hide();
     $('#vote_code').focus();
-    
-    if (supports_html5_storage())
+
+    var voteCode = null;
+    if (supportsHtml5Storage())
     {
-        var ls_vote_code = localStorage["vote_code"];
-        if (ls_vote_code != "")
-            $('#vote_code').val(ls_vote_code);
+        voteCode = localStorage.getItem("vote_code");
+        if (voteCode != null) {
+            $('#vote_code').val(voteCode);
+	}
     }
-    //onload get any saved votes + get sys status (if competition is open etc)
     votejs.init();
-   
+    rereadOrSetMessage(voteCode);
+
     $('#vote_code').on('keyup', function(e)
     {
-        var vote_code = $(this).val();
-        
-        if (vote_code.length < 6) {
-            
-            statusDiv.html('<div class="infobar infobar-neutral" data-mini="true">Välkommen! ange först din röstkod.</div>');
-            return false;
-        }
-        else
-	{
-            var ajax_load = "<img src='js/loading.gif' alt='loading...' />";
-            statusDiv.html(ajax_load);
-            votejs.reread();
-            
-        }
+        var voteCode = $(this).val();
+        rereadOrSetMessage(voteCode);
         return false;
     });
-    //submittar något av våra voteforms
+
     $('.voteform_trigger').on('submit',function(e)
     {  
         e.preventDefault();
@@ -67,8 +55,21 @@ $(document).on('pageinit',"#votepage",function(event)
     });
 });
 
+function rereadOrSetMessage(voteCode) {
+    var statusDiv = $('#statusdiv');
+    if (voteCode == null || voteCode.length != 6) {
+        
+        statusDiv.html('<div class="infobar infobar-neutral" data-mini="true">Välkommen! Ange din röstkod.</div>');
+    }
+    else
+    {
+        var ajax_load = "<img src='js/loading.gif' alt='loading...' />";
+        statusDiv.html(ajax_load);
+        votejs.reread(voteCode);
+    }
+}
 
-function supports_html5_storage() {
+function supportsHtml5Storage() {
     try {
         return 'localStorage' in window && window['localStorage'] !== null;
     } catch (e) {
@@ -89,7 +90,6 @@ function printInfobar(elemId, msgtype, usrmsg)
             $(elemId).html('<div class="infobar infobar-error" data-mini="true">' + usrmsg + '</div>');
         $(elemId).show();			
     }	    
-    
 }
 
 votejs = function()
@@ -100,51 +100,41 @@ votejs = function()
     var sysstatusInterval = 10000; //todo uppercase
     var sysstatustmr = null;
     
-    function reread()
+    function reread(voteCode)
     {
         $.ajax({  
             type: "POST",  
             url: "./php/vote_ajax.php",  
-            dataType: 'json', //note: kräver post
+            dataType: 'json',
             cache : false,
             data: {
-                operation: 		'reread', 
-                vote_code:		$('#vote_code').val()
+                operation: 'reread', 
+                vote_code: voteCode
             },
 
             success: function(response) {
-                var disinput = true;
+                var disableInput = true;
                 if (response.msgtype == "ok")
 		{
                     $('#vote_code').val(response.vote_code); //uppercased etc
-                    if (supports_html5_storage()) 
+                    if (supportsHtml5Storage())
+		    {
                         localStorage['vote_code'] = response.vote_code;
-                    disinput = false;
+		    }
+                    disableInput = false;
                 }
-                else if (response.msgtype == "ok-cached")
-		{
-                    if (supports_html5_storage()) 
-                        localStorage['vote_code'] = response.vote_code;
-                    disinput = false;
-                }
-                if (response.usrmsg != null)
-		{
-                    printInfobar('#statusdiv', response.msgtype, response.usrmsg);
-                }
+		
+                printInfobar('#statusdiv', response.msgtype, response.usrmsg);
+
 		sys_cat = response.sys_cat;
-                $.each(sys_cat,function(index,value)
+                $.each(sys_cat, function(index, value)
 		{
                     for (i = 1; i <= VOTES_PER_CAT; i++)
 		    {
-                        $('#' + value + '_vote' + i).prop( "disabled", disinput); //prevent input on bad code
-                        $('#' + value + '_vote' + i).val(response['vote_' + i + '_' + value]); //set previusly saved votes, ie  $('#lager_vote1').val(response.vote_1_lager); etc
+                        $('#' + value + '_vote' + i).prop( "disabled", disableInput); // prevent input on bad vote code
+                        $('#' + value + '_vote' + i).val(response['vote_' + i + '_' + value]);
                     }
                 });
-                $('#submit_stat').prop("disabled", disinput);
-                
-                var errortags = $('.error');
-                errortags.html("");
-                errortags.hide();
 
             },
             error: function(xhr, status, thrown)
@@ -161,7 +151,7 @@ votejs = function()
             dataType: 'json', 
             cache : false,
             data: {
-                operation: 	'sysstatus', 
+                operation: 'sysstatus', 
                 my_interval: sysstatusInterval
             },
 	    
@@ -171,24 +161,20 @@ votejs = function()
                     $("#competition_header").text(response.competition_name);
 		}
 		
-                if (response.msgtype == "interval" && sysstatustmr != null)
+                if (response.msgtype == "interval")
                 {
                     clearInterval(sysstatustmr);
                     sysstatusInterval = response.interval;
                     sysstatustmr = window.setInterval(sysstatus,response.interval)
                 }
-                else if (response.msgtype == "stop")
-		{
-                    $('#sysbar').hide();
-                    REQUEST_SYSSTATUS = false;
-                }
                 else if (response.usrmsg.length > 0)
 		{
                     printInfobar('#sysbar', response.msgtype, response.usrmsg);
                 }
-
                 else
+		{
                     $('#sysbar').hide();
+		}
             },
             error: function(xhr, status, thrown) {
                 alert("serverfel, sysstatus: " + status + xhr + thrown); 
@@ -199,27 +185,26 @@ votejs = function()
     function voteFormEval(formref){
         var $formId = $(formref);
         
-        
-        var vote_code = $("#vote_code").val(); //inte i detta form
-        var category = $('.vote_category',$formId).attr('id').toLowerCase(); ///lager,ale etc
+        var voteCode = $("#vote_code").val(); // inte i detta form
+        var category = $('.vote_category',$formId).attr('id');
         var statusId = $('.formstatus_trigger',$formId);
         var votes = [];
-        var checkfail = false;
-        var votes_filled = 0;
+	var checkfail = false;
         
-        //kontrollera inputs längder i varje li (inputs är numeric så "om siffra" behöver inte kollas)
-        //sätt dold .error div med text vid fel
-        //annars lägg in värde i votes
+        // kontrollera inputs längder i varje li (inputs är numeric så "om siffra" behöver inte kollas)
+        // sätt dold .error div med text vid fel
+        // annars lägg in värde i votes
         $('li',$formId).each(function(){
             //obs: $this refererar till li, går ej backa längre upp i DOM än $this
             var voteInput = $(this).find('input');
-            if (voteInput != null){ //exkl li's utan input (submit li)
+
+	    if (voteInput != null) //exkl li's utan input (submit li)
+	    { 
                 var voteval = voteInput.val();
                 if (typeof voteval != 'undefined')
                 {    
-                    if (false && voteval != null && voteval.length != 3 && voteval.length > 0)
+                    if (voteval != null && voteval.length != 3 && voteval.length > 0)
                     {
-                        checkfail = true;
                         var errortag = $(this).find('.error');
                         if (errortag != null)
                         {
@@ -230,79 +215,84 @@ votejs = function()
 			{
                             console.log('check html, missing an error tag for ' + category);
 			}
-                    }
-                    else if (voteval != null && voteval.length != 0) {
-                        votes_filled++;
+			checkfail = true;
                     }
                     votes.push(voteval);
                 }
 		
             }
         });
+
+	if (checkfail)
+	{
+	    return false;
+	}
         
         var arrcheck = votes.slice(0); // clone
-        var identicalCount = 1;
-        var identicalCount_max = 1;
-        var missrequired = false;
 	
-        //check that identical votes doesn't exceed max allowed.
+        // check that identical votes doesn't exceed max allowed.
         while (arrcheck.length > 0) {
             var v = arrcheck.pop();
             var cc;
             if (v != "") // ignore empty votes
 	    { 
+		var identicalCount = 1;
+		
                 //count & remove all identical
                 while (arrcheck.length > 0 && (cc = arrcheck.indexOf(v)) != -1)
 		{
                     identicalCount++;
                     arrcheck.splice(cc, 1); 
                 }
-                if (identicalCount > identicalCount_max)
-                    identicalCount_max = identicalCount;
-                identicalCount = 1; // ready for next vote-number
+                if (identicalCount > MAX_SAME_VOTES)
+		{
+		    statusId.html('Högst ' + MAX_SAME_VOTES + ' röst(er) per öl');
+		    statusId.fadeToggle();
+		    return false;
+		}
             }
             else if (VOTES_REQUIRE_ALL === true)
 	    {
-                missrequired = true;
+		statusId.html('Alla röster måste fyllas i, försök igen');
+		statusId.fadeToggle();
+		return false;
             }
         }
-        if (missrequired)
-	{
-            checkfail = true;
-            statusId.html('Alla röster måste fyllas i, försök igen');
-            statusId.fadeToggle();
-        }
-        if (identicalCount_max > MAX_SAME_VOTES)
-	{
-            checkfail = true;
-            statusId.html('Högst ' + MAX_SAME_VOTES + ' röst(er) per öl');
-            statusId.fadeToggle();
-        }
-	
-        if (checkfail)
-	{
-            return false;
-	}
-	
+
         var vdata = {
-            vote_code: 		vote_code,
-            category: 		category,
-            operation: 		'post_vote'
+            vote_code: voteCode,
+            category: category,
+            operation: 'post_vote'
         };
         $.each(votes, function (index, vote) { // append votes
             vdata['vote_' + (index+1)] = vote;
         });
         $.ajax({  
-            type: "POST",  
+	    type: "POST",  
             url: "./php/vote_ajax.php",  
-            dataType: 'html',
+            dataType: 'json', 
             cache : false,
             data : vdata,
 	    
             success: function(response) {
-                statusId.html(response);
+		if (response.resetVoteCode) {
+                    $('#vote_code').val('');
+                    if (supportsHtml5Storage())
+		    {
+                        localStorage['vote_code'] = '';
+		    }
+
+		    sys_cat = response.sys_cat;
+                    $.each(sys_cat, function(index, value)
+			   {
+			       for (i = 1; i <= VOTES_PER_CAT; i++)
+			       {
+				   $('#' + value + '_vote' + i).val('');
+			       }
+			   });
+		}
+                statusId.html(response.usrmsg);
                 statusId.fadeToggle();
-		
             },
             error: function(xhr, status, thrown) {
                 statusId.html("serverfel: " + status);
@@ -314,7 +304,6 @@ votejs = function()
     
     function init()
     {
-        reread();
         //uppdatera systemstatus kontinuerligt
         sysstatustmr = window.setInterval(sysstatus, sysstatusInterval);
         sysstatus();

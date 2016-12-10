@@ -1,5 +1,5 @@
-<?php
-/* -*- coding: utf-8 -*-
+<?php // -*- coding: utf-8 -*-
+/*
  
  * ------------------------------------------------------------------------
  *
@@ -120,7 +120,7 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
     <div class="ui-block-a"  data-mini="true" style="padding-right:0.5em">
 	<ul data-role="listview" data-inset="true" >
 	    <li data-role="fieldcontain" id="statusdiv">
-		<div class="infobar infobar-neutral" data-mini="true">Välkommen! ange först din röstkod.</div>
+		<div class="infobar infobar-neutral" data-mini="true">Välkommen!</div>
 	    </li> 
 	</ul>
     </div>
