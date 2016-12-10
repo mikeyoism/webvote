@@ -3,6 +3,9 @@
 session_start();
 include '../php/common.inc';
 
+define("SETTING_SYSSTATUS_INTERVAL", 10000);
+define("SETTING_VOTES_PER_CATEGORY", 3);
+
 $dbAccess = new DbAccess();
 
 $competition = apc_fetch('competition');
@@ -10,8 +13,6 @@ if ($competition === false) {
     $competition = $dbAccess->getCurrentCompetition();
     apc_store('competition', $competition, 30); // Cache for 30 seconds.
 }
-
-define("SETTING_SYSSTATUS_INTERVAL", 10000);
 
 if (isset($_POST['operation']))
 {
@@ -132,22 +133,30 @@ function ax_post_vote($dbAccess, $competition, $category, $voteCode)
     }
     
     $ivotes = array(); // integers
-    
-    $vote_count = 0;
     $filled_votes = 0;
-    // client implementation is responsible for sending empty POSTS (ie not null) for all votes not filled in
-    while (isset($_POST['vote_' . ($vote_count + 1)])) {
-        $vote = filter_var($_POST['vote_' . ($vote_count + 1)], FILTER_SANITIZE_STRING);
-
-        list($ivote, $errorString) = parseVote($category['entries'], $vote);
-        if ($ivote == 0) {
-            echo "Röst rad #$vote_count,  $ivote: $errorString";
-            return;
-        } else if ($ivote != -1) {
-            $filled_votes++;
-            $ivotes[$vote_count] = $ivote;
+    $duplicate = false;
+    
+    for ($i = 1; $i <= SETTING_SYSSTATUS_INTERVAL; $i++) {
+        if (isset($_POST["vote_$i"])) {
+            $vote = filter_var($_POST["vote_$i"], FILTER_SANITIZE_STRING);
+        } else {
+            $vote = '';
         }
-        $vote_count++;
+            
+        list($ivote, $errorString) = parseVote($category['entries'], $vote);
+        if ($ivote == -1) {
+            echo "Röst rad #$i: $errorString";
+            return;
+        } else if ($ivote != 0) {
+            if (array_search($ivote, $ivotes)) {
+                echo "Högst en röst per öl.";
+                return;
+            }
+            array_push($ivotes, $ivote);
+            $filled_votes++;
+        } else {
+            array_push($ivotes, null);
+        }
     }
     
     if ($filled_votes == 0) {
@@ -155,18 +164,7 @@ function ax_post_vote($dbAccess, $competition, $category, $voteCode)
         return false;
     }
 
-    $errorStr = checkVoteRules($ivotes, 3);
-    if ($errorStr != '') {
-        echo $retStr;
-        return;
-    }
-
     $dbAccess->insertVote($voteCodeId, $category['id'], $ivotes);
     
     echo "Rösterna har registrerats";
-
-    foreach ($ivotes as $key => $vote)
-    {
-        if ($vote > 0) $_SESSION['vote_{$key}_{$category}'] = $vote;
-    }
 }

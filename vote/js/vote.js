@@ -275,7 +275,7 @@ votejs = function()
         if (identicalCount_max > MAX_SAME_VOTES)
 	{
             checkfail = true;
-            statusId.html('Max ' + MAX_SAME_VOTES + ' röster per öl');
+            statusId.html('Högst ' + MAX_SAME_VOTES + ' röst(er) per öl');
             statusId.fadeToggle();
         }
 	

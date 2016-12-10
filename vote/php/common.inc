@@ -197,7 +197,6 @@ class DbAccess
         $stmt = $this->getConnection()->prepare($sql) or die ("removeCategoryEntries: prepare failed: $sql");
         $stmt->execute() or die ("removeCategoryEntries: Execute failed: $sql");
     }
-
     
     // Might change in future -- probably hard coded at some other places too right now.
     public function getCurrentVoteWeightAndLabels()
@@ -251,9 +250,9 @@ class DbAccess
 
     public function insertVote($voteCodeId, $categoryId, $votes)
     {
-        $vote1 = count($votes) >= 1 ? $votes[0] : 'null';
-        $vote2 = count($votes) >= 2 ? $votes[1] : 'null';
-        $vote3 = count($votes) >= 3 ? $votes[2] : 'null';
+        $vote1 = $votes[0] === null ? 'null' : $votes[0];
+        $vote2 = $votes[1] === null ? 'null' : $votes[1];
+        $vote3 = $votes[2] === null ? 'null' : $votes[2];
         
         $sql = 'insert into votes '.
              '(id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) '.
@@ -308,7 +307,19 @@ class DbAccess
             $voteCount['points'] = $voteCount['vote1'] * 3 + $voteCount['vote2'] * 2 + $voteCount['vote3'];
         }
         
-        usort($voteCounts, function($a, $b) { return $b['points'] - $a['points']; });
+        usort($voteCounts, function($a, $b) {
+            $diff = $b['points'] - $a['points'];
+            if ($diff != 0) {
+                return $diff;
+            }
+            $diff = $b['vote1'] - $a['vote1'];
+            if ($diff != 0) {
+                return $diff;
+            }
+            $diff = $b['vote2'] - $a['vote2'];
+            return $diff;
+        });
+
         return $voteCounts;
     }
 
@@ -381,51 +392,25 @@ function redirectToSelf()
 
 /*
  * Returns two values (vote, errorDescription):
- * vote is an integer: positivt means a vote, -1 a missing vote, and 0 that an error occurred.
+ * vote is an integer: positivt means a vote, 0 a missing vote, and -1 that an error occurred.
  */
 function parseVote($categoryEntries, $vote)
 {
     if ($vote == '') {
-        return array(-1, '');
+        return array(0, '');
     }
 
-    if ($vote == '0') { // special case since we otherwise say it's not an integer...
-        return array(0, 'ogiltig röst');
+    if (($vote = filter_var($vote, FILTER_VALIDATE_INT)) === false) {
+        return array(-1, "ogiltig röst, ej heltal");
     }
-
     
-    $ivote = (int)$vote; // 0 vid icke-numerisk sträng
-    if ($ivote == 0) {
-        return array(0, "ogiltig röst ($vote), ej heltal");
-    }
+    $ivote = (int)$vote;
 
-    $sr = array_search($ivote, $categoryEntries);
-    if ($sr === false) {
-        return array(0, "ogiltig röst ($vote), otillåtet tävlings-id");
+    if (array_search($ivote, $categoryEntries) === false) {
+        return array(-1, "ogiltig röst ($vote), otillåtet tävlings-id");
     }
 
     return array($ivote, '');
-}
-
-/*
- * $ivotes: integer array of votes to check for one category
- * $votesPerCategory: number of possible votes per category
- */
-function checkVoteRules($ivotes, $votesPerCategory)
-{
-    if (count($ivotes) == 0) {
-        return "Minst en röst krävs.";
-    }
-
-    if (count($ivotes) > $votesPerCategory) {
-        return "Maximalt $votesPerCategory kan anges.";
-    }
-    
-    if (count(array_unique($ivotes)) != count($ivotes)) {
-        return "Max en röst per öl.";
-    }
-    
-    return ''; 
 }
 
 ?>

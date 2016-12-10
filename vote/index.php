@@ -1,5 +1,5 @@
 <?php
-/**
+/* -*- coding: utf-8 -*-
  
  * ------------------------------------------------------------------------
  *
@@ -100,7 +100,6 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
 </div>
 	<div style="padding:0.5em 1em;" id="helpform">
 	    <p>Börja med att fylla i din personliga röstkod (se programbladet), den måste <b>alltid</b> vara ifylld när du röstar.</p>
-	    <p>Tävlande öl är indelade i olika tävlingsklasser efter alkoholhalt.</p>
 	    <p>Rösta på dina favoritöl i en klass genom att först ange ölens tävlingsnummer, <b>rösterna registreras när du trycker på SPARA-knappen</b>.
 	    Du får alltid en bekräftelse tillbaka. Röster kan uppdateras/ändras obegränsat fram till tävlingen stänger med spara-knapparna.</p>
 	    <p><b>Observera att varje tävlingsklass har sin egen spara-knapp</b>, du sparar alltså röster inividuellt per klass.</p>
@@ -164,12 +163,8 @@ function htmlVoteRow($cat, $voteNr, $voteLabel)
     return $ret;
 }
     
-$labelc = count($vote_weight_and_labels);
-if ($labelc > 0) {
-    $vote_labels = array_keys($vote_weight_and_labels);
-}
-
-$votes_per_cat = $labelc;
+$votes_per_cat = count($vote_weight_and_labels);
+$vote_labels = array_keys($vote_weight_and_labels);
 
 foreach ($categories as $c)
 {
@@ -186,7 +181,7 @@ foreach ($categories as $c)
     
     for ($voteNr = 1; $voteNr <= $votes_per_cat; $voteNr++){
         echo '		<li data-role="fieldcontain">';
-        echo 			htmlVoteRow($id, $voteNr, ($labelc > 0 ? $vote_labels[$voteNr-1] : ''));
+        echo 			htmlVoteRow($id, $voteNr, ($vote_labels[$voteNr-1]));
         echo '		</li>';
     }
     
