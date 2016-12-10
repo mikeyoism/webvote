@@ -48,7 +48,7 @@ class DbAccess
     
     public function getCompetition($id)
     {
-        $sql = "SELECT count(*) as c FROM voteCodes WHERE competitionId=$id";
+        $sql = 'SELECT count(*) as c FROM voteCodes WHERE competitionId='.$this->escape($id);
         $result = $this->getConnection()->query($sql) or die ("getCompetition: Query failed: $sql");
 
         $voteCodeCount = $result->fetch_assoc()['c'];
@@ -59,7 +59,7 @@ class DbAccess
         $result = $this->getConnection()->query($sql) or die ("getCompetition: Query failed: $sql");
     
         if ($result->num_rows != 1)
-            die("Invalid current competition.");
+            die("Invalid competition id.");
         $row = $result->fetch_assoc();
 
         $openTime = new DateTime($row['openTime']);
@@ -355,14 +355,14 @@ class DbAccess
 
     private static function formatDateInterval($diff)
     {
-        $ret = $diff->format(' %y years, %m months, %a days, %h hours, %i minutes, %S seconds');
+        $ret = $diff->format(' %y år, %m månader, %d dagar, %h timmar, %i minuter, %S sekunder');
         
-        $ret = str_replace(array(' 0 years,', ' 0 months,', ' 0 days,', ' 0 hours,', ' 0 minutes,'),
+        $ret = str_replace(array(' 0 år,', ' 0 månader,', ' 0 dagar,', ' 0 timmar,', ' 0 minuter,'),
                            ' ',
                            $ret);
         
-        $ret = str_replace(array(' 1 years,', ' 1 months,', '1 days,', ' 1 hours,', ' 1 minutes'),
-                           array(' 1 year, ',' 1 month, ',' 1 day, ',' 1 hour, ',' 1 minute'),
+        $ret = str_replace(array(' 1 månader,', ' 1 dagar,', ' 1 timmar,', ' 1 minuter'),
+                           array(' 1 månad, ',' 1 dag, ',' 1 timme, ',' 1 minut'),
                            $ret);
         $ret = substr($ret, 1);
         return $ret;
