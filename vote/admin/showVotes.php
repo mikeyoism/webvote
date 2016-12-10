@@ -22,15 +22,11 @@ $openTimes = dbAccess::calcCompetitionTimes($competition);
 
 <p><?=$openTimes['openCloseText']?>
 <?php
-$openTime = $competition['openTime'];
-$now = new DateTime();
-$timeBeforeOpen = date_diff($now, $openTime);
-if ($timeBeforeOpen->invert) {
-    $voteCountStartTime = $openTime;
-    print '<p>Endast röster avlagda efter '.$voteCountStartTime->format('Y-m-d H:i').' räknas med i röstresultatet.';
-} else {
-    $voteCountStartTime = null;
+$voteCountStartTime = $openTimes['voteCountStartTime'];
+if ($voteCountStartTime === null) {
     print '<p>Alla röster räknas med i röstresultatet.';
+} else {
+    print '<p>Endast röster avlagda efter '.$voteCountStartTime->format('Y-m-d H:i').' räknas med i röstresultatet.';
 }
 ?>
 

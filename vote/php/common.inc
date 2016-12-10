@@ -102,26 +102,31 @@ class DbAccess
             $open = false;
             $timeBeforeClose = NULL;
             $openCloseText = 'Röstningen har stängt.';
+            $voteCountStartTime = $openTime;
         } else if ($timeBeforeOpen->invert) {
             $open = true;
             $openCloseText = 'Röstningen stänger om ' . self::formatDateInterval($timeBeforeClose).'.';
+            $voteCountStartTime = $openTime;
         } else if ($timeBeforeTestingClose != null && !$timeBeforeTestingClose->invert) {
             $open = true;
             $openCloseText = 'Röstningen öppen för test och stänger om '.
                            self::formatDateInterval($timeBeforeTestingClose).'.';
             $timeBeforeClose = $timeBeforeTestingClose;
+            $voteCountStartTime = null;
         } else {
             $open = false;
             $openCloseText = 'Röstningen öppnar om '.
                            self::formatDateInterval($timeBeforeOpen).'.';
+            $voteCountStartTime = null;
         }
-
+        
         return array('openTime' => $openTime,
                      'closeTime' => $closeTime,
                      'open'=> $open,
                      'openCloseText'=> $openCloseText,
                      'timeBeforeOpen' => $timeBeforeOpen,
-                     'timeBeforeClose' => $timeBeforeClose);
+                     'timeBeforeClose' => $timeBeforeClose,
+                     'voteCountStartTime' => $voteCountStartTime);
     }
     
     public function getCurrentCompetition()
@@ -263,12 +268,19 @@ class DbAccess
         $stmt->execute() or die ("insertVote: Execute failed: $sql");
     }
 
-    public function getCurrentVotes($competitionId, $voteCodeId)
+    public function getCurrentVotes($competitionId, $voteCodeId, $voteCountStartTime)
     {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="'.$voteCountStartTime->format('Y-m-d G:i:s').'"';
+        }
         $sql = 'select categoryId, vote1, vote2, vote3 '.
              '  from votes V '.
              '  join ( select max(V.id) id from votes V join categories C on V.categoryId=C.id '.
-             "         where C.competitionId=$competitionId and V.voteCodeId=$voteCodeId ".
+             "         where C.competitionId=$competitionId ".
+             "         and V.voteCodeId=$voteCodeId ".
+             "         $extraCond ".
              '         group by voteCodeId, categoryId ) T '.
              '  on V.id=T.id';
 

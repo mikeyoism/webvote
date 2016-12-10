@@ -129,8 +129,10 @@ function ax_reread($dbAccess, $competition, $categories, $voteCode)
         $jsonReply['usrmsg'] = "Ok! Nu kan du rösta nedanför.";
         $jsonReply['msgtype'] = "ok";
         $jsonReply['vote_code'] = $voteCode;
-        
-        $votes = $dbAccess->getCurrentVotes($competition['id'], $voteCodeId);
+
+        $openTimes = dbAccess::calcCompetitionTimes($competition);
+        $voteCountStartTime = $openTimes['voteCountStartTime'];
+        $votes = $dbAccess->getCurrentVotes($competition['id'], $voteCodeId, $voteCountStartTime);
 
         foreach ($votes as $categoryId => $vote) {
             $jsonReply['vote_1_'.$categoryId] = $vote['vote1'];
