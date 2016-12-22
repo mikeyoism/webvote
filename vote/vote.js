@@ -63,7 +63,7 @@ function rereadOrSetMessage(voteCode) {
     }
     else
     {
-        var ajax_load = "<img src='js/loading.gif' alt='loading...' />";
+        var ajax_load = "<img src='loading.gif' alt='loading...' />";
         statusDiv.html(ajax_load);
         votejs.reread(voteCode);
     }
@@ -104,7 +104,7 @@ votejs = function()
     {
         $.ajax({  
             type: "POST",  
-            url: "./php/vote_ajax.php",  
+            url: "vote_ajax.php",  
             dataType: 'json',
             cache : false,
             data: {
@@ -147,7 +147,7 @@ votejs = function()
     function sysstatus(args) {
         $.ajax({  
             type: "POST",  
-            url: "./php/vote_ajax.php",  
+            url: "vote_ajax.php",  
             dataType: 'json', 
             cache : false,
             data: {
@@ -269,7 +269,7 @@ votejs = function()
         });
         $.ajax({  
 	    type: "POST",  
-            url: "./php/vote_ajax.php",  
+            url: "vote_ajax.php",  
             dataType: 'json', 
             cache : false,
             data : vdata,

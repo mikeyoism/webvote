@@ -1,10 +1,4 @@
 <?php // -*- coding: utf-8 -*-
-/*
- 
- * ------------------------------------------------------------------------
- *
- * @author      Micke Josefsson (micke_josefsson (at) hotmail.com)
- */
 
 session_start();
 include 'php/common.inc';
@@ -64,58 +58,24 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
 	}
     }
     </style>    
-    <script src="js/vote.js" type="text/javascript"></script> 
+    <script src="vote.js" type="text/javascript"></script> 
 </head>
 <body>
     
 <div data-role="page" id="votepage">
 
-<!--huvée-->
 <div class="ui-header ui-bar-a" data-swatch="a" data-theme="a" data-form="ui-bar-a" data-role="header" role="banner">
-    <a class="ui-btn-left ui-btn-icon-notext ui-btn-corner-all ui-shadow ui-btn-up-a" data-iconpos="notext" data-theme="a" data-role="none" data-icon="none" title=" Home ">
-        <span class="ui-btn-inner ui-btn-corner-all">
-            <span class="ui-btn-text"> Home </span>
-            <span data-form="ui-icon" class="ui-icon ui-icon-home ui-icon-shadow"></span>
-        </span>
-    </a>
-   
-    <h1 class="ui-title" id ="competition_header" tabindex="0" role="heading" aria-level="1" data-mini="true">SM</h1> <!--js dynamic-->
-    <a href="#popupHelp" id="helpButton" data-rel="popup" data-transition="slide" data-inline="true" data-position-to="window"
-    class="ui-btn-right  ui-btn-icon-notext ui-btn-corner-all ui-shadow ui-btn-up-a" data-iconpos="notext" data-theme="a" data-role="button" data-icon="info" title=" Hjälp ">
-	<span class="ui-btn-inner ui-btn-corner-all">
-	    <span class="ui-btn-text"> Hjälp </span>
-	    <span data-form="ui-icon" class="ui-icon ui-icon-grid ui-icon-shadow"></span>
-	</span>
-    </a>
+    <h1 class="ui-title" id ="competition_header" tabindex="0" role="heading" aria-level="1" data-mini="true">SM</h1>
 </div>
 
-<!--content-->
 <div class="ui-content" data-role="content" data-theme="a">
 
-<div data-role="popup" id="popupHelp" data-theme="a" class="ui-corner-all">
-<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-left">Close</a>    
-
-<div data-role="header" data-theme="a" class="ui-corner-top ui-header ui-bar-a" role="banner">
-    <h1 class="ui-title" role="heading" aria-level="1">Hjälp</h1>
-</div>
-	<div style="padding:0.5em 1em;" id="helpform">
-	    <p>Börja med att fylla i din personliga röstkod (se programbladet), den måste <b>alltid</b> vara ifylld när du röstar.</p>
-	    <p>Rösta på dina favoritöl i en klass genom att först ange ölens tävlingsnummer, <b>rösterna registreras när du trycker på SPARA-knappen</b>.
-	    Du får alltid en bekräftelse tillbaka. Röster kan uppdateras/ändras obegränsat fram till tävlingen stänger med spara-knapparna.</p>
-	    <p><b>Observera att varje tävlingsklass har sin egen spara-knapp</b>, du sparar alltså röster inividuellt per klass.</p>
-	    <p>Du väljer själv i vilka klasser du vill rösta.</p>
-	</div>
-</div>  
-
-<!--logo-->
 <div class="ui-bar ui-bar-b"> <!--ui-bar-b  = bakgrundsfärgstema-->
     <div id="headerbanner" >
 	<img src="img/banner.png" alt="Home" </img>
     </div>
 </div>    
-      
-      
-<!--röstkod/status-->      
+
 <div class="ui-grid-a">
     <div class="ui-block-a"  data-mini="true" style="padding-right:0.5em">
 	<ul data-role="listview" data-inset="true" >
@@ -135,7 +95,6 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
     </div>
 </div>
 
-<!--systemstatus - default dold -->
 <div class="ui-grid-solo" >
     <div class="ui-block-a" data-mini="true">
 	<ul data-role="listview" data-inset="true"  >
@@ -143,7 +102,6 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
     </div>
 </div> 
     
-<!--röster-->
 <div data-role="collapsible-set" data-theme="a" data-content-theme="a">
 
 <?php
@@ -177,7 +135,6 @@ foreach ($categories as $c)
     echo '	<form name="' . $id . '_vote" id="' . $id . '_vote" class="voteform_trigger" data-ajax="false" >';
     echo '	    <div class="vote_category" id="' . $id . '"></div>';
     echo '	    <ul data-role="listview" data-inset="true">';
-    //sup3
     
     for ($voteNr = 1; $voteNr <= $votes_per_cat; $voteNr++){
         echo '		<li data-role="fieldcontain">';
@@ -198,12 +155,11 @@ foreach ($categories as $c)
 }
 ?>
         
-</div> <!-- collapsible-set-->
+</div> 
 
 
-</div> <!-- ui-content container -->
-<!-- framtida footer-->
-</div> <!-- page -->
+</div> 
+</div>
 
 </body>
 </html>

@@ -23,7 +23,7 @@
 */
 
 session_start();
-include '../php/common.inc';
+include 'php/common.inc';
 
 define("SETTING_SYSSTATUS_INTERVAL", 10000);
 define("SETTING_VOTES_PER_CATEGORY", 3);
