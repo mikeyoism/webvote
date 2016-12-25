@@ -23,6 +23,7 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
     <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.3.2/jquery.mobile.structure-1.3.2.min.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//ajax.aspnetcdn.com/ajax/jquery.mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+    <link rel="shortcut icon" href="data:image/x-icon;,"type="image/x-icon">
 
     <style>
     #headerbanner img { /*fullsize logga */
