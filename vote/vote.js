@@ -29,21 +29,21 @@ $(document).on('pageinit',"#votepage",function(event)
     $('.error').hide();
     $('#vote_code').focus();
 
-    var voteCode = null;
+    var vote_code = null;
     if (supportsHtml5Storage())
     {
-        voteCode = localStorage.getItem("vote_code");
-        if (voteCode != null) {
-            $('#vote_code').val(voteCode);
+        vote_code = localStorage.getItem("vote_code");
+        if (vote_code != null) {
+            $('#vote_code').val(vote_code);
 	}
     }
     votejs.init();
-    rereadOrSetMessage(voteCode);
+    rereadOrSetMessage(vote_code);
 
     $('#vote_code').on('keyup', function(e)
     {
-        var voteCode = $(this).val();
-        rereadOrSetMessage(voteCode);
+        var vote_code = $(this).val();
+        rereadOrSetMessage(vote_code);
         return false;
     });
 
@@ -55,9 +55,9 @@ $(document).on('pageinit',"#votepage",function(event)
     });
 });
 
-function rereadOrSetMessage(voteCode) {
+function rereadOrSetMessage(vote_code) {
     var statusDiv = $('#statusdiv');
-    if (voteCode == null || voteCode.length != 6) {
+    if (vote_code == null || vote_code.length != 6) {
         
         statusDiv.html('<div class="infobar infobar-neutral" data-mini="true">Välkommen! Ange din röstkod.</div>');
     }
@@ -65,7 +65,7 @@ function rereadOrSetMessage(voteCode) {
     {
         var ajax_load = "<img src='loading.gif' alt='loading...' />";
         statusDiv.html(ajax_load);
-        votejs.reread(voteCode);
+        votejs.reread(vote_code);
     }
 }
 
@@ -77,44 +77,48 @@ function supportsHtml5Storage() {
     }
 }
 
-function printInfobar(elemId, msgtype, usrmsg)
+function printInfobar(element, level, message)
 {
-    if (usrmsg.length > 0) {
-        if (msgtype == "ok" || msgtype == "ok-cached")
-            $(elemId).html('<div class="infobar infobar-ok" data-mini="true">' + usrmsg + '</div>');
-        else if (msgtype == "neutral")
-            $(elemId).html('<div class="infobar infobar-neutral" data-mini="true">' + usrmsg + '</div>');
-        else if (msgtype == "warning")
-            $(elemId).html('<div class="infobar infobar-warning" data-mini="true">' + usrmsg + '</div>');
-        else if (msgtype == "error")
-            $(elemId).html('<div class="infobar infobar-error" data-mini="true">' + usrmsg + '</div>');
-        $(elemId).show();			
-    }	    
+    var style_class = '';
+    switch (level) {
+    case "ERROR":
+	style_class = 'infobar-error';
+	break;
+    case "WARNING":
+	style_class = 'infobar-warning';
+	break;
+    case "OK":
+	style_class = 'infobar-ok';
+	break;
+    }
+    element.html('<div class="infobar ' + style_class
+		 + '" data-mini="true"><p>' + message + '</p></div>');
+    element.show();			
 }
 
 votejs = function()
 {
-    var MAX_SAME_VOTES = 1;
+    var competition_id = null;
+    var status_interval = 10000;
+    var status_timer = null;
+
     var VOTES_PER_CAT = 3;
-    var VOTES_REQUIRE_ALL = false;
-    var sysstatusInterval = 10000; //todo uppercase
-    var sysstatustmr = null;
     
-    function reread(voteCode)
+    function reread(vote_code)
     {
         $.ajax({  
-            type: "POST",  
-            url: "vote_ajax.php",  
+            type: "POST",
+            url: "ajax/vote.php",  
+	    contentType: 'application/json',
             dataType: 'json',
             cache : false,
-            data: {
-                operation: 'reread', 
-                vote_code: voteCode
-            },
+            data: JSON.stringify({
+                vote_code: vote_code
+            }),
 
             success: function(response) {
                 var disableInput = true;
-                if (response.msgtype == "ok")
+                if ("vote_code" in response)
 		{
                     $('#vote_code').val(response.vote_code); //uppercased etc
                     if (supportsHtml5Storage())
@@ -124,60 +128,61 @@ votejs = function()
                     disableInput = false;
                 }
 		
-                printInfobar('#statusdiv', response.msgtype, response.usrmsg);
+                printInfobar($('#statusdiv'), response.msgtype, response.usrmsg);
 
 		sys_cat = response.sys_cat;
                 $.each(sys_cat, function(index, value)
 		{
                     for (i = 1; i <= VOTES_PER_CAT; i++)
 		    {
-                        $('#' + value + '_vote' + i).prop( "disabled", disableInput); // prevent input on bad vote code
-                        $('#' + value + '_vote' + i).val(response['vote_' + i + '_' + value]);
+                        $('#' + value + '_vote' + i).prop("disabled", disableInput); // prevent input on bad vote code
+
+			var vote = "votes" in response ? response.votes[value][i] : '';
+                        $('#' + value + '_vote' + i).val(vote);
                     }
                 });
 
             },
-            error: function(xhr, status, thrown)
+            error: function(xhr, textStatus, errorThrown)
 	    {
-		alert("serverfel, reread: " + status + xhr + thrown); 
+		alert("error: " + textStatus + ", responseText: " + xhr.responseText); 
             }  
         });
     };
 
-    function sysstatus(args) {
+    function sysstatus(args)
+    {
         $.ajax({  
-            type: "POST",  
-            url: "vote_ajax.php",  
-            dataType: 'json', 
+            type: "GET",
+            url: "ajax/status.php",
+	    contentType: 'application/json',
+            dataType: 'json',
             cache : false,
-            data: {
-                operation: 'sysstatus', 
-                my_interval: sysstatusInterval
-            },
-	    
+            data: {},
             success: function(response) {
-		if (response.competition_name.length > 0)
-		{
-                    $("#competition_header").text(response.competition_name);
-		}
+		competition_id = response.competition_id;
+                $("#competition_header").text(response.competition_name);
 		
-                if (response.msgtype == "interval")
+                if (response.interval != status_interval)
                 {
-                    clearInterval(sysstatustmr);
-                    sysstatusInterval = response.interval;
-                    sysstatustmr = window.setInterval(sysstatus,response.interval)
+                    clearInterval(status_timer);
+                    status_interval = response.update_interval;
+                    status_timer = window.setInterval(sysstatus, status_interval)
                 }
-                else if (response.usrmsg.length > 0)
-		{
-                    printInfobar('#sysbar', response.msgtype, response.usrmsg);
-                }
-                else
-		{
-                    $('#sysbar').hide();
+
+		if (response.competition_seconds_to_close < 60) {
+		    var alert_level = 'WARNING'
+		} else if (response.competition_seconds_to_close < 600) {
+		    var alert_level = 'RED'
+		} else {
+		    var atert_level = 'OK'
 		}
+
+                printInfobar($('#sysbar'), alert_level, response.competition_status);
             },
-            error: function(xhr, status, thrown) {
-                alert("serverfel, sysstatus: " + status + xhr + thrown); 
+            error: function(xhr, textStatus, errorThrown)
+	    {
+		alert("error: " + textStatus + ", responseText: " + xhr.responseText); 
             }  
         });	
     };
@@ -185,94 +190,53 @@ votejs = function()
     function voteFormEval(formref){
         var $formId = $(formref);
         
-        var voteCode = $("#vote_code").val(); // inte i detta form
-        var category = $('.vote_category',$formId).attr('id');
-        var statusId = $('.formstatus_trigger',$formId);
-        var votes = [];
-	var checkfail = false;
-        
-        // kontrollera inputs längder i varje li (inputs är numeric så "om siffra" behöver inte kollas)
-        // sätt dold .error div med text vid fel
-        // annars lägg in värde i votes
-        $('li',$formId).each(function(){
-            //obs: $this refererar till li, går ej backa längre upp i DOM än $this
-            var voteInput = $(this).find('input');
+        var vote_code = $("#vote_code").val();
+        var category_id = $('.vote_category', $formId).attr('id');
+        var statusId = $('.formstatus_trigger', $formId);
 
-	    if (voteInput != null) //exkl li's utan input (submit li)
-	    { 
-                var voteval = voteInput.val();
-                if (typeof voteval != 'undefined')
-                {    
-                    if (voteval != null && voteval.length != 3 && voteval.length > 0)
+        var votes = {};
+	for (var i = 1; i <= 3; i++) {
+            var voteval = $('#' + category_id + '_vote' + i).val();
+	    if (voteval != '')
+	    {
+		if (voteval.length != 3)
+		{
+                    var errortag = $('div #' + category_id + "_vote" + i + ' .error').find('.error');
+                    if (errortag != null)
                     {
-                        var errortag = $(this).find('.error');
-                        if (errortag != null)
-                        {
-                            errortag.html("Tre siffror förväntas")
-                            errortag.slideDown();
-                        }
-                        else
-			{
-                            console.log('check html, missing an error tag for ' + category);
-			}
-			checkfail = true;
+			errortag.html("Tre siffror förväntas")
+			errortag.slideDown();
                     }
-                    votes.push(voteval);
-                }
-		
-            }
-        });
-
-	if (checkfail)
-	{
-	    return false;
-	}
-        
-        var arrcheck = votes.slice(0); // clone
-	
-        // check that identical votes doesn't exceed max allowed.
-        while (arrcheck.length > 0) {
-            var v = arrcheck.pop();
-            var cc;
-            if (v != "") // ignore empty votes
-	    { 
-		var identicalCount = 1;
-		
-                //count & remove all identical
-                while (arrcheck.length > 0 && (cc = arrcheck.indexOf(v)) != -1)
-		{
-                    identicalCount++;
-                    arrcheck.splice(cc, 1); 
-                }
-                if (identicalCount > MAX_SAME_VOTES)
-		{
-		    statusId.html('Högst ' + MAX_SAME_VOTES + ' röst(er) per öl');
-		    statusId.fadeToggle();
+                    else
+		    {
+			console.log('check html, missing an error tag for ' + category);
+		    }
 		    return false;
 		}
-            }
-            else if (VOTES_REQUIRE_ALL === true)
-	    {
-		statusId.html('Alla röster måste fyllas i, försök igen');
-		statusId.fadeToggle();
-		return false;
-            }
-        }
-
-        var vdata = {
-            vote_code: voteCode,
-            category: category,
-            operation: 'post_vote'
-        };
-        $.each(votes, function (index, vote) { // append votes
-            vdata['vote_' + (index+1)] = vote;
-        });
+		for (var j = 1; j < i; j++)
+		{
+		    if (votes[j] == voteval) {
+			statusId.html('Högst en röst per öl');
+			statusId.fadeToggle();
+			return false;
+		    }
+		}
+	    }
+            votes[i] = voteval;
+	}
+        
+        var vdata = {};
+	vdata[category_id] = votes;
         $.ajax({  
 	    type: "POST",  
-            url: "vote_ajax.php",  
+            url: "ajax/vote.php",
+	    contentType: 'application/json',
             dataType: 'json', 
             cache : false,
-            data : vdata,
+            data : JSON.stringify({
+		vote_code: vote_code,
+		votes: vdata
+            }),
 	    
             success: function(response) {
 		if (response.resetVoteCode) {
@@ -291,21 +255,20 @@ votejs = function()
 			       }
 			   });
 		}
-                statusId.html(response.usrmsg);
+                statusId.html(response.vote_result.usrmsg);
                 statusId.fadeToggle();
             },
-            error: function(xhr, status, thrown) {
-                statusId.html("serverfel: " + status);
+            error: function(xhr, textStatus, errorThrown)
+	    {
+		statusId.html("error: " + textStatus + ", responseText: " + xhr.responseText); 
                 statusId.fadeToggle();
             }  
         });
-        return false;  
     };
     
     function init()
     {
-        //uppdatera systemstatus kontinuerligt
-        sysstatustmr = window.setInterval(sysstatus, sysstatusInterval);
+        status_timer = window.setInterval(sysstatus, status_interval);
         sysstatus();
     };
     

@@ -255,9 +255,9 @@ class DbAccess
 
     public function insertVote($voteCodeId, $categoryId, $votes)
     {
-        $vote1 = $votes[0] === null ? 'null' : $votes[0];
-        $vote2 = $votes[1] === null ? 'null' : $votes[1];
-        $vote3 = $votes[2] === null ? 'null' : $votes[2];
+        $vote1 = $votes['1'] === null ? 'null' : $votes['1'];
+        $vote2 = $votes['2'] === null ? 'null' : $votes['2'];
+        $vote3 = $votes['3'] === null ? 'null' : $votes['3'];
         
         $sql = 'insert into votes '.
              '(id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) '.
@@ -268,28 +268,32 @@ class DbAccess
         $stmt->execute() or die ("insertVote: Execute failed: $sql");
     }
 
-    public function getCurrentVotes($competitionId, $voteCodeId, $voteCountStartTime)
+    public function getVotes($competitionId, $voteCodeId, $voteCountStartTime)
     {
         if ($voteCountStartTime === null) {
             $extraCond = '';
         } else {
             $extraCond = ' and creationTime>="'.$voteCountStartTime->format('Y-m-d G:i:s').'"';
         }
-        $sql = 'select categoryId, vote1, vote2, vote3 '.
-             '  from votes V '.
-             '  join ( select max(V.id) id from votes V join categories C on V.categoryId=C.id '.
-             "         where C.competitionId=$competitionId ".
-             "         and V.voteCodeId=$voteCodeId ".
-             "         $extraCond ".
-             '         group by voteCodeId, categoryId ) T '.
-             '  on V.id=T.id';
+        $sql = 'select C.id categoryId, T.vote1, T.vote2, T.vote3 '.
+             '  from categories C '.
+             '  left outer join '
+             .  '(select * from votes where id in '.
+             '      ( select max(votes.id) id '.
+             '         from votes join categories on votes.categoryId=categories.id '.
+             "         where categories.competitionId=$competitionId ".
+             "         and voteCodeId=$voteCodeId $extraCond ".
+             '         group by categoryId ) '.
+             '   ) T'.
+             '  on C.id=T.categoryId '.
+             "  where C.competitionId=$competitionId";
 
-        $result = $this->getConnection()->query($sql) or die ("getCurrentVotes: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getVotes: Query failed: $sql");
 
         $votes = array();
         while ($row = $result->fetch_assoc()) {
             $votes[$row['categoryId']] =
-                   array('vote1' => $row['vote1'], 'vote2' => $row['vote2'], 'vote3' => $row['vote3']);
+                   array('1' => $row['vote1'], '2' => $row['vote2'], '3' => $row['vote3']);
         }
         return $votes;
     }
@@ -400,29 +404,6 @@ function redirectToSelf()
     $uri   = $_SERVER['PHP_SELF'];
     header("Location: http://$host$uri"); 
     exit;
-}
-
-/*
- * Returns two values (vote, errorDescription):
- * vote is an integer: positivt means a vote, 0 a missing vote, and -1 that an error occurred.
- */
-function parseVote($categoryEntries, $vote)
-{
-    if ($vote == '') {
-        return array(0, '');
-    }
-
-    if (($vote = filter_var($vote, FILTER_VALIDATE_INT)) === false) {
-        return array(-1, "ogiltig röst, ej heltal");
-    }
-    
-    $ivote = (int)$vote;
-
-    if (array_search($ivote, $categoryEntries) === false) {
-        return array(-1, "ogiltig röst ($vote), otillåtet tävlings-id");
-    }
-
-    return array($ivote, '');
 }
 
 ?>
