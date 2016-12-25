@@ -63,7 +63,7 @@ function rereadOrSetMessage(vote_code) {
     }
     else
     {
-        var ajax_load = "<img src='loading.gif' alt='loading...' />";
+        var ajax_load = "<img src='img/loading.gif' alt='loading...' />";
         statusDiv.html(ajax_load);
         votejs.reread(vote_code);
     }
