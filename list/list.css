@@ -17,3 +17,45 @@
 .grey {
     color: grey;
 }
+
+.rating > input {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.rating > label {
+    float: left;
+    width: 1.2em;
+    padding: 0 .2em; 
+    overflow: hidden;
+    white-space: nowrap; 
+    font-size: 160%; 
+    line-height: 1.2;
+    color: gold;
+    visibility: hidden;
+}
+
+.rating > label:before {
+    visibility: visible;
+    content: '\2605';
+    font-family: FontAwesome;
+}
+
+.rating > label.rating-clear-button:before {
+    visibility: visible;
+    content: '\f05e';
+    font-family: FontAwesome;
+    color: black;
+}
+
+.rating > input:checked ~ label {
+    color: grey;
+}
+
+.rating > input:checked + label {
+    color: gold;
+}
