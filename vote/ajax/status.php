@@ -18,9 +18,11 @@ $openTimes = dbAccess::calcCompetitionTimes($competition);
 $jsonReply = array();
 $jsonReply['update_interval'] = SETTING_SYSSTATUS_INTERVAL;
 
-$jsonReply['competition_id'] = $competition['name'];
+$jsonReply['competition_id'] = $competition['id'];
 $jsonReply['competition_name'] = $competition['name'];
+$jsonReply['competition_open'] = $openTimes['open'];
 $jsonReply['competition_status'] = $openTimes['openCloseText'];
+$jsonReply['competition_seconds_to_open'] = $competition['openTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
 $jsonReply['competition_seconds_to_close'] = $competition['closeTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
 
 header('Content-Type: application/json', true);

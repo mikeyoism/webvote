@@ -173,7 +173,7 @@ votejs = function()
 		if (response.competition_seconds_to_close < 60) {
 		    var alert_level = 'WARNING'
 		} else if (response.competition_seconds_to_close < 600) {
-		    var alert_level = 'RED'
+		    var alert_level = 'ERROR'
 		} else {
 		    var atert_level = 'OK'
 		}

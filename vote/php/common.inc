@@ -8,7 +8,7 @@ class DbAccess
     {
     }
 
-    function __descruct()
+    function __destruct()
     {
         mysqli_close($this->dbConn);
         $this->dbConn = 0;
@@ -359,16 +359,20 @@ class DbAccess
 
     private static function formatDateInterval($diff)
     {
-        $ret = $diff->format(' %y år, %m månader, %d dagar, %h timmar, %i minuter, %S sekunder');
+        $ret = $diff->format(' %y år, %m månader, %d dagar, %h timmar, %i minuter, %s sekunder');
         
-        $ret = str_replace(array(' 0 år,', ' 0 månader,', ' 0 dagar,', ' 0 timmar,', ' 0 minuter,'),
-                           ' ',
-                           $ret);
+        $ret = str_replace(
+            array(' 0 år,', ' 0 månader,', ' 0 dagar,', ' 0 timmar,', ' 0 minuter,'),
+            ' ',
+            $ret);
         
-        $ret = str_replace(array(' 1 månader,', ' 1 dagar,', ' 1 timmar,', ' 1 minuter'),
-                           array(' 1 månad, ',' 1 dag, ',' 1 timme, ',' 1 minut'),
-                           $ret);
+        $ret = str_replace(
+            array(' 1 månader,', ' 1 dagar,', ' 1 timmar,', ' 1 minuter', ' 1 sekunder'),
+            array(' 1 månad, ',' 1 dag, ',' 1 timme, ',' 1 minut', ' 1 sekund'),
+            $ret);
+        
         $ret = substr($ret, 1);
+        
         return $ret;
     }
 }

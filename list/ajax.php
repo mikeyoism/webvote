@@ -35,4 +35,4 @@ foreach ($rawBeers as $beer) {
 }
  
 header('Content-Type: application/json', true);
-echo json_encode(array('competition_id' => 1, 'classes' => $classes, 'beers' => $beers, 'competitionId' => 1));
+echo json_encode(array('competition_id' => 2, 'classes' => $classes, 'beers' => $beers));

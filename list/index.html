@@ -35,7 +35,7 @@
 	  </ul>
 	</li>
 	<li class="nav-item">
-	  <a class="nav-link" id="vote-menu-button" data-toggle="tab" href="#page-vote">Folkets val</a>
+	  <a class="nav-link" data-toggle="modal" href="#vote-popup">Folkets val</a>
 	</li>
       </ul>
     </nav>
@@ -43,46 +43,74 @@
     <div class="tab-content">
       
       <!-- Javascript will insert one tab per voting class here. -->
-      
-      <div id="page-vote" class="tab-pane fade">
-	<h1 class="display-4">Folkets val</h1>
 
-	<form class="">
-	  <div class="form-group">
-	    <label for="vote-code" class="form-control-label">Röstningskod</label>
-	    <input type="text" class="form-control" id="vote-code"
-		   maxlength="6" placeholder="Röstningskod">
-	    <small id="vote-code-help" class="form-control-feedback"
-		   class="form-text text-muted">Röstningskoden finns i progambladet.</small>
-	  </div>
-	</form>
-	
-	<form>
-	  <div class="row">
-	    <div class="col-xs-3"></div>
-	    <div class="col-xs-3">
-	      Guld
-	    </div>
-	    <div class="col-xs-3">
-	      Silver
-	    </div>
-	    <div class="col-xs-3">
-	      Brons
-	    </div>
-	  </div>
-	  <div id="vote-form-rows">
-	  </div>
-	</form>
-      </div>
     </div>
-    
-    <div id="popup" class="modal" role="dialog">
+
+    <div id="vote-popup" class="modal" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3><span id="popup-header">XXX Ölnamn</span></br>
-              <span id="popup-style" class="beer-style">Ölklass</span></h3>
+            <h3>
+              <button type="button" class="btn btn-secondary pull-right"
+		      data-dismiss="modal">Stäng</button>
+	      Folkets val
+	    </h3>
+          </div>
+          <div class="modal-body">
+	    <div id="vote-competition-status"></div>
+	    <div class="votes-dirty-field d-inline-block alert
+			alert-danger hidden-xs-up">Det finns osparade röster.
+	    </div>
+	    <div class="votes-registered-field d-inline-block
+			hidden-xs-up">Alla röster sparade.
+	    </div>
+
+	    <form>
+	      <div class="row">
+		<div class="col-sm-8 col-xs-10">
+		  <div class="form-group">
+		    <label for="vote-code" class="form-control-label">Röstningskod</label>
+		    <input type="text" class="form-control" id="vote-code"
+			   maxlength="6" placeholder="Röstningskod">
+		    <small id="vote-code-help" class="form-control-feedback"
+			   class="form-text text-muted">Se progambladet
+		      för att hitta din röstningskod.</small>
+		  </div>
+		</div>
+	      </div>
+	    </form>
+	    
+	    <form>
+	      <div class="row">
+		<div class="col-xs-3"></div>
+		<div class="col-xs-3">
+		  Guld
+		</div>
+		<div class="col-xs-3">
+		  Silver
+		</div>
+		<div class="col-xs-3">
+		  Brons
+		</div>
+	      </div>
+	      <div id="vote-form-rows">
+	      </div>
+	    </form>
+	  </div>
+	</div>
+      </div>
+    </div>
+
+    <div id="beer-popup" class="modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>
+	      <button type="button" class="btn btn-secondary pull-right"
+		      data-dismiss="modal">Stäng</button>
+	      <span id="popup-header">XXX Ölnamn</span></br>
+              <span id="popup-style" class="beer-style">Ölklass</span>
+	    </h3>
           </div>
           <div class="modal-body">
             <p>Bryggare: <span id="popup-brewer">Bryggare</span></p>
@@ -112,7 +140,7 @@
 	      </fieldset>
 	      <fieldset>
 		<legend style="font-size: 1rem;">Folkets val-röst:</legend>
-		<div class="btn-group" data-toggle="buttons">
+		<div id="popup-medal-group" class="btn-group" data-toggle="buttons">
 		  <label class="btn btn-primary" id="popup-medal-0-button">
 		    <input type="radio" name="popup-medal"
 			   value="0"><span class="fa fa-ban"></span></input>
@@ -129,6 +157,11 @@
 		</div>
 	      </fieldset>
 	    </form>
+	    <div id="popup-alert-no-vote-code"
+		 class="d-inline-block alert alert-danger hidden-xs-up">
+	      Mata in din röstningskod från programbladet för att
+	      registrera rösterna!
+	    </div>
           </div>
         </div>
       </div>
