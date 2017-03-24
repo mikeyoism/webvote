@@ -1,0 +1,78 @@
+102	5C - IPA	Ferocious IPA	Patrik Svensk, Carl Sundstedt, Pontus Lakso, Marcus Löthman	6,5	65	16	157
+105	5B - Strong pale ale	FruitBomb!	Patrik Svensk, Carl Sundstedt, Pontus Lakso, Marcus Löthman	6,6	65	15	79
+109	3F - English ordinary bitter	Hönö Bitter	Nicklas Lathvenis	3,4	40	14	32
+111	5C - IPA	DRUNK IPA	Thomas Jarlsmark	6,7	66	15	63
+116	4C - Pale ale (APA)	Sättaren	Anders Söderlund, Mats Wennberg, Claes-Håkan Wahlberg, Magnus Eriksson	5,5	55	13	39
+117	4C - Pale ale (APA)	Pale Kåbo Ale	Eric Wiktelius, Peter Sandblad	5,4	52	11	40
+119	5C - IPA	Hillbilly Amarillo	Arvid Thunholm, Hampus Stensson, Gustav Erixon	5,9	57	12	74
+125	5C - IPA	Milvus - Falkor IPA	Dan Åkerlund	6,3	61	13	63
+126	4C - Pale ale (APA)	Milvus - Norbert APA	Dan Åkerlund, Isabella Åkerlund	4,8	48	12	48
+127	5E - Dubbel IPA	Milvus - Drogon Double IPA	Dan Åkerlund, Linn Åkerlund	7,9	74	14	75
+134	5C - IPA	Tres Patres Elf	Emil Hillerström, Jerry Nilsson och Tony Carlsson	6,7	61	10	153
+135	5E - Dubbel IPA	Tres Patres Decima	Emil Hillerström, Jerry Nilsson och Tony Carlsson	8,4	72	8	187
+137	4C - Pale ale (APA)	Hasses humleskola Ekeby en SPA Swensk pale ale	Erik Johansson, Sven Byström medlemsnr:5328 Hans Ericson medlemsnummer:7015	3,8	45	16	20
+139	4C - Pale ale (APA)	Hasses humleskola UPA Uppsala Pale Ale	Erik Johansson, Sven Byström medlemsnr:5328 Hans Ericson medlemsnummer:7015	5,3	56	16	20
+143	5C - IPA	Folkets IPA	Erik Wood	6,1	63	17	74
+147	5E - Dubbel IPA	P.A.D.	Fredrik Ericson, Kristian Brodd	9,0	80	12	99
+150	5C - IPA	Von Gogh	Fredrik Gustavsson, Therese Mortensen	6,2	61	14	71
+153	5C - IPA	Fermentörernas Råg IPA	Magnus Vasilis, Martin Jonsson & Jonas Wetterlundh	7,0	65	12	50
+157	4C - Pale ale (APA)	Lemongrale	Daniel Borg, Daniel Töyrä	5,9	56	11	40
+162	4C - Pale ale (APA)	Whale Rider	Peter Herzig, Christer Gustafsson, Albert Sjölin, John Hagström, Jan Andersson	5,3	52	12	40
+166	6F - Hopfenweizen	Candide	Kalle Hårding, Mats Cederholm	6,2	65	18	50
+180	5E - Dubbel IPA	Generalen	Maarten Vanwildemeersch, Johan Holmdahl	12,8	135	38	250
+188	4D - Brown ale (amerikansk)	Rotbrunna gårdsbryggeri's ABA	Jens Gradstock, Urban Landegren	5,4	56	15	30
+189	5C - IPA	Rotbrunna gårdsbryggeri's IPA	Jens Gradstock, Urban Landegren	6,3	61	13	55
+190	5E - Dubbel IPA	From Jursla With Love	Johan Ernerudh, Erik Ernerudh, Anders Rosen, Tommy Alm, Anders Söderberg, Tobbe Smedberg, Henrik Engström och Per Forsell	7,8	75	16	107
+192	5E - Dubbel IPA	Lite beskt, tack! (Mosaic/Cascade)	Oskar Frodin	9,8	86	12	110
+195	6F - Hopfenweizen	Oakbay's Humlan	Rickard Berglund	6,1	60	14	45
+196	4C - Pale ale (APA)	FornExotisk	Hampus Ny, Markus Mårtensson	3,4	46	20	138
+202	5C - IPA	C.R.E.A.M (Caramalt Ruins Everything Around Me)	Viktor Nyman, Jens Peterson, Viktor Larsson	6,2	57	10	65
+205	4C - Pale ale (APA)	En APA som liknar dig!	Peter Pinaitis, Anna Kihlstedt	5,5	56	14	38
+207	4C - Pale ale (APA)	Grainfather Don (the ill wheat freaker)	Mikael Josefsson	5,3	54	14	62
+209	5C - IPA	Seatown Brewing - Winter IPA	Joakim Gustafsson	6,5	65	16	75
+211	5C - IPA	It's summer! I Pee Ale	Jimmy Petersson	6,2	64	17	67
+212	4C - Pale ale (APA)	Frejas Fröjd	Joel Blom	5,8	56	12	85
+216	5C - IPA	Indiana Pale Ale	Johan Ungerstedt	6,5	68	19	60
+222	5E - Dubbel IPA	Ascension -DIPA	Jonathon McKeever, Benjamin Tallmadge	9,5	83	11	106
+223	4C - Pale ale (APA)	Pride - Extra Pale Ale	Jonathon McKeever, Joel Greek	4,4	46	13	29
+226	5C - IPA	(k)AmaCitra	Kalle Ekstrand, Anderstorps Bryggerisällskap	6,7	67	16	58
+228	4C - Pale ale (APA)	Baja California	Klas Fredriksson	6,6	60	10	50
+229	5C - IPA	Sunset IPA	Linus Anemyr	7,3	67	12	65
+230	4D - Brown ale (amerikansk)	Breweriets Lerpöl	Daniel Markänger, Tobias Strand	5,8	54	10	38
+231	5C - IPA	S.A.N.C.S HOPE	Marcus Friberg, Peter Rosensvärd	6,3	58	10	84
+232	5D - Black IPA	Mindfuck	Marcus Friberg, Peter Rosensvärd 	6,7	65	14	44
+233	3F - English ordinary bitter	(nästan) Folkölsbitter	Mattias Engblom, Petra Engblom	3,6	39	12	38
+234	5C - IPA	Mandaripa	Mattias Engblom, Petra Engblom	6,5	61	12	56
+235	4D - Brown ale (amerikansk)	HBG2 - Illegal in 15 US states	Christian Olsson, Arne Lärksäter & Roger Lärksäter	5,7	60	17	57
+237	5E - Dubbel IPA	HBG2 - This Is Why We Can't Have Nice Things	Martin Björck, Patrik Jargenius, Fredrik Wallerfrost, Victoria Shulga, Kristoffer Björk, Stefan Alexi, Niklas Lindqvist	8,8	79	12	96
+240	5D - Black IPA	Bad Brew	Kim Nilsson, Sam Nilsson	5,1	56	17	56
+249	4C - Pale ale (APA)	Ausmerican Pale Ale	Matias Leinikka, Ian Taylor	5,3	46	6	31
+250	5C - IPA	Bastard IPA	Matias Leinikka, Ian Taylor	6,1	56	10	67
+262	5E - Dubbel IPA	Hopsansa DIPA	Claes Holmberg, Henrik Hildemar	11,2	100	15	92
+263	4C - Pale ale (APA)	Atlantic Crossing	Jens Henning	5,9	56	11	40
+264	5D - Black IPA	67's BIPA	Jens Henning	6,7	65	14	67
+271	4C - Pale ale (APA)	Sörskogen APA	Mikael Mekras, Georgios Goussis, Vasilios Varfis	5,4	50	9	71
+272	5C - IPA	Sörskogen IPA	Mikael Mekras, Georgios Goussis, Vasilios Varfis	6,1	54	8	60
+275	4C - Pale ale (APA)	Gambrinius Belma Single Hope	Hans Pettersson, Torsten Jakobsson	5,3	56	16	39
+279	5B - Strong pale ale	Gambrinius Winterale	Jerry Westlund	6,3	66	18	44
+281	6F - Hopfenweizen	En ljus öl	Mikael Sandberg, Jan Rolandsson	6,3	60	12	41
+282	5B - Strong pale ale	Señor Otter	Richard Johansson, Daniel Johansson	5,7	61	18	40
+283	4D - Brown ale (amerikansk)	Baker Boyz India Brown Ale	Norman Geaney, Magnus Bäck	5,7	55	12	34
+284	4C - Pale ale (APA)	Baker Boyz Viksjö Pale Ale	Norman Geaney, Magnus Bäck	5,9	56	11	30
+289	5C - IPA	Funky fruitastk ipa 	Paul Thacker	6,1	60	14	60
+290	5B - Strong pale ale	The New World Theft!!!!!!	Paul Thacker	6,5	61	12	43
+294	6F - Hopfenweizen	Hopfenschajse	Peter Högström	7,4	70	14	34
+302	5C - IPA	Awaken Nights IPA	Samuel Mancho	7,1	65	11	60
+303	5C - IPA	Midnite Maniac	Sara Dersten, Ingela Engström	6,1	60	14	65
+304	5C - IPA	Honolulu Fruit & Candy 	Staffan Högfeldt, Olof Fors, Anders Spångmark, Thomas Thelin	6,6	61	11	68
+307	4D - Brown ale (amerikansk)	Billie Brown	Staffan Högfeldt, Olof Fors, Thomas Thelin	5,4	52	11	35
+308	6F - Hopfenweizen	Monox - Hopfenweizen	Fredrik Brenkle, Andreas Lundgren	5,4	51	10	30
+311	5C - IPA	Belman 2.0	Mats Nyqvist, Magnus Torstensson och Mathias Ljungsten	6,7	70	19	60
+312	5C - IPA	Christian B Ale 2015	Mattias Persson, Emil Edbom, Andreas Bastås, Sebastian Grönqvist	7,0	69	16	53
+318	5C - IPA	Funky Clown 100% Brett IPA	Anders Granberg, Stefan Björnsbacka, Robin Åhlgren, Marco Leiva	6,6	61	11	56
+327	4C - Pale ale (APA)	Boxerale NZPA	Thomas Åsberg	5,7	53	10	37
+335	3F - English ordinary bitter	Cookie Bitter	William Blackmon	3,4	38	12	32
+337	5D - Black IPA	En Svart IPA	Robert Siirilä, Carin Eriksson	6,3	60	12	60
+297	4C - Pale Ale (APA)	Nashville Amber	Richard Sören Strand, Dave Osler	5,0	45	7	24
+320	5C - IPA	World Of Witchcraft	Pelle Nyman, Erkki Yli-Tokola	6,1	62	16	70
+322	5C - IPA	RockaBilly IPA	Pernilla Nyman, Peter Nyman, Jessica Fällgren	6,6	64	14	56

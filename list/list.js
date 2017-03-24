@@ -95,9 +95,14 @@ var beer_db = function()
 	// Default to the first class (this only sets the pill text -- by default the first tab is selected.
 	$('#menu-item-' + classes[0].id).trigger('click');
 
-	$('#menu-item-sort-by-entry-id').click(function() {
+	$('#menu-item-sort-by-entry-code').click(function() {
 	    var current_tab = get_current_tab_hash();
-	    fill_beer_lists(compare_beers_by_entry_id, current_tab);
+	    fill_beer_lists(compare_beers_by_entry_code, current_tab);
+	});
+
+	$('#menu-item-sort-by-style').click(function() {
+	    var current_tab = get_current_tab_hash();
+	    fill_beer_lists(compare_beers_by_style, current_tab);
 	});
 
 	$('#menu-item-sort-by-rating').click(function() {
@@ -126,7 +131,7 @@ var beer_db = function()
 	    update_no_vote_code_alert();
 	});
 	
-	fill_beer_lists(compare_beers_by_entry_id, '#page-' + classes[0].id);
+	fill_beer_lists(compare_beers_by_entry_code, '#page-' + classes[0].id);
 
 	// Workaround for tabs not being inactivated coorectly.
 	// Remove when bootstrap fixes this (hopefully in 4alpha6).
@@ -151,11 +156,28 @@ var beer_db = function()
 	localStorage.setItem('user_data_' + competition_id, JSON.stringify(user_data));
     }
 
-    function compare_beers_by_entry_id(a, b)
+    function compare_beers_by_entry_code(a, b)
     {
-	return a > b ? 1 : a == b ? 0 : -1;
+	var a_code = beers[a].entry_code;
+	var b_code = beers[b].entry_code;
+
+	return a_code > b_code ? 1 : a_code == b_code ? 0 : -1;
     }
 
+    function compare_beers_by_style(a, b)
+    {
+	var a_style_parts = beers[a].styleId.match(/([0-9]+)([A-Z]+)/);
+	var b_style_parts = beers[b].styleId.match(/([0-9]+)([A-Z]+)/);
+
+	if (a_style_parts[1] != b_style_parts[1]) {
+	    return a_style_parts[1] - b_style_parts[1];
+	}
+	if (a_style_parts[2] != b_style_parts[2]) {
+	    return a_style_parts[2].localeCompare(b_style_parts[2]);
+	}
+	return compare_beers_by_entry_code(a, b);
+    }
+    
     function compare_beers_by_rating(a, b)
     {
 	var a_rating = 0;
@@ -172,9 +194,9 @@ var beer_db = function()
 	{
 	    return b_rating - a_rating;
 	}
-	return a > b ? 1 : a == b ? 0 : -1;
+	return compare_beers_by_entry_code(a, b);
     }
-    
+
     function fill_beer_lists(compare_function, active_tab_hash)
     {
 	// Order beers by sort order
@@ -203,8 +225,8 @@ var beer_db = function()
 		    + get_rating_string(rating)
 		    + '</span>'
 		    + '<span class="float-xs-right" id="medal-display-' + entry_id + '" style="padding-right: 10px;"></span>'
-		    + '<span class="beer-number">' + beer.beerCounter + '</span>. '
-		    + '<span class="beer-name">' + beer.BeerName + '</span><br>'
+		    + '<span class="beer-number">' + beer.entry_code + '</span>. '
+		    + '<span class="beer-name">' + beer.name + '</span><br>'
 		    + '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
 		    + '</a>');
 	});
@@ -263,7 +285,7 @@ var beer_db = function()
 			   + vote_class.id + "-" + j + '" value="');
 		if (user_votes[vote_class.id][j])
 		{
-		    items.push(beers[user_votes[vote_class.id][j]].beerCounter);
+		    items.push(beers[user_votes[vote_class.id][j]].entry_code);
 		}
 		items.push('"></div>');
 	    }
@@ -276,12 +298,8 @@ var beer_db = function()
     function popup_beer(item_id, e)
     {
 	var beer = beers[item_id];
-	$("#popup-header").html(beer.beerCounter + ". " + beer.BeerName);
-	var brewers = beer.brewer;
-	if (beer.coBrewers != '') {
-	    brewers += ', ' + beer.coBrewers.replace(/&lt;[^&]*&gt;/g, ''); 
-	}
-	$("#popup-brewer").html(brewers);
+	$("#popup-header").html(beer.entry_code + ". " + beer.name);
+	$("#popup-brewer").html(beer.brewer);
 	$("#popup-style").html(beer.styleName + " (" + beer.styleId + ")");
 	$("#popup-og").html(beer.OG);
 	$("#popup-fg").html(beer.FG);
@@ -377,7 +395,7 @@ var beer_db = function()
 		user_votes[class_id][medal] = entry_id;
 		votes_dirty = true;
 		update_medal_in_beer_list(entry_id, medal);
-		$('#vote-form-' + class_id + '-' + medal).val(beers[entry_id].beerCounter);
+		$('#vote-form-' + class_id + '-' + medal).val(beers[entry_id].entry_code);
 	    }
 	}
 
@@ -391,12 +409,12 @@ var beer_db = function()
 	if (votes_dirty)
 	{
 	    votes_dirty_field.removeClass('hidden-xs-up');
-	    votes_regitered_field.addClass('hidden-xs-up');
+	    votes_registered_field.addClass('hidden-xs-up');
 	}
 	else
 	{
 	    votes_dirty_field.addClass('hidden-xs-up');
-	    votes_regitered_field.removeClass('hidden-xs-up');
+	    votes_registered_field.removeClass('hidden-xs-up');
 	}
     }
 

@@ -1,0 +1,19 @@
+112	9K - Belgiskt och franskt specialöl	MUNK IPA	Thomas Jarlsmark	9,5	82	10	60
+115	6B - Klassisk veteöl av sydtysk typ	Manna från Himlen	Anders Söderlund, Mats Wennberg, Claes-Håkan Wahlberg, Magnus Eriksson	5,0	50	12	13
+120	6E - Weizenbock	Mossens Köksbryggeri Weizen Bockus	Bo Ström, Lars Sundberg	7,1	70	16	19
+129	6D - Belgisk wit	Vitsippa 	Daniel Zetterstrom, Olivia Kastebring 	4,5	44	10	10
+131	9D - Ljus stark belgisk ale	BΔ7 (Bmaj7)	David Gustafsson, Urban Evjen	8,2	69	7	30
+132	6C - Mörkt veteöl av sydtysk typ	Linders Mörka HelVete	Dennis Linder	5,0	48	10	15
+156	6E - Weizenbock	Kellermeister Weizenbock	Per-Ola Roos	8,8	86	19	16
+165	9K - Belgiskt och franskt specialöl	Calyptra	Kalle Andersson, Kalle Hårding, Mats Cederholm	9,6	81	8	32
+181	9K - Belgiskt och franskt specialöl	Blonde à la Framboise	Mattias Nordell, Kristin Nordell	6,7	60	9	16
+185	9H - Saison	Goede Doel Saison	Gustav Dominicus	6,5	54	5	25
+187	9D - Ljus stark belgisk ale	Bövel	Gustav Dominicus, Niklas Stenlås	8,2	69	7	33
+244	9K - Belgiskt och franskt specialöl	Hallonsäsong	Dan Nilsson, Maria, Lars, Hanna, John, Jens, Joar, Ruben, Magnus, Joel, Daniel	6,7	52	1	22
+255	9F - Dubbel	Chocolate Tonka Bean dubbel	Richard Bolton	6,7	67	16	32
+256	9J - Supersaison	De Verleidelijke Non (Den förföriska nunnan)	Mikael Jansson, James Skallsjö	7,1	62	8	43
+257	9C - Tripel	Het Verlangen Monnik (Den längtande munken)	Mikael Jansson, James Skallsjö	9,2	82	12	39
+305	9C - Tripel	The Bohemian Blond Conspiracy	Staffan Högfeldt, Olof Fors, Anders Spångmark, Thomas Thelin	8,8	76	9	34
+309	9J - Supersaison	Cedrela Saison - Cederträlagrad	Fredrik Brenkle, Andreas Lundgren, Christoffer Fohrs	7,4	61	5	35
+324	6C - Mörkt veteöl av sydtysk typ	Svarvarbo Dunkelweizen	Thomas Pless, Martin Pless	5,3	52	12	13
+330	9G - Mörk stark belgisk ale	Rocka Fett	Tomas Andersson, Patrik Andersson	12,4	100	6	27

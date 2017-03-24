@@ -1,0 +1,23 @@
+101	1I - Internationell lager	American Lager	Patrik Svensk, Carl Sundstedt, Pontus Lakso, Marcus Löthman	4,2	43	11	14
+110	2C - Modern Ljus Lager	Ålekråga Lager	Nicklas Lathvenis	5,4	52	11	41
+122	2C - Modern Ljus Lager	Mossens Köksbryggeri Prospect Park City-Turtle Modern Lager	Bo Ström, Per Thoren, Lars Sundberg	5,3	53	13	45
+133	1J - Övriga klassiska i kategori Mild/karaktärsful	gammaldags torpar öl	Jan Mårtensson	5,1	55	16	10
+138	1I - Internationell lager	Hasses humleskola Tunabackar Uppsala lager	Erik Johansson, Sven Byström medlemsnr:5328 Hans Ericson medlemsnummer:7015	5,0	46	8	6
+149	2C - Modern Ljus Lager	Broddweiser	Kristian Brodd, Johan Stenberg	5,4	52	11	35
+158	1J - Övriga klassiska i kategori Mild/karaktärsful	Fritzky Ležák Polotmavé	Fredrik Ståhl	5,1	51	12	34
+160	1E - Centraleuropeisk mörk lager	Kallocain	Maja Koivunen	5,3	56	16	24
+191	2C - Modern Ljus Lager	LUGER LAGER	Jonas Eriksson	5,3	52	12	40
+214	1E - Centraleuropeisk mörk lager	Maj'n Dunkel	Johan Ungerstedt	4,5	56	22	18
+215	2C - Modern Ljus Lager	Amarillo Delight	Johan Ungerstedt	5,3	56	16	33
+219	2D - Modern Mörk Lager	Gabba Gabba Hey	Jonas Carlfjord, Majo Ramone	3,2	40	16	25
+227	1E - Centraleuropeisk mörk lager	Stenstugan Dark Lager	Kent Karlsson	5,4	55	14	16
+236	2C - Modern Ljus Lager	HBG2 - Fathead	Martin Björck, Patrik Jargenius, Fredrik Wallerfrost, Victoria Shulga, Kristoffer Björk, Stefan Alexi, Niklas Lindqvist	5,5	53	11	39
+246	1C - Märzen	SchultzBräu Märzen	Johan Schultz	5,3	56	16	22
+259	1D - Frankisk lager	Fränky	Matthias Zumpe, Ludvig Fahlgren	5,1	51	12	20
+267	1F - Schwarzbier	Schwartz vänsterfot	Patrik Norrlöf	5,3	52	12	26
+268	2B - Dubbelbock	Diphalliator	Patrik Norrlöf	8,1	80	19	23
+274	1G - Tjeckisk pilsner	Gambrinius Tjeckisk Pilsner	Per Olof Larsson	5,0	50	12	32
+285	2D - Modern Mörk Lager	Arnöl Brooklyn Lager	Ola Ramström, Henrik Sjöberg, Jonas Tauberman, Johan Stenhof, Tommy Sköld, Per Sjöström	4,9	49	12	36
+299	2B - Dubbelbock	Lindorm	Richard Sören Strand	7,9	76	16	27
+315	1I - Internationell lager	Fuckin' Close to Water	Stefan Backlund, Jimmy Jonsson	4,9	47	10	12
+130	1C - Märzen	VG Klassisk	Michael Skoglund	4,8	48	12	22
