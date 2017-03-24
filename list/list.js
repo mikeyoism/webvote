@@ -145,6 +145,12 @@ var beer_db = function()
 	    }
 	})
 
+	$(window).on('hashchange', function(e) {
+	    if (window.location.hash != '#modal-beer-popup') {
+		$('#beer-popup').modal('hide');
+	    }
+	});
+
 	if (enable_voting) {
 	    fill_vote_form();
 	} else {
@@ -248,6 +254,7 @@ var beer_db = function()
 		       + ('#page-' + vote_class.id == active_tab_hash ? ' active' : '') + '">');
 
 	    pages.push('<h1 class="display-4">' + vote_class.name + '</h1>');
+
 	    pages.push('<div class="votes-dirty-field d-inline-block alert alert-danger hidden-xs-up">Det finns osparade röster.</div>');
 	    
 	    pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group">');
@@ -330,6 +337,7 @@ var beer_db = function()
 	update_no_vote_code_alert();
 	
 	current_popup_item_id = item_id;
+	window.location.hash = 'modal-beer-popup'; // Used to trap back button
     }
     
     function update_rating_in_beer_list(entry_id, rating)

@@ -15,7 +15,7 @@ $classes = array();
 $beers = array();
 $nextEntryId = 1;
 foreach ($files as $class) {
-    array_push($classes, array('id' => $class{'class_id'}, 'name' => $class{'name'}));
+    array_push($classes, array('id' => $class{'class_id'}, 'name' => $class{'name'}, 'description' => $class{'description'}));
 
     $str = file_get_contents($class{'filename'});
     $lines = explode("\n", trim($str, "\n"));
