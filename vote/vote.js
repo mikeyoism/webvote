@@ -113,6 +113,7 @@ votejs = function()
             dataType: 'json',
             cache : false,
             data: JSON.stringify({
+		competition_id: competition_id,
                 vote_code: vote_code
             }),
 
@@ -153,14 +154,15 @@ votejs = function()
     function sysstatus(args)
     {
         $.ajax({  
-            type: "GET",
+            type: "POST",
             url: "ajax/status.php",
 	    contentType: 'application/json',
             dataType: 'json',
             cache : false,
-            data: {},
+	    data : JSON.stringify({
+		competition_id: competition_id
+            }),
             success: function(response) {
-		competition_id = response.competition_id;
                 $("#competition_header").text(response.competition_name);
 		
                 if (response.interval != status_interval)
@@ -234,6 +236,7 @@ votejs = function()
             dataType: 'json', 
             cache : false,
             data : JSON.stringify({
+		competition_id: competition_id,
 		vote_code: vote_code,
 		votes: vdata
             }),
@@ -268,6 +271,7 @@ votejs = function()
     
     function init()
     {
+	competition_id = $('#votepage').attr('data-competition-id');
         status_timer = window.setInterval(sysstatus, status_interval);
         sysstatus();
     };

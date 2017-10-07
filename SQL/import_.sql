@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: webvote
 -- ------------------------------------------------------
--- Server version	5.6.30
+-- Server version	5.6.35
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -30,7 +30,7 @@ CREATE TABLE `categories` (
   PRIMARY KEY (`id`),
   KEY `competitionId` (`competitionId`),
   CONSTRAINT `categories_ibfk_1` FOREIGN KEY (`competitionId`) REFERENCES `competitions` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,21 +47,7 @@ CREATE TABLE `competitions` (
   `closeTime` datetime NOT NULL,
   `testingOpenUntilTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `config`
---
-
-DROP TABLE IF EXISTS `config`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `config` (
-  `currentCompetitionId` int(11) DEFAULT NULL,
-  KEY `currentCompetitionId` (`currentCompetitionId`),
-  CONSTRAINT `config_ibfk_1` FOREIGN KEY (`currentCompetitionId`) REFERENCES `competitions` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,7 +65,27 @@ CREATE TABLE `entries` (
   UNIQUE KEY `categoryCodeUniqueIndex` (`categoryId`,`entryCode`),
   KEY `categoryCodeIndex` (`categoryId`,`entryCode`),
   CONSTRAINT `entries_ibfk_1` FOREIGN KEY (`categoryId`) REFERENCES `categories` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=144 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `privileges`
+--
+
+DROP TABLE IF EXISTS `privileges`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `privileges` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user` int(11) NOT NULL,
+  `competition` int(11) NOT NULL,
+  `privilegeLevel` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user` (`user`),
+  KEY `competition` (`competition`),
+  CONSTRAINT `privileges_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`id`),
+  CONSTRAINT `privileges_ibfk_2` FOREIGN KEY (`competition`) REFERENCES `competitions` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,8 +98,8 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
-  `privilege` int(11) NOT NULL,
-  PRIMARY KEY (`username`)
+  `id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -111,7 +117,7 @@ CREATE TABLE `voteCodes` (
   PRIMARY KEY (`id`),
   KEY `competitionId` (`competitionId`),
   CONSTRAINT `voteCodes_ibfk_1` FOREIGN KEY (`competitionId`) REFERENCES `competitions` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=606 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,7 +147,7 @@ CREATE TABLE `votes` (
   CONSTRAINT `votes_ibfk_3` FOREIGN KEY (`categoryId`, `vote1`) REFERENCES `entries` (`categoryId`, `entryCode`),
   CONSTRAINT `votes_ibfk_4` FOREIGN KEY (`categoryId`, `vote2`) REFERENCES `entries` (`categoryId`, `entryCode`),
   CONSTRAINT `votes_ibfk_5` FOREIGN KEY (`categoryId`, `vote3`) REFERENCES `entries` (`categoryId`, `entryCode`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -153,4 +159,4 @@ CREATE TABLE `votes` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-12-09  1:38:50
+-- Dump completed on 2017-10-07 10:57:15

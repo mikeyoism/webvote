@@ -12,15 +12,22 @@ if (isset($_POST['login'])) {
     redirectToSelf();
 }
 
-list($privilegeLevel, $username) = requireLoggedIn(1, false);
-$competition = $dbAccess->getCurrentCompetition();
+$competitionId = getCompetitionId();
+
+if (isLoggedIn()) {
+    list($privilegeLevel, $username) = requireLoggedIn($competitionId, 1);
+} else {
+    $privilegeLevel = 0;
+}
+
+$competition = $dbAccess->getCompetition($competitionId);
 $openTimes = dbAccess::calcCompetitionTimes($competition);
 
 if (isset($_POST['generateVoteCodes'])) {
     if ($privilegeLevel < 2) {
         die('Not authorized.');
     }
-    generateVoteCodes($competition['id'], $_POST['voteCodesToGenerate']);
+    generateVoteCodes($competitionId, $_POST['voteCodesToGenerate']);
     redirectToSelf();
 } else if (isset($_POST['addEntryCodes'])) {
     $dbAccess->addCategoryEntries($_POST['categoryId'], expandRangesToArray($_POST['entryCodes']));
@@ -30,7 +37,7 @@ if (isset($_POST['generateVoteCodes'])) {
     redirectToSelf();
 } else if (isset($_POST['openForTest'])) {
     $closeTime = (new DateTime())->add(new DateInterval('PT1H'));
-    $dbAccess->setCompetitionOpenForTestUntil($competition['id'], $closeTime);
+    $dbAccess->setCompetitionOpenForTestUntil($competitionId, $closeTime);
     redirectToSelf();
 }
 
@@ -69,7 +76,7 @@ if ($privilegeLevel < 1) {
 }
 ?>
 
-<p>Aktuell tävling är <?= $competition['name'] ?>.  Tävlingen öppnar för röstning <?= $openTimes['openTime']->format('Y-m-d H:i') ?> och stänger <?= $openTimes['closeTime']->format('Y-m-d H:i') ?>.
+<p><?= $competition['name'] ?>: öppnar för röstning <?= $openTimes['openTime']->format('Y-m-d H:i') ?> och stänger <?= $openTimes['closeTime']->format('Y-m-d H:i') ?>.
 
 <p><?=$openTimes['openCloseText']?>
 <?php
@@ -82,7 +89,7 @@ if (!$openTimes['open'] && !$openTimes['timeBeforeOpen']->invert) {
 <hr>
 
 <p>Det finns <?=$competition['voteCodeCount']?> <a
-href="listVoteCodes.php?competitionId=<?=$competition['id']?>">röstkoder</a> för denna tävling.
+href="listVoteCodes.php?competitionId=<?=$competitionId?>">röstkoder</a> för denna tävling.
              
 <?php
 if ($privilegeLevel == 2) {
@@ -98,7 +105,7 @@ if ($privilegeLevel == 2) {
 <hr>
 
 <?php
-$categories = $dbAccess->getCategories($competition['id']);
+$categories = $dbAccess->getCategories($competitionId);
 
 foreach ($categories as $category) {
 ?>
@@ -119,7 +126,7 @@ foreach ($categories as $category) {
 
 <hr>
 
-<p>Se <a href="showVotes.php?competitionId=<?=$competition['id']?>">röstningsresultatet</a>.
+<p>Se <a href="showVotes.php?competitionId=<?=$competitionId?>">röstningsresultatet</a>.
 
 </body>
 </html>

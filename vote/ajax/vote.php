@@ -3,29 +3,37 @@
 session_start();
 include '../php/common.inc';
 
-$dbAccess = new DbAccess();
-
-$competition = apc_fetch('competition');
-if ($competition === false) {
-    $competition = $dbAccess->getCurrentCompetition();
-    apc_store('competition', $competition, 30); // Cache for 30 seconds.
+$voteArgs = json_decode(file_get_contents('php://input'));
+if (!isset($voteArgs->competition_id)) {
+    die('competition_id missing');
+}
+$competitionId = $voteArgs->competition_id;
+if (!preg_match('/^[1-9][0-9]{0,4}$/', $competitionId)) {
+    die('competition_id non-numeric');
 }
 
-$categories = apc_fetch('categories');
+$dbAccess = new DbAccess();
+
+$competition = apc_fetch('competition-' . $competitionId);
+if ($competition === false) {
+    $competition = $dbAccess->getCompetition($competitionId);
+    apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
+}
+
+$categories = apc_fetch('categories-' . $competitionId);
 if ($categories === false) {
-    $categories = $dbAccess->getCategories($competition['id']);
-    apc_store('categories', $categories, 120); // Cache for 120 seconds.
+    $categories = $dbAccess->getCategories($competitionId);
+    apc_store('categories-' . $competitionId, $categories, 120); // Cache for 120 seconds.
 }
 
 $resetVoteCode = isset($_SESSION['public_vote_terminal']) && $_SESSION['public_vote_terminal'] === true;
 
-$voteArgs = json_decode(file_get_contents('php://input'));
 
 $jsonReply = array();
 $jsonReply['sys_cat'] = array_keys($categories);
 
 $voteCode = strtoupper($voteArgs->vote_code);
-$voteCodeId = $dbAccess->checkVoteCode($voteCode);
+$voteCodeId = $dbAccess->checkVoteCode($competitionId, $voteCode);
 if ($voteCodeId == 0) {
     $jsonReply['usrmsg'] = "Ogiltig kod. Försök igen. Koden finns på programmet.";
     $jsonReply['msgtype'] = "WARNING";

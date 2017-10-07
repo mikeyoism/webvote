@@ -10,7 +10,9 @@ class DbAccess
 
     function __destruct()
     {
-        mysqli_close($this->dbConn);
+        if ($this->dbConn != null) {
+            mysqli_close($this->dbConn);
+        }
         $this->dbConn = 0;
     }
 
@@ -30,20 +32,32 @@ class DbAccess
 
     public function login($user, $password)
     {
-        $sql = 'SELECT privilege, username '
-             .'FROM users '
+        # We make two queries so that we can differentiate between the user
+        # not found (or wrong password), and the case where the user has insufficient
+        # privileges.
+        $sql = 'SELECT id, username FROM users '
              .'WHERE username="'.$this->escape($user).'" '
              .'AND password=password("'.$this->escape($password).'")';
-        $result = mysqli_query($this->getConnection(), $sql) or die ("login: Query failed: $sql");
-        
-        if (mysqli_num_rows($result) != 1) {
-            return;
-        } else {
-            $row = mysqli_fetch_assoc($result);
-            $_SESSION['privilegeLevel'] = $row['privilege'];
-            $_SESSION['username'] = $row['username'];
+        $result = mysqli_query($this->getConnection(), $sql) or die ("login: Query failed: $sql")
+;
+        if (!($row = $result->fetch_assoc())) {
             return;
         }
+        $userId = $row['id'];
+        $username = $row['username'];
+        
+        $sql = 'SELECT competition, privilegeLevel FROM privileges WHERE user='.$userId;
+        $result = mysqli_query($this->getConnection(), $sql) or die ("login: Query failed: $sql");
+
+        $privileges = array();
+        while ($row = $result->fetch_assoc()) {
+            $privileges[$row['competition']] = $row['privilegeLevel'];
+        }
+
+        $_SESSION['username'] = $username;
+        $_SESSION['privileges'] = $privileges;
+
+        return;
     }
     
     public function getCompetition($id)
@@ -129,15 +143,6 @@ class DbAccess
                      'voteCountStartTime' => $voteCountStartTime);
     }
     
-    public function getCurrentCompetition()
-    {
-        $sql = 'SELECT currentCompetitionId as id FROM config';
-        $result = $this->getConnection()->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
-        $id = $result->fetch_assoc()['id'];
-    
-        return $this->getCompetition($id);
-    }
-
     public function setCompetitionOpenForTestUntil($competitionId, $time)
     {
         $sql = 'update competitions '.
@@ -174,15 +179,6 @@ class DbAccess
         return $categories;
     }
     
-    public function getCurrentCategories()
-    {
-        $sql = 'SELECT currentCompetitionId as id FROM config';
-        $result = $this->getConnection()->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
-        $id = $result->fetch_assoc()['id'];
-
-        return $this->getCategories($id);
-    }
-
     public function addCategoryEntries($categoryId, $codes) {
         $catId = $this->escape($categoryId);
         $sql = 'INSERT INTO entries '
@@ -204,7 +200,7 @@ class DbAccess
     }
     
     // Might change in future -- probably hard coded at some other places too right now.
-    public function getCurrentVoteWeightAndLabels()
+    public function getVoteWeightAndLabels($competitionId)
     {
         return array('Guld' => 3, 'Silver' => 2, 'Brons' => 1);
     }
@@ -214,7 +210,7 @@ class DbAccess
         $sql = 'SELECT code FROM voteCodes '.
              'WHERE competitionId='.$this->escape($competitionId).' '.
              'ORDER BY code';
-        $result = $this->getConnection()->query($sql) or die ("getCurrentCompetition: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die ("getVoteCodes: Query failed: $sql");
 
         $array = $result->fetch_all(MYSQLI_NUM);
 
@@ -234,15 +230,14 @@ class DbAccess
         $stmt->execute() or die ("insertVoteCodes: Execute failed: $sql");
     }
 
-    public function checkVoteCode($voteCode)
+    public function checkVoteCode($competitionId, $voteCode)
     {
         $voteCode = strtoupper($voteCode);
         $voteCode = trim($voteCode);
 
-        $sql = 'SELECT VC.id FROM '.
-             'config JOIN competitions C ON config.currentCompetitionId=C.id '.
-             'JOIN voteCodes VC ON VC.competitionId=C.id '.
-             'WHERE VC.code="'.$this->escape($voteCode).'"';
+        $sql = 'SELECT id FROM voteCodes '
+             .'WHERE competitionId='.$this->escape($competitionId).' '
+             .'  AND code="'.$this->escape($voteCode).'"';
              
         $result = $this->getConnection()->query($sql) or die ("checkVoteCode: Query failed: $sql");
         if ($result->num_rows != 1) {
@@ -377,28 +372,46 @@ class DbAccess
     }
 }
 
-// Checks that the session has authenticated with at least the given level.
-// If not, the user is redirected to the index page if $redirect is true.
-// (The intention is that $redirect is false when called from the index page.)
-function requireLoggedIn($minLevel, $redirect)
-{
-    if (isset($_SESSION['privilegeLevel']) &&  $_SESSION['privilegeLevel'] >= $minLevel) {
-        return array($_SESSION['privilegeLevel'], $_SESSION['username']);
-    } else {
-        if ($redirect) {
-            $host  = $_SERVER['HTTP_HOST'];
-            $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-            header("Location: http://$host$uri/"); 
-            exit;
-        } else {
-            return array(0, NULL);
-        }
+function getCompetitionId() {
+    if (!isset($_GET['competitionId'])) {
+        die('Missing competition');
     }
+    
+    return $_GET['competitionId'];
+}
+
+function isLoggedIn() {
+    return isset($_SESSION['privileges']);
+}
+
+// Ensures that the session has authenticated with at least the given level.
+function requireLoggedIn($competitionId, $minLevel) {
+    if (isset($_SESSION['privileges']) &&
+        isset($_SESSION['privileges'][$competitionId]) &&
+        $_SESSION['privileges'][$competitionId] >= $minLevel) {
+        return array($_SESSION['privileges'][$competitionId], $_SESSION['username']);
+    } else {
+        die('Not authorized.');
+    }
+}
+
+// Ensures that the session has authenticated with at least the given level.
+// If not, the user is redirected to the index page if not logged in at all.
+function requireLoggedInOrRedirect($competitionId, $minLevel) {
+    if (!isLoggedIn()) {
+        $host  = $_SERVER['HTTP_HOST'];
+        $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+        $query = isset($_GET['competitionId']) ? '?competitionId='.$_GET['competitionId'] : '';
+        header("Location: http://$host$uri/$query"); 
+        exit;
+    }
+    
+    return requireLoggedIn($competitionId, 1);
 }
 
 function logout()
 {
-    unset($_SESSION['privilegeLevel']);
+    unset($_SESSION['privileges']);
     unset($_SESSION['username']);
 }
 
@@ -406,7 +419,9 @@ function redirectToSelf()
 {
     $host  = $_SERVER['HTTP_HOST'];
     $uri   = $_SERVER['PHP_SELF'];
-    header("Location: http://$host$uri"); 
+    $query = isset($_GET['competitionId']) ? '?competitionId='.$_GET['competitionId'] : '';
+
+    header("Location: http://$host$uri$query"); 
     exit;
 }
 

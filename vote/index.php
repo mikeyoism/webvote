@@ -4,8 +4,10 @@ session_start();
 include 'php/common.inc';
 $dbAccess = new DbAccess();
 
-$categories= $dbAccess->getCurrentCategories();
-$vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
+$competitionId = getCompetitionId();
+
+$categories= $dbAccess->getCategories($competitionId);
+$vote_weight_and_labels = $dbAccess->getVoteWeightAndLabels($competitionId);
 
 ?>
 
@@ -63,7 +65,7 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
 </head>
 <body>
     
-<div data-role="page" id="votepage">
+<div data-role="page" id="votepage" data-competition-id="<?=$competitionId?>">
 
 <div class="ui-header ui-bar-a" data-swatch="a" data-theme="a" data-form="ui-bar-a" data-role="header" role="banner">
     <h1 class="ui-title" id ="competition_header" tabindex="0" role="heading" aria-level="1" data-mini="true">SM</h1>
@@ -104,7 +106,7 @@ $vote_weight_and_labels = $dbAccess->getCurrentVoteWeightAndLabels();
 </div> 
     
 <div data-role="collapsible-set" data-theme="a" data-content-theme="a">
-
+    
 <?php
 function htmlVoteRow($cat, $voteNr, $voteLabel)
 {

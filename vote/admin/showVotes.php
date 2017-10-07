@@ -3,7 +3,9 @@
 session_start();
 include '../php/common.inc';
 
-list($privilegeLevel, $username) = requireLoggedIn(1, true);
+$competitionId = getCompetitionId();
+
+list($privilegeLevel, $username) = requireLoggedInOrRedirect($competitionId, 1);
 
 $dbAccess = new DbAccess();
 $competition = $dbAccess->getCompetition($_GET['competitionId']);
