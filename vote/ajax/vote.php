@@ -38,21 +38,23 @@ if ($voteCodeId == 0) {
     $jsonReply['usrmsg'] = "Ogiltig kod. Försök igen. Koden finns på programmet.";
     $jsonReply['msgtype'] = "WARNING";
 } else {
-    $jsonReply['usrmsg'] = "Ok!";
-    $jsonReply['msgtype'] = "OK";
-
     $jsonReply['vote_code'] = $voteCode;
+    $jsonReply['resetVoteCode'] = $resetVoteCode;
 
     $openTimes = dbAccess::calcCompetitionTimes($competition);
     if (isset($voteArgs->votes)) {
         if ($openTimes['open'] === false) {
-            $voteResult = array('usrmsg' => 'Röstningen är STÄNGD!');
+            list($status, $msg) = array('WARNING', 'Röstningen är STÄNGD!');
         } else {
-            $voteResult = postVotes($dbAccess, $competition, $voteCodeId, $voteArgs->votes, $resetVoteCode, $categories);
+            list($status, $msg) = postVotes($dbAccess, $competition, $voteCodeId, $voteArgs->votes, $resetVoteCode, $categories);
         }
-        $jsonReply['vote_result'] = $voteResult;
+        $jsonReply['msgtype'] = $status;
+        $jsonReply['usrmsg'] = $msg;
+    } else {
+        $jsonReply['msgtype'] = "OK";
+        $jsonReply['usrmsg'] = "Ok!";
     }
-
+    
     $voteCountStartTime = $openTimes['voteCountStartTime'];
     $jsonReply['votes'] = $dbAccess->getVotes($competition['id'], $voteCodeId, $voteCountStartTime);
 }
@@ -63,35 +65,30 @@ echo  json_encode($jsonReply);
 
 function postVotes($dbAccess, $competition, $voteCodeId, $votes, $resetVoteCode, $categories)
 {
-    $jsonReply = array();
-
     foreach ($votes as $categoryId => $categoryVotes) {
         $category = $categories[$categoryId];
 
         $ivotes = [];
     
         for ($i = 1; $i <= 3; $i++) {
-            $vote = filter_var($categoryVotes->{$i}, FILTER_SANITIZE_STRING);
-            list($ivote, $errorString) = parseVote($category['entries'], $vote);
-            if ($ivote == -1) {
-                $jsonReply['usrmsg'] = "Röst rad #$i: $errorString";
-                return $jsonReply;
-            } else if ($ivote != 0) {
-                if (array_search($ivote, $ivotes)) {
-                    $jsonReply['usrmsg'] = 'Högst en röst per öl.';
-                    return $jsonReply;
+            if (property_exists($categoryVotes, $i)) {
+                $vote = filter_var($categoryVotes->{$i}, FILTER_SANITIZE_STRING);
+                list($ivote, $errorString) = parseVote($category['entries'], $vote);
+                if ($ivote == -1) {
+                    return array('WARNING', "Röst rad #$i: $errorString");
+                } else if ($ivote != 0) {
+                    if (array_search($ivote, $ivotes)) {
+                        return array('WARNING', 'Högst en röst per öl.');
+                    }
                 }
+                $ivotes[$i] = $ivote;
             }
-            $ivotes[$i] = $ivote;
         }
-    
+        
         $dbAccess->insertVote($voteCodeId, $categoryId, $ivotes);
     }
     
-    $jsonReply['usrmsg'] = "Rösterna har registrerats";
-    $jsonReply['resetVoteCode'] = $resetVoteCode;
-
-    return $jsonReply;
+    return array('OK', "Rösterna har registrerats");
 }
 
 /*

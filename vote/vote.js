@@ -199,32 +199,34 @@ votejs = function()
         var votes = {};
 	for (var i = 1; i <= 3; i++) {
             var voteval = $('#' + category_id + '_vote' + i).val();
-	    if (voteval != '')
-	    {
-		if (voteval.length != 3)
+	    if (typeof voteval !== 'undefined') {
+		if (voteval != '')
 		{
-                    var errortag = $('div #' + category_id + "_vote" + i + ' .error').find('.error');
-                    if (errortag != null)
-                    {
-			errortag.html("Tre siffror förväntas")
-			errortag.slideDown();
-                    }
-                    else
+		    if (voteval.length != 3)
 		    {
-			console.log('check html, missing an error tag for ' + category);
-		    }
-		    return false;
-		}
-		for (var j = 1; j < i; j++)
-		{
-		    if (votes[j] == voteval) {
-			statusId.html('Högst en röst per öl');
-			statusId.fadeToggle();
+			var errortag = $('#' + category_id + "_vote" + i + '_status');
+			if (errortag != null)
+			{
+			    errortag.html("Tre siffror förväntas")
+			    errortag.slideDown();
+			}
+			else
+			{
+			    console.log('check html, missing an error tag for ' + category);
+			}
 			return false;
 		    }
+		    for (var j = 1; j < i; j++)
+		    {
+			if (votes[j] == voteval) {
+			    statusId.html('Högst en röst per öl');
+			    statusId.fadeToggle();
+			    return false;
+			}
+		    }
 		}
+		votes[i] = voteval;
 	    }
-            votes[i] = voteval;
 	}
         
         var vdata = {};
@@ -258,7 +260,7 @@ votejs = function()
 			       }
 			   });
 		}
-                statusId.html(response.vote_result.usrmsg);
+                statusId.html(response.usrmsg);
                 statusId.fadeToggle();
             },
             error: function(xhr, textStatus, errorThrown)

@@ -200,9 +200,23 @@ class DbAccess
     }
     
     // Might change in future -- probably hard coded at some other places too right now.
-    public function getVoteWeightAndLabels($competitionId)
+    public function getVoteWeightAndLabels($categoryId)
     {
-        return array('Guld' => 3, 'Silver' => 2, 'Brons' => 1);
+        $sql = 'SELECT label, weight FROM vote_weights_and_labels '.
+             'WHERE category='.$this->escape($categoryId).' '.
+             'ORDER BY weight DESC';
+        $result = $this->getConnection()->query($sql) or die ("getVoteWeightAndLabels: Query failed: $sql");
+
+        $x = array();
+        while ($row = $result->fetch_assoc()) {
+            $x[$row['label']] = $row['weight'];
+        }
+
+        if (count($x) > 0) {
+            return $x;
+        } else {
+            return array('Guld' => 3, 'Silver' => 2, 'Brons' => 1);
+        }
     }
     
     public function getVoteCodes($competitionId)
@@ -250,9 +264,9 @@ class DbAccess
 
     public function insertVote($voteCodeId, $categoryId, $votes)
     {
-        $vote1 = $votes['1'] === null ? 'null' : $votes['1'];
-        $vote2 = $votes['2'] === null ? 'null' : $votes['2'];
-        $vote3 = $votes['3'] === null ? 'null' : $votes['3'];
+        $vote1 = !array_key_exists('1', $votes) || $votes['1'] === null ? 'null' : $votes['1'];
+        $vote2 = !array_key_exists('2', $votes) || $votes['2'] === null ? 'null' : $votes['2'];
+        $vote3 = !array_key_exists('3', $votes) || $votes['3'] === null ? 'null' : $votes['3'];
         
         $sql = 'insert into votes '.
              '(id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) '.

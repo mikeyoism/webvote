@@ -121,6 +121,24 @@ CREATE TABLE `voteCodes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `vote_weights_and_labels`
+--
+
+DROP TABLE IF EXISTS `vote_weights_and_labels`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `vote_weights_and_labels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `category` int(11) NOT NULL,
+  `label` varchar(50) NOT NULL,
+  `weight` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `category` (`category`),
+  CONSTRAINT `vote_weights_and_labels_ibfk_1` FOREIGN KEY (`category`) REFERENCES `categories` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `votes`
 --
 
@@ -159,4 +177,4 @@ CREATE TABLE `votes` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-10-07 10:57:15
+-- Dump completed on 2017-10-13  7:14:08

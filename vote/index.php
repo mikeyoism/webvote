@@ -7,7 +7,6 @@ $dbAccess = new DbAccess();
 $competitionId = getCompetitionId();
 
 $categories= $dbAccess->getCategories($competitionId);
-$vote_weight_and_labels = $dbAccess->getVoteWeightAndLabels($competitionId);
 
 ?>
 
@@ -124,11 +123,12 @@ function htmlVoteRow($cat, $voteNr, $voteLabel)
     return $ret;
 }
     
-$votes_per_cat = count($vote_weight_and_labels);
-$vote_labels = array_keys($vote_weight_and_labels);
-
 foreach ($categories as $c)
 {
+    $vote_weight_and_labels = $dbAccess->getVoteWeightAndLabels($c['id']);
+    $votes_per_cat = count($vote_weight_and_labels);
+    $vote_labels = array_keys($vote_weight_and_labels);
+
     $extra = isset($c['description']) ? ' (' . $c['description'] . ')' : '';
     $cColor = isset($c['color']) ? $c['color'] : '#cccccc';
     $id = $c['id'];
