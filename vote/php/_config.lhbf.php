@@ -64,13 +64,16 @@ define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('','')));
 //define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('sm_takeover'=>'101-119')));
 define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('vinterbeer_porterstout'=>'101-126','vinterbeer_other'=>'201-212')));
 //define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('summerbeer'=>'101-126','summerbeer_cider'=>'201-202')));
-
+//Antal siffror i serierna för NUMBERSPAN ovan (måste vara samma antal siffror från min - max i alla kategoerier (ex 100-999 = 3 siffror)
+define("CONST_SETTING_BEERID_NUMBERSPAN_LENGTH",3);
 //Sparaknapparnas bakgrundsfärger, för ökat visuell känsla av vad man håller på att rösta på. CCCCCC är defaultfärgen grå som matchar övrig bakgrund
 //define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('gul'=>'#D8C704','gron'=>'#75AF6A','bla'=>'#6A8EAF','rod'=>'#D83737','etikett'=>'#CCCCCC')));
 //define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('sm_takeover'=>'#6A8EAF')));
 define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('vinterbeer_porterstout'=>'#75AF6A','vinterbeer_other'=>'#D8C704')));
 //define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('summerbeer'=>'#75AF6A','summerbeer_cider'=>'#D8C704')));
 
+//Längd på röstkoder - överskrid inte satt maxlängd i db.
+define("CONST_SETTING_VOTE_CODE_LENGTH",3);
 
 //Antal röster per kategori
 //Om fler än 7st måste DB-tabeller utökas, se readme.md
