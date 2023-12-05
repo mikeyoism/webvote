@@ -16,6 +16,7 @@ $user_cat_extra  = unserialize(CONST_SETTING_CATEGORIES_PUBLIC_SUB);
 $cat_col = unserialize(CONST_SETTING_CATEGORIES_COLORS);
 $votes_per_cat = CONST_SETTING_VOTES_PER_CATEGORY;
 $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
+$code_len = CONST_SETTING_VOTE_CODE_LENGTH;
 ?>
 
 <!DOCTYPE html>
@@ -69,6 +70,7 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
     }
     </style>    
     <script src="js/vote.min.js" type="text/javascript"></script> 
+    <!--<script src="js/vote.js" type="text/javascript"></script> -->
 </head>
 <body>
     
@@ -138,7 +140,7 @@ $vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
      	    <ul data-role="listview" data-inset="true">
 		<li data-role="fieldcontain">
 		    
-		    <input type="text" id="vote_code" name="vote_code"  placeholder="Din röstkod" value="" maxlength="6" data-mini="true" size="5"  >
+		    <input type="text" id="vote_code" name="vote_code"  placeholder="Din röstkod" value="" maxlength="<?=$code_len;?>" data-mini="true" size="5"  >
 		</li>
 	    </ul>
  

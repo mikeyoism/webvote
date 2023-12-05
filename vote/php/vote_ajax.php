@@ -206,9 +206,20 @@ function ax_reread($userStored_vote_code)
 {
     header('Content-Type: application/json', true);
     $jsonReply = array();
-    
+    //mj php8
+    if (!isset($_SESSION["vote_code_approved"]))
+      $_SESSION["vote_code_approved"]  = false;
+    if (!isset($_SESSION['vote_code']))
+      $_SESSION['vote_code']  = "";
+    $code_len = CONST_SETTING_VOTE_CODE_LENGTH;
+    //mj fix, kod som varit ok i session tidigare ska direkt bli ogiltig vid radering av tecken / fel antal tecken
+    if (strlen($userStored_vote_code) != $code_len){
+         $_SESSION["vote_code_approved"]  = false;
+         $_SESSION['vote_code'] = "";
+    }
+      
     //dubblekolla kod mod sql, returnera meddelande till user, utför bara om kod-in ändrats mot vad vi har serverside.
-    if (($_SESSION["vote_code_approved"] !== true || $_SESSION['vote_code'] != $userStored_vote_code)  && strlen($userStored_vote_code) == 6){
+    if (($_SESSION["vote_code_approved"] !== true || $_SESSION['vote_code'] != $userStored_vote_code)  && strlen($userStored_vote_code) == $code_len){
 	$jsonReply = codeCheck2($userStored_vote_code);
     }
     else if ($_SESSION["vote_code_approved"] === true){
@@ -277,7 +288,7 @@ function ax_reread($userStored_vote_code)
 	    else
 	    {
 		for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
-		    $jsonReply["vote_{$voteNr}_{$currCategory}"] = $_SESSION["vote_{$voteNr}_{$currCategory}"];
+                   $jsonReply["vote_{$voteNr}_{$currCategory}"] = $_SESSION["vote_{$voteNr}_{$currCategory}"] ?? ""; //mj php8
 
 	    }
 	}
@@ -290,7 +301,7 @@ function ax_reread($userStored_vote_code)
 	return true;
 
     }
-    if ($jsonReply["usrmsg"] != "")
+    if ($jsonReply["usrmsg"] ?? "" != "")
     {
 	$jsonReply["no votes"] = "";
 	echo json_encode($jsonReply);
@@ -307,8 +318,8 @@ function ax_reread($userStored_vote_code)
  */
 function ax_post_stat($vote_code,$gender,$age,$location,$firstSM)
 {
-
-    if(strlen($vote_code) < 6){
+   $code_len = CONST_SETTING_VOTE_CODE_LENGTH;
+   if(strlen($vote_code) < $code_len){
 	echo "Felaktig röstkod!, ange din röstkod längst upp innan du registrerar";
 	return;
     }
@@ -343,7 +354,8 @@ function ax_post_vote($category,$vote_code){
 	 echo "Röstningen är STÄNGD!";
 	 return;
     }
-    if(strlen($vote_code) != 6){
+    $code_len = CONST_SETTING_VOTE_CODE_LENGTH;
+    if(strlen($vote_code) != $code_len ){
 	echo "Felaktig röstkod!, ange din röstkod längst upp innan du röstar";
 	return;
     }
@@ -501,6 +513,7 @@ function ax_post_vote($category,$vote_code){
 		    }
 		    if (SETTING_LOG_CHANGED_VOTES && $changes)
 		    {
+         $sqlHvalues = ""; //mj php8
 			foreach ($ivotes as $key => $vote)
 			{
 			    //($vote > 0 ? (",". $vote . ",'" . $now . "'" ) : (", NULL, NULL") )
@@ -549,11 +562,12 @@ function codeCheck2($stored_client_code = "")
 {
 
 	$count = 0;
-	$vote_code_old = $_SESSION['vote_code'];
-	if (strlen($stored_client_code) == 6)
+	$vote_code_old = $_SESSION['vote_code'] ?? ""; //mj php8
+   $code_len = CONST_SETTING_VOTE_CODE_LENGTH;
+	if (strlen($stored_client_code) == $code_len )
 	    $vote_code = $stored_client_code;
 	else
-	    $vote_code =$_GET["vote_code"];
+	    $vote_code =$_GET["vote_code"] ?? "";  //mj php8
 	$vote_code = strtoupper($vote_code);
 	$vote_code = trim($vote_code);	    
 	$count = check_vote_code_sql($vote_code,null,$vote_code);
@@ -569,7 +583,7 @@ function codeCheck2($stored_client_code = "")
 	    $jsonReply["msgtype"] = "ok";
 	    $jsonReply["vote_code"] = $vote_code; //retunera formatterad/uppercasad
 	}
-	else if (count == 0)
+	else if ($count == 0) //mj php8
 	{
 	    unset($_SESSION["vote_code"]);
 	    $_SESSION["vote_code_approved"] = false;

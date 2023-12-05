@@ -39,7 +39,7 @@ votejs = function() {
     var sysstatustmr = null;
     var VOTES_PER_CAT = 0;
     var VOTE_WEIGHT_AND_LABELS = null;
-
+    var VOTE_CODE_LEN = 3;
 
     //to store & retrieve the voting categories for this competition.
     var sys_cat = [];
@@ -65,6 +65,7 @@ votejs = function() {
 		    sysstatusInterval = response.SETTING_SYSSTATUS_INTERVAL;
 		    VOTES_PER_CAT = response.CONST_SETTING_VOTES_PER_CATEGORY;
 		    VOTE_WEIGHT_AND_LABELS = response.CONST_SETTING_VOTE_WEIGHT;
+            VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
 		    if (DEBUGMODE) console.log(response);
 
 		    sys_cat = response.CONST_SETTING_CATEGORIES_SYS;

@@ -34,11 +34,11 @@
 	    
 	    var vote_code = $(this).val();
 	    
-	    if (e.type == "keyup" && vote_code.length < 6) {
+	    if (e.type == "keyup" && vote_code.length < votejs.VOTE_CODE_LEN) {
 		return false;
 	    }
-	    else if (e.type == "focusout" && vote_code.length < 6) {
-		statusDiv.html('<div class="infobar infobar-warning" data-mini="true">Kod ska vara 6 tecken!</div>');
+	    else if (e.type == "focusout" && vote_code.length < votejs.VOTE_CODE_LEN) {
+		statusDiv.html('<div class="infobar infobar-warning" data-mini="true">Kod har fel antal tecken!</div>');
 		statusDiv.fadeIn();
 	    }
 	    else{
@@ -89,6 +89,7 @@ votejs = function(){
     var DUPE_VOTE_REQUIRE_ALL = true;
     var VOTES_PER_CAT = 0;
     var VOTES_REQUIRE_ALL = false;
+    var VOTE_CODE_LEN = 3;
     var REQUEST_SYSSTATUS = false;
     var sysstatusInterval = 9999; //todo uppercase
     var sysstatustmr = null;
@@ -119,6 +120,7 @@ votejs = function(){
                         REQUEST_SYSSTATUS = response.REQUEST_SYSSTATUS;
                         sysstatusInterval = response.SETTING_SYSSTATUS_INTERVAL;
     
+                        VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
                         MAX_SAME_VOTES = response.CONST_SETTING_VOTES_PER_CATEGORY_SAME;
                         DUPE_VOTE_REQUIRE_ALL = response.CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL;
 			VOTES_PER_CAT = response.CONST_SETTING_VOTES_PER_CATEGORY;

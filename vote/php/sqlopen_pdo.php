@@ -3,7 +3,7 @@ $dbhost = '';
 $dbname = '';
 $dbuser = '';
 $dbpass = '';
-require "sqlopen_pdo.MY.gitignore.php"; //either create the MY.gitignore.php file with values for above variables set, or fill in above variables and remove this line.
+require_once "sqlopen_pdo.MY.gitignore.php"; //either create the MY.gitignore.php file with values for above variables set, or fill in above variables and remove this line.
 
 //our php/html-pages are stored as utf8
 //avoid PDO::ATTR_PERSISTENT => true ? to avoid reaching max-user limit

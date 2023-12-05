@@ -25,13 +25,17 @@
 
 //tvälingsnamn, visas som header på röstsida (och övriga sidor)
 //håll namnet KORT, annars trunkeras namnet (framförallt i mobila enheter, testa)
-define("SETTING_COMPETITION_NAME","SM 2016");  
+//define("SETTING_COMPETITION_NAME","LHBF SM Takeover 2022");
+define("SETTING_COMPETITION_NAME","Novembermörker 2022");  
 
 //tävlingens öppettider format ex : 2014-01-22 20:00:00"
 //SETTING_OPEN_DEBUG_ALWAYS_OPEN = bara true vid test, överskrider inställa öppettider
+//define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true); /only for test and debug
 define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",false);
-define("SETTING_OPEN_DATE_OPEN", "2016-04-30 13:00:00");
-define("SETTING_OPEN_DATE_CLOSE","2016-04-30 16:00:00");
+define("SETTING_OPEN_DATE_OPEN","2022-11-04 14:00:00");
+define("SETTING_OPEN_DATE_CLOSE","2022-11-19 16:30:00");
+//define("SETTING_OPEN_DATE_OPEN", "2021-07-03 18:00:00");
+//define("SETTING_OPEN_DATE_CLOSE","2021-07-03 21:30:00");
 
 //innan categories ändras måste tabeller i databas skapas som stämmer överens:
 //tabellerna ska heta "vote_cat_xxx" och "vote_cat_xxx_history" där xxx motsvarar CONST_SETTING_CATEGORIES_SYS
@@ -39,31 +43,35 @@ define("SETTING_OPEN_DATE_CLOSE","2016-04-30 16:00:00");
 
 //publika namn på kategorier  - svenska tecken och dyl är OK här
 //ex define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Gul','Grön','Blå','Röd','Etikett')));
-define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Folkets val klass A', 'Folkets val klass B', 'Folkets val klass C', 'Folkets val klass D', 'Etikettävlingen')));
+define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Mörk öl','Öppen klass')));
+//define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Öppen klass')));
+//define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Sommaröl')));
+//define ("CONST_SETTING_CATEGORIES_PUBLIC", serialize (array ('Sommaröl', 'Cider & Mjöd')));
 
 //tekniska namn på kategorier (databasnamn etc) - svenska, mellanslag etc är förbjudna här! måste stämma i antal och i sekvens med publika
 //(en databastabell skall finns för varje kategori med samman man som här och prefix vote_cat_)
 //ex define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('gul','gron','bla','rod','etikett')));
-define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('fv1', 'fv2', 'fv3', 'fv4', 'label')));
+//define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('sm_takeover')));
+define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('vinterbeer_porterstout', 'vinterbeer_other')));
+//define ("CONST_SETTING_CATEGORIES_SYS", serialize (array ('summerbeer', 'summerbeer_cider')));
 
 //publik extra info för respektive kategori,måste stämma i antal och i sekvens med tekniska
 //define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('lågalkoholöl 0-3,5%','sessionöl 3,6-5,5%','medelkraftig öl 5,6-7%','kraftfull öl 7-∞%','')));
-define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('0 - 3,5 % vol', '3,6 - 5,4 % vol', '5,5 - 6,8 % vol', '6,9 % vol och över', '')));
+define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('','')));
 
 //Nummerserier för röster för respektive kategori, krav: positiva heltal (ej noll) min-max separarade med bindestreck, nycklar = lika CATEGORIES_SYS
 //define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('gul'=>'101-199','gron'=>'201-299','bla'=>'301-399','rod'=>'401-499','etikett'=>'501-599')));
-define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('fv1'=>'100-499', 'fv2'=>'100-499', 'fv3'=>'100-499', 'fv4'=>'100-499', 'label'=>'500-999')));
+//define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('sm_takeover'=>'101-119')));
+define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('vinterbeer_porterstout'=>'101-126','vinterbeer_other'=>'201-212')));
+//define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('summerbeer'=>'101-126','summerbeer_cider'=>'201-202')));
 
-//Antal siffror i serierna för NUMBERSPAN ovan (måste vara samma antal siffror från min - max i alla kategoerier (ex 100-999 = 3 siffror)
-define("CONST_SETTING_BEERID_NUMBERSPAN_LENGTH",3);
 //Sparaknapparnas bakgrundsfärger, för ökat visuell känsla av vad man håller på att rösta på. CCCCCC är defaultfärgen grå som matchar övrig bakgrund
 //define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('gul'=>'#D8C704','gron'=>'#75AF6A','bla'=>'#6A8EAF','rod'=>'#D83737','etikett'=>'#CCCCCC')));
-define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('example'=>'#75AF6A','example2'=>'#6A8EAF')));
+//define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('sm_takeover'=>'#6A8EAF')));
+define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('vinterbeer_porterstout'=>'#75AF6A','vinterbeer_other'=>'#D8C704')));
+//define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('summerbeer'=>'#75AF6A','summerbeer_cider'=>'#D8C704')));
 
 
-
-//Längd på röstkoder - överskrid inte satt maxlängd i db.
-define("CONST_SETTING_VOTE_CODE_LENGTH",6);
 //Antal röster per kategori
 //Om fler än 7st måste DB-tabeller utökas, se readme.md
 define("CONST_SETTING_VOTES_PER_CATEGORY",3);
@@ -74,20 +82,20 @@ define("CONST_SETTING_VOTES_PER_CATEGORY",3);
 //röstnamn är den label som presenteras för användarna på röstsidan
 //OBS ordningen motsvarar vote_1, vote_2, Vote_3 i respektive kategori-tabell i SQL
 //OBS att antal labels och poäng MÅSTE stämma överens med inställningen CONST_SETTING_VOTES_PER_CATEGORY
-//Om denna inställning inte används lämna tom (serialize (array ('')));) då kommer lablar "Röst 1, Röst 2 etc"
+//Om denna inställning inte används lämna tom (serialize (array ()));) då kommer lablar "Röst 1, Röst 2 etc"
 //automatiskt presenteras för användarna på röstsidan och varje röst ge en poäng (som SM2014)
 //(du KAN INTE fylla i poäng '1' rakt igenom för att få andra lablar (ej testat))
 //exempel define ("CONST_SETTING_VOTE_WEIGHT", serialize (array ('Guld'=>5,'Silver'=>4,'Brons'=>3,'Sten'=>2,'Lera'=>1,'Mögel'=>0,'Avföring'=>-1)));
-define ("CONST_SETTING_VOTE_WEIGHT", serialize (array ('Guld'=>3,'Silver'=>2,'Brons'=>1)));
+define ("CONST_SETTING_VOTE_WEIGHT", serialize (array ()));
 
 //Max antal röster på samma öl - i samma kategori, sätt -1 för att inaktivera begränsing.
-define("CONST_SETTING_VOTES_PER_CATEGORY_SAME",1);
+define("CONST_SETTING_VOTES_PER_CATEGORY_SAME",2);
 //Kräv att alla tre röster utnyttjas, om man röstat på samma öl +1 gång
 define("CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL",true);
 
 //Kräv att alla röster alltid utnyttjas (överskrider CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL)
 //rekommenders om röster är viktade , ex Guld, Silver röster via CONST_SETTING_VOTE_WEIGHT
-define("CONST_SETTING_VOTES_PER_CATEGORY_REQUIRE_ALL",true);
+define("CONST_SETTING_VOTES_PER_CATEGORY_REQUIRE_ALL",false);
 
 //true = om en papperröst registreras så ska denna skriva över ev webbröster
 //vid false ignoreras pappersröst där webbröst redan finns.
@@ -100,7 +108,7 @@ define("CONST_SETTING_PAPERVOTE_CAN_OVERWRITE_WEBVOTE",true);
 
 //intervall klienter ska fråga efter systatus, i millisekunder
 //(sysstatus = fönsterat som visar hur länge tävlig är öppen/stängd mm i klienten)
-define("SETTING_SYSSTATUS_INTERVAL",10000);
+define("SETTING_SYSSTATUS_INTERVAL",5000);
 
 //Normalt false. True meddelar klienter att sluta fråga efter status, använd för att minska bandbreddsproblem
 //aktiva klienter kommer sedan inte prova igen, förrän klientsida laddas om!
@@ -122,7 +130,7 @@ define("CONST_SETTING_ENABLE_VISITOR_STATISTICS",true);
 
 //output js & php script debug i klient? Viktigt att sätta false i produktion
 //ger extra fel och info rutor för testning 
-define("CONST_SYS_JS_DEBUG",false); 
+define("CONST_SYS_JS_DEBUG", true); 
 
 //denna inställning bör enbart stängas av vid test/utveckling, eller möjligtvis vid allvarliga problem under pågående tävling för att spara prestanda.
 //(true = inskickad röstkod kontrolleras server-side första gången röster kommer in för en ny röstkod i en kategori.

@@ -36,8 +36,8 @@ function check_vote_format($category, $str_vote)
     //om någon anser att "0" = ingen röst, så tillåt det genom att konvertera till tomt (som nedan blir int -1)
     if ($str_vote === "0")
 	$str_vote = "";
-	
-    if(strlen($str_vote) != 3 && strlen($str_vote) > 0)
+	$beer_ids_len = CONST_SETTING_BEERID_NUMBERSPAN_LENGTH;
+    if(strlen($str_vote) != $beer_ids_len  && strlen($str_vote) > 0)
        return "Fel antal siffror";
     $ivote = -1; //tom röst
     
@@ -135,8 +135,8 @@ function check_vote_rules($ivotes, $admin = true)
 function check_vote_code_sql($vote_code,$manreg_paper_vote = null,$vote_code_old = "")
 {
     $count = 0;
-    
-    if(strlen($vote_code) != 6){
+    $code_len = CONST_SETTING_VOTE_CODE_LENGTH;
+    if(strlen($vote_code) != $code_len){
 	return  -1;
     }
     else{
@@ -150,7 +150,7 @@ function check_vote_code_sql($vote_code,$manreg_paper_vote = null,$vote_code_old
 		{
 		    $count = 1;
 		    //manreg_paper_vote=2 = röstat via publik dator, 1= röst reggad av funktionär (manreg_adm)
-		    if (strlen($vote_code_old) == 6 && $vote_code_old != $vote_code) //indikera att koden ändrats = statistik för om flera användare delar enhet
+		    if (strlen($vote_code_old) == $code_len && $vote_code_old != $vote_code) //indikera att koden ändrats = statistik för om flera användare delar enhet
 		    {
 			$stmt = $db->prepare("INSERT INTO vote_codes_allocation_log  (vote_code,allocation_DT,old_code,manreg_paper_vote) VALUES(:vote_code, :date ,:vote_code_old, :manreg_paper_vote)");
 			$stmt->execute(array(':vote_code' => $vote_code, ':date' => date("Y-m-d H:i:s"), ':vote_code_old' => $vote_code_old, ':manreg_paper_vote' => $manreg_paper_vote));

@@ -46,6 +46,8 @@ if(isset($_POST['operation']))
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY_REQUIRE_ALL"] = CONST_SETTING_VOTES_PER_CATEGORY_REQUIRE_ALL;
         $jsonReply["CONST_SETTING_CATEGORIES_SYS"] = unserialize(CONST_SETTING_CATEGORIES_SYS);
         $jsonReply["CONST_SETTING_VOTE_WEIGHT"] = unserialize(CONST_SETTING_VOTE_WEIGHT);
+        $jsonReply["CONST_SETTING_VOTE_CODE_LENGTH"] = CONST_SETTING_VOTE_CODE_LENGTH;
+         
         echo  json_encode($jsonReply);
         return true;
 

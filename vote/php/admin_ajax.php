@@ -89,6 +89,7 @@ function ax_getvotes($inCat){
     
     if ($cfound){
 	header('Content-Type: application/json', true);
+    $WeightCount = 0; //mj php8
 	$jsonReply = array();
 	FB::info($WeightCount,"weight count");
 	$vote_weight_and_labels = unserialize(CONST_SETTING_VOTE_WEIGHT);
@@ -328,14 +329,15 @@ function ax_login($username,$password){
 }
 
 function ax_votecode_generate($NrofCodes){
+    $code_len = CONST_SETTING_VOTE_CODE_LENGTH;
     if ($NrofCodes > 0)
     {
 	$codes = array();
 	for ($i = 0; $i  < $NrofCodes; $i++)
 	{
-	    $new = generateRandomString(6);
+	    $new = generateRandomString($code_len);
 	    while (in_array($new,$codes))
-		   $new = generateRandomString(6);
+		   $new = generateRandomString($code_len);
 	    array_push($codes,$new);
 	}
 
