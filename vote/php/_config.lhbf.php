@@ -25,15 +25,15 @@
 
 //tvälingsnamn, visas som header på röstsida (och övriga sidor)
 //håll namnet KORT, annars trunkeras namnet (framförallt i mobila enheter, testa)
-//define("SETTING_COMPETITION_NAME","LHBF SM Takeover 2022");
-define("SETTING_COMPETITION_NAME","Novembermörker 2022");  
+//define("SETTING_COMPETITION_NAME","Sommarölsträffen 2023");
+define("SETTING_COMPETITION_NAME","Novembermörker 2023x");  
 
 //tävlingens öppettider format ex : 2014-01-22 20:00:00"
 //SETTING_OPEN_DEBUG_ALWAYS_OPEN = bara true vid test, överskrider inställa öppettider
 //define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true); /only for test and debug
-define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",false);
-define("SETTING_OPEN_DATE_OPEN","2022-11-04 14:00:00");
-define("SETTING_OPEN_DATE_CLOSE","2022-11-19 16:30:00");
+define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true);
+define("SETTING_OPEN_DATE_OPEN","2023-11-25 14:00:00");
+define("SETTING_OPEN_DATE_CLOSE","2023-11-25 16:30:00");
 //define("SETTING_OPEN_DATE_OPEN", "2021-07-03 18:00:00");
 //define("SETTING_OPEN_DATE_CLOSE","2021-07-03 21:30:00");
 
@@ -62,8 +62,9 @@ define ("CONST_SETTING_CATEGORIES_PUBLIC_SUB", serialize (array ('','')));
 //Nummerserier för röster för respektive kategori, krav: positiva heltal (ej noll) min-max separarade med bindestreck, nycklar = lika CATEGORIES_SYS
 //define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('gul'=>'101-199','gron'=>'201-299','bla'=>'301-399','rod'=>'401-499','etikett'=>'501-599')));
 //define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('sm_takeover'=>'101-119')));
-define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('vinterbeer_porterstout'=>'101-126','vinterbeer_other'=>'201-212')));
-//define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('summerbeer'=>'101-126','summerbeer_cider'=>'201-202')));
+define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('vinterbeer_porterstout'=>'101-124','vinterbeer_other'=>'201-218')));
+//define ("CONST_SETTING_CATEGORIES_NUMBERSPAN", serialize (array ('summerbeer'=>'101-135','summerbeer_cider'=>'201-204')));
+
 //Antal siffror i serierna för NUMBERSPAN ovan (måste vara samma antal siffror från min - max i alla kategoerier (ex 100-999 = 3 siffror)
 define("CONST_SETTING_BEERID_NUMBERSPAN_LENGTH",3);
 //Sparaknapparnas bakgrundsfärger, för ökat visuell känsla av vad man håller på att rösta på. CCCCCC är defaultfärgen grå som matchar övrig bakgrund
@@ -72,9 +73,10 @@ define("CONST_SETTING_BEERID_NUMBERSPAN_LENGTH",3);
 define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('vinterbeer_porterstout'=>'#75AF6A','vinterbeer_other'=>'#D8C704')));
 //define ("CONST_SETTING_CATEGORIES_COLORS", serialize (array ('summerbeer'=>'#75AF6A','summerbeer_cider'=>'#D8C704')));
 
-//Längd på röstkoder - överskrid inte satt maxlängd i db.
-define("CONST_SETTING_VOTE_CODE_LENGTH",3);
 
+
+//Längd på röstkoder - överskrid inte satt maxlängd i db.
+define("CONST_SETTING_VOTE_CODE_LENGTH",6);
 //Antal röster per kategori
 //Om fler än 7st måste DB-tabeller utökas, se readme.md
 define("CONST_SETTING_VOTES_PER_CATEGORY",3);

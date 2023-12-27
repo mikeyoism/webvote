@@ -119,12 +119,12 @@ votejs = function(){
                         DEBUGMODE = response.CONST_SYS_JS_DEBUG;
                         REQUEST_SYSSTATUS = response.REQUEST_SYSSTATUS;
                         sysstatusInterval = response.SETTING_SYSSTATUS_INTERVAL;
-    
+                        
                         VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
                         MAX_SAME_VOTES = response.CONST_SETTING_VOTES_PER_CATEGORY_SAME;
                         DUPE_VOTE_REQUIRE_ALL = response.CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL;
-			VOTES_PER_CAT = response.CONST_SETTING_VOTES_PER_CATEGORY;
-			VOTES_REQUIRE_ALL = response.CONST_SETTING_VOTES_PER_CATEGORY_REQUIRE_ALL;
+                        VOTES_PER_CAT = response.CONST_SETTING_VOTES_PER_CATEGORY;
+            			VOTES_REQUIRE_ALL = response.CONST_SETTING_VOTES_PER_CATEGORY_REQUIRE_ALL;
                         
                         if (DEBUGMODE) console.log(response);
                         

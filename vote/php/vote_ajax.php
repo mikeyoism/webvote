@@ -217,97 +217,97 @@ function ax_reread($userStored_vote_code)
          $_SESSION["vote_code_approved"]  = false;
          $_SESSION['vote_code'] = "";
     }
-      
+    
     //dubblekolla kod mod sql, returnera meddelande till user, utför bara om kod-in ändrats mot vad vi har serverside.
     if (($_SESSION["vote_code_approved"] !== true || $_SESSION['vote_code'] != $userStored_vote_code)  && strlen($userStored_vote_code) == $code_len){
-	$jsonReply = codeCheck2($userStored_vote_code);
+         $jsonReply = codeCheck2($userStored_vote_code);
     }
     else if ($_SESSION["vote_code_approved"] === true){
-	$jsonReply["msgtype"] = "ok-cached";
-	$jsonReply["usrmsg"] = "Ok! nu kan du rösta nedanför";
+      $jsonReply["msgtype"] = "ok-cached";
+      $jsonReply["usrmsg"] = "Ok! nu kan du rösta nedanför";
     }
     //läs in sparade röster, om kod är ok.
     if ($_SESSION["vote_code_approved"] === true)
     {
 
-	FB::info("approved");
-	$approved_code = $jsonReply["vote_code"] = $_SESSION["vote_code"];
-	$connOpen = false; //öppna en gång, i foreach.
+         FB::info("approved");
+         $approved_code = $jsonReply["vote_code"] = $_SESSION["vote_code"];
+         $connOpen = false; //öppna en gång, i foreach.
+      
+         $cats  = unserialize(CONST_SETTING_CATEGORIES_SYS);
 
-	$cats  = unserialize(CONST_SETTING_CATEGORIES_SYS);
-
-	foreach ($cats  as $currCategory)
-	{
-
-	    if (needReReadSql($currCategory))
-	    {
-		FB::info("need reread");
-		$sqlvotes = "";
-		for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
-		    $sqlvotes .= "vote_{$voteNr},";
-		$sqlvotes = substr($sqlvotes,0,-1);
-
-		if (!$connOpen){
-		    include 'sqlopen_pdo.php';
-		    $connOpen = true;
-		}
-		//$sqlsearch = "SELECT {$sqlvotes} from vote_cat_{$currCategory} WHERE vote_code = '" . $approved_code . "' LIMIT 1";
-		$sqlsearch = "SELECT {$sqlvotes} from vote_cat_{$currCategory} WHERE vote_code = :approved_code LIMIT 1";
-		$stmt = $db->prepare($sqlsearch);
-		
-		//if($result = mysql_query($sqlsearch) )
-		if($stmt->execute(array(':approved_code' => $approved_code)) )
-		{
-		    
-		    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-		    //if ($row = mysql_fetch_assoc($result))
-		    if (!empty($row))
-		    {
-			FB::info($row,"rr");
-			for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
-			{
-			    
-			    $_SESSION["vote_{$voteNr}_{$currCategory}"] = $jsonReply["vote_{$voteNr}_{$currCategory}"] = $row["vote_{$voteNr}"];
-			}
-
-
-		    }
-		    //mysql_free_result($result);
-		    $stmt = null;
-		}
-		else{
-		    //om inte annat resettar detta sessionvariabler vid felsökning
-		    for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
-			$jsonReply["vote_{$voteNr}_{$currCategory}"] = $_SESSION["vote_{$voteNr}_{$currCategory}"] = "";
-		    FB::info("no votes");
-
-		}
-
-
-	    }
-	    else
-	    {
-		for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
+         foreach ($cats  as $currCategory)
+         {
+      
+             if (needReReadSql($currCategory))
+             {
+                  FB::info("need reread");
+                  $sqlvotes = "";
+                  for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
+                      $sqlvotes .= "vote_{$voteNr},";
+                  $sqlvotes = substr($sqlvotes,0,-1);
+            
+                  if (!$connOpen){
+                      include 'sqlopen_pdo.php';
+                      $connOpen = true;
+                  }
+                  //$sqlsearch = "SELECT {$sqlvotes} from vote_cat_{$currCategory} WHERE vote_code = '" . $approved_code . "' LIMIT 1";
+                  $sqlsearch = "SELECT {$sqlvotes} from vote_cat_{$currCategory} WHERE vote_code = :approved_code LIMIT 1";
+                  $stmt = $db->prepare($sqlsearch);
+                  
+                  //if($result = mysql_query($sqlsearch) )
+                  if($stmt->execute(array(':approved_code' => $approved_code)) )
+                  {
+                      
+                      $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                      //if ($row = mysql_fetch_assoc($result))
+                      if (!empty($row))
+                      {
+                     FB::info($row,"rr");
+                     for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
+                     {
+                         
+                         $_SESSION["vote_{$voteNr}_{$currCategory}"] = $jsonReply["vote_{$voteNr}_{$currCategory}"] = $row["vote_{$voteNr}"];
+                     }
+            
+            
+                      }
+                      //mysql_free_result($result);
+                      $stmt = null;
+                  }
+                  else{
+                      //om inte annat resettar detta sessionvariabler vid felsökning
+                      for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
+                           $jsonReply["vote_{$voteNr}_{$currCategory}"] = $_SESSION["vote_{$voteNr}_{$currCategory}"] = "";
+                      FB::info("no votes");
+            
+                  }
+      
+      
+             }
+             else
+             {
+               for ($voteNr = 1; $voteNr <= CONST_SETTING_VOTES_PER_CATEGORY; $voteNr++)
                    $jsonReply["vote_{$voteNr}_{$currCategory}"] = $_SESSION["vote_{$voteNr}_{$currCategory}"] ?? ""; //mj php8
-
-	    }
-	}
-	if ($connOpen){
-	    //include 'sqlclose.php';
-	    $db = $stmt = null;
-	}
-
-	echo  json_encode($jsonReply);
-	return true;
+         
+             }
+         }
+         if ($connOpen){
+             //include 'sqlclose.php';
+             $db = $stmt = null;
+         }
+      
+         echo  json_encode($jsonReply);
+         return true;
 
     }
     if ($jsonReply["usrmsg"] ?? "" != "")
     {
-	$jsonReply["no votes"] = "";
-	echo json_encode($jsonReply);
+         $jsonReply["no votes"] = "";
+         echo json_encode($jsonReply);
     }
     else //empty
-	echo json_encode(array('no votes,no code' => '')); //nästan empty
+      echo json_encode(array('no votes,no code' => '')); //nästan empty
 
     return true;
 }
@@ -458,7 +458,7 @@ function ax_post_vote($category,$vote_code){
 		    echo "Rösterna har registrerats";
 		    foreach ($ivotes as $key => $vote)
 		    {
-			if ($vote > 0) $_SESSION["vote_{$key}_{$category}"] = $vote;
+            if ($vote > 0) $_SESSION["vote_{$key}_{$category}"] = $vote;
 
 		    }
 		}

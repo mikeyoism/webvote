@@ -339,8 +339,9 @@ function ax_votecode_generate($NrofCodes){
 	    while (in_array($new,$codes))
 		   $new = generateRandomString($code_len);
 	    array_push($codes,$new);
+	    
+	    
 	}
-
 	$now = date("Y-m-d H:i:s");
 	$insert = "INSERT IGNORE INTO vote_codes (vote_code,generated_DT) VALUES";
 	foreach ($codes as $code){

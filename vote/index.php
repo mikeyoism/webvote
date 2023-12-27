@@ -69,7 +69,7 @@ $code_len = CONST_SETTING_VOTE_CODE_LENGTH;
 	}
     }
     </style>    
-    <script src="js/vote.min.js" type="text/javascript"></script> 
+    <script src="js/vote.min.js" type="text/javascript"></script>
     <!--<script src="js/vote.js" type="text/javascript"></script> -->
 </head>
 <body>

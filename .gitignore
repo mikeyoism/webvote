@@ -218,3 +218,9 @@ pip-log.txt
 *.gitignore.*
 vote/error_log
 vote/php/error_log
+
+#svn etc
+.svn/
+*.komodoproject
+*.jar
+
