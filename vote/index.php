@@ -90,7 +90,8 @@ $categories= $dbAccess->getCategories($competitionId);
     <div class="ui-block-b" data-mini="true">
      	    <ul data-role="listview" data-inset="true">
 		<li data-role="fieldcontain">
-		    <input type="text" id="vote_code" name="vote_code"  placeholder="Din röstkod" value="" maxlength="6" data-mini="true" size="5"  >
+		    
+		    <input type="text" id="vote_code" name="vote_code"  placeholder="Din röstkod" value="" maxlength="<?=$code_len;?>" data-mini="true" size="5"  >
 		</li>
 	    </ul>
  
