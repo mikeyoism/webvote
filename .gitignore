@@ -224,3 +224,7 @@ vote/php/error_log
 *.komodoproject
 *.jar
 
+SQL/devdata/*
+.vscode/*
+
+vote/php/config_lhbf.ini
