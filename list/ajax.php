@@ -1,7 +1,7 @@
 <?php // -*- coding: utf-8 -*-
 
-$competitionId = 2;
-$enableVoting = 0;
+$competitionId = 1;
+$enableVoting = 1;
 
 
 $files = [
