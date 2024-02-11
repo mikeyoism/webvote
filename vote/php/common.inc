@@ -1,5 +1,5 @@
 <?php // -*- coding: utf-8 -*-
-
+require_once '_config.php';
 class DbAccess
 {
     private $dbConn = null;
@@ -73,7 +73,7 @@ class DbAccess
         $result = $this->getConnection()->query($sql) or die ("getCompetition: Query failed: $sql");
     
         if ($result->num_rows != 1)
-            die("Invalid competition id.");
+            die("Invalid competition id." . $id);
         $row = $result->fetch_assoc();
 
         $openTime = new DateTime($row['openTime']);
@@ -387,8 +387,12 @@ class DbAccess
 }
 
 function getCompetitionId() {
+    
     if (!isset($_GET['competitionId'])) {
-        die('Missing competition');
+        if (COMPETITION_ID !== null)
+            return COMPETITION_ID;
+        else
+            die('Missing competition');
     }
     
     return $_GET['competitionId'];
