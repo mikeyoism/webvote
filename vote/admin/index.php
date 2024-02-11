@@ -5,7 +5,9 @@ include '../php/common.inc';
 $dbAccess = new DbAccess();
 
 if (isset($_POST['login'])) {
+    
     $dbAccess->login($_POST['username'], $_POST['password']);
+    
     redirectToSelf();
 } else if (isset($_POST['logout'])) {
     logout();
@@ -47,7 +49,7 @@ if (isset($_POST['generateVoteCodes'])) {
 <head>
 <meta charset="utf-8"/>
 <title>Administration</title>
-<link rel="stylesheet" href="css/themes/shbf.css" />
+<link rel="stylesheet" href="../css/themes/shbf.css" />
 </head>
 <body>
 <h1>Administration</h1>
@@ -61,7 +63,7 @@ if ($privilegeLevel < 1) {
     <input type="text" name="username" value=""/>
     <label>Lösenord:</label>
     <input type="password" name="password"/>
-    <button type="submit" name='login'>Logga in</button>
+    <button type="submit" name="login">Logga in</button>
     </form>
 <?php
     exit;
@@ -141,7 +143,7 @@ function generatevoteCodes($competitionId, $count)
     for ($i = 0; $i  < $count; $i++)
     {
         do {
-            $code = generateRandomString(6);
+            $code = generateRandomString(CONST_SETTING_VOTE_CODE_LENGTH);
         } while (in_array($code, $codes));
 	    array_push($codes, $code);
 	}

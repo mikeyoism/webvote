@@ -68,13 +68,43 @@ $categories= $dbAccess->getCategories($competitionId);
 
 <div class="ui-header ui-bar-a" data-swatch="a" data-theme="a" data-form="ui-bar-a" data-role="header" role="banner">
     <h1 class="ui-title" id ="competition_header" tabindex="0" role="heading" aria-level="1" data-mini="true">SM</h1>
+    <a href="#popupHelp" id="helpButton" data-rel="popup" data-transition="slide" data-inline="true" data-position-to="window"
+    class="ui-btn-right  ui-btn-icon-notext ui-btn-corner-all ui-shadow ui-btn-up-a" data-iconpos="notext" data-theme="a" data-role="button" data-icon="info" title=" Hjälp ">
+	<span class="ui-btn-inner ui-btn-corner-all">
+	    <span class="ui-btn-text"> Hjälp </span>
+	    <span data-form="ui-icon" class="ui-icon ui-icon-grid ui-icon-shadow"></span>
+	</span>
+    </a>    
 </div>
 
+<!--content-->
 <div class="ui-content" data-role="content" data-theme="a">
 
+<!--help popup-->
+<div data-role="popup" id="popupHelp" data-theme="a" class="ui-corner-all">
+    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-left">Close</a>    
+
+    <div data-role="header" data-theme="a" class="ui-corner-top ui-header ui-bar-a" role="banner">
+        <h1 class="ui-title" role="heading" aria-level="1">Hjälp</h1>
+    </div>
+        
+        <div style="padding:0.5em 1em;" id="helpform">
+            <p>Börja med att fylla i din personliga röstkod (se programbladet), den måste <b>alltid</b> vara ifylld när du röstar. </p>
+            <p>Tävlande öl är indelade i olika tävlingsklasser.</p>
+            <p>Rösta på dina favoritöl i en klass genom att först ange ölens tävlingsnummer, <b>rösterna registreras när du trycker på SPARA-knappen</b>.
+            Du får alltid en bekräftelse tillbaka. Röster kan uppdateras/ändras obegränsat fram till tävlingen stänger med spara-knapparna.</p>
+            <p><b>Observera att varje tävlingsklass har sin egen spara-knapp</b>, du sparar alltså röster inividuellt per klass.</p>
+            <p>Du väljer själv i vilka klasser du vill rösta och hur många röster du vill avge. 
+            </p>
+        </div>
+
+
+</div>  
+
+<!--logo-->
 <div class="ui-bar ui-bar-b"> <!--ui-bar-b  = bakgrundsfärgstema-->
     <div id="headerbanner" >
-	<img src="img/banner.png" alt="Home" </img>
+	<img src="img/banner.png" alt="Home"> </img>
     </div>
 </div>    
 
@@ -110,7 +140,7 @@ $categories= $dbAccess->getCategories($competitionId);
 <?php
 function htmlVoteRow($cat, $voteNr, $voteLabel)
 {
-    $ret;
+    $ret= "";
     $label = "Röst " . $voteNr; //default, röst 1, röst 2 etc
     if ($voteLabel != "")
         $label = $voteLabel; //user defined, guld, silver etc...

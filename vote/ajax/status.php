@@ -3,8 +3,8 @@
 session_start();
 include '../php/common.inc';
 
-define("SETTING_SYSSTATUS_INTERVAL", 10000);
-
+//define("SETTING_SYSSTATUS_INTERVAL", 10000);
+//post
 $voteArgs = json_decode(file_get_contents('php://input'));
 if (!isset($voteArgs->competition_id)) {
     die('competition_id missing');
@@ -16,11 +16,11 @@ if (!preg_match('/^[1-9][0-9]{0,4}$/', $competitionId)) {
 
 $dbAccess = new DbAccess();
 
-$competition = apc_fetch('competition-' . $competitionId);
-if ($competition === false) {
+//$competition = apc_fetch('competition-' . $competitionId);
+//if ($competition === false) {
     $competition = $dbAccess->getCompetition($competitionId);
-    apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
-}
+//    apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
+//}
 
 $openTimes = dbAccess::calcCompetitionTimes($competition);
 

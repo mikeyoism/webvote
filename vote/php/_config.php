@@ -51,17 +51,13 @@ define("CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL",true);
 //(sysstatus = fönsterat som visar hur länge tävlig är öppen/stängd mm i klienten)
 define("SETTING_SYSSTATUS_INTERVAL",10000);
 
-
-//visa användararstatistik som möjliggör ange användare ange kön, ort etc
-define("CONST_SETTING_ENABLE_VISITOR_STATISTICS",true);
-
 //----END OF COMPETITION SETTINGS-----
 
 //output js & php script debug i klient? Viktigt att sätta false i produktion
 //ger extra fel och info rutor för testning 
 define("CONST_SYS_JS_DEBUG", true); 
-
-
+//php extension som inte alltid finns installerad (one.com)
+define("APC_CACHE_ENABLED", false);
 
 //php debugging to JS console, enabled if CONST_SYS_JS_DEBUG
 //(you need a firefox/chrome firephp-addon to see these messages in your console)
