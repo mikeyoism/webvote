@@ -26,8 +26,47 @@ var beer_db = function () {
 	var vote_status_interval = 10000;
 	var vote_status_timer = null;
 
-	function init() {
-		$.ajax({
+	var DEBUGMODE = false;
+	var status_interval = 10000;
+	
+	var VOTE_CODE_LEN = 6;
+
+	function getVoteSettings() {
+
+        return $.ajax({
+            type: "POST",
+            url: "../vote/ajax/jssettings.php",
+            dataType: 'json',
+            cache: false,
+            async: true,
+            data: {
+                operation: 'getjssettings',
+                source: 'index.php',
+                subset: ''
+            },
+            success: function (response) {
+                if (response.msgtype == "ok") {
+                    DEBUGMODE = response.CONST_SYS_JS_DEBUG;
+                    status_interval = response.SETTING_SYSSTATUS_INTERVAL;
+                    VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
+
+                    if (DEBUGMODE) console.log(response);
+                }
+                else {
+
+                    printInfobar('#statusdiv', 'warning', 'serverfel 1-1');
+                }
+
+            },
+			error: function (xhr, textStatus, errorThrown) {
+				console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
+				//alert("error: " + textStatus + ", responseText: " + xhr.responseText);
+			}			
+        });
+    };
+
+	function get_competition_data() {
+		return $.ajax({
 			type: 'GET',
 			cache: 'false',
 			url: 'ajax.php',
@@ -38,6 +77,20 @@ var beer_db = function () {
 				enable_voting = response.enable_voting;
 				classes = response.classes;
 				beers = response.beers;
+
+
+			},
+			error: function (xhr, textStatus, errorThrown) {
+				if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
+				//alert("error: " + textStatus + ", responseText: " + xhr.responseText);
+			}
+		});
+	}
+
+	function init() {
+		getVoteSettings().done(function() {
+			get_competition_data().done(function() {
+				if (DEBUGMODE){ console.log('init done, comptetition_id: ' + competition_id + ', classes: '); console.log(classes);}
 
 				var user_data_string = localStorage.getItem("user_data_" + competition_id);
 				if (user_data_string != null) {
@@ -60,8 +113,8 @@ var beer_db = function () {
 				// vote code changes.
 				$('#vote-code').on('keyup', function (e) {
 					var code = $(this).val();
-					if (code.length > 6) {
-						code = code.substr(0, 6);
+					if (code.length > VOTE_CODE_LEN) {
+						code = code.substr(0, VOTE_CODE_LEN);
 						$(this).val(code);
 					}
 					var code = $(this).val();
@@ -75,7 +128,7 @@ var beer_db = function () {
 						vote_status_interval);
 					get_competition_status();
 				}
-				//if url-parmeters for bid and cid are set, we should open the popup for that beer
+				//if url-parmeters for bid and cid are set (qr-code url's), we should open the popup for that beer
 				var bid = UrlParameters('bid'); //beer id aka entry_id
 				var cid = UrlParameters('cid'); //competition id
 
@@ -84,12 +137,9 @@ var beer_db = function () {
 					$('#beer-popup').modal('show');
 				}
 
-			},
-			error: function (xhr, textStatus, errorThrown) {
-				console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
-				//alert("error: " + textStatus + ", responseText: " + xhr.responseText);
-			}
+			});
 		});
+	
 	}
 
 	function initialize_html() {
@@ -595,6 +645,7 @@ var beer_db = function () {
 		var seconds = s % 60;
 		return [hours, minutes, seconds].map(v => v < 10 ? "0" + v : v).join(":")
 	}
+
 
 	return {
 		init: init

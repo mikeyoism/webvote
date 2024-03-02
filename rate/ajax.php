@@ -1,6 +1,6 @@
 <?php // -*- coding: utf-8 -*-
-
-$competitionId = 1;
+require_once '../vote/php/_config.php';
+$competitionId = COMPETITION_ID;
 $enableVoting = 1;
 
 
