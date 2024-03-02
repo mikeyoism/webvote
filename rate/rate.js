@@ -23,12 +23,10 @@ var beer_db = function () {
 
 	var current_popup_item_id = null;
 
-	var vote_status_interval = 10000;
-	var vote_status_timer = null;
-
-	var DEBUGMODE = false;
-	var status_interval = 10000;
 	
+	var vote_status_timer = null;
+	var DEBUGMODE = false;
+	var VOTE_STATUS_INTERVAL = 10000;
 	var VOTE_CODE_LEN = 6;
 
 	function getVoteSettings() {
@@ -47,7 +45,7 @@ var beer_db = function () {
             success: function (response) {
                 if (response.msgtype == "ok") {
                     DEBUGMODE = response.CONST_SYS_JS_DEBUG;
-                    status_interval = response.SETTING_SYSSTATUS_INTERVAL;
+                    VOTE_STATUS_INTERVAL = response.SETTING_SYSSTATUS_INTERVAL;
                     VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
 
                     if (DEBUGMODE) console.log(response);
@@ -125,7 +123,7 @@ var beer_db = function () {
 				if (enable_voting) {
 					// Wait before we have the competition id here too
 					vote_status_timer = window.setInterval(get_competition_status,
-						vote_status_interval);
+						VOTE_STATUS_INTERVAL);
 					get_competition_status();
 				}
 				//if url-parmeters for bid and cid are set (qr-code url's), we should open the popup for that beer
@@ -579,16 +577,19 @@ var beer_db = function () {
                 competition_id: competition_id
             }),
 			success: function (response) {
+				if (DEBUGMODE) console.log(response);
 				if (response.competition_id != competition_id) {
 					alert('competition id mismatch');
+					if (DEBUGMODE) console.log('competition id mismatch');
 					return;
 				}
 
-				if (response.interval != vote_status_interval) {
+				if (response.update_interval != VOTE_STATUS_INTERVAL) {
 					clearInterval(vote_status_timer);
-					vote_status_interval = response.update_interval;
+					VOTE_STATUS_INTERVAL = response.update_interval;
 					vote_status_timer = window.setInterval(get_competition_status,
-						vote_status_interval)
+						VOTE_STATUS_INTERVAL);
+					if (DEBUGMODE) console.log('vote status interval updated to ' + VOTE_STATUS_INTERVAL);
 				}
 
 				var style_class = 'rounded d-inline-block p-1 mb-1';
