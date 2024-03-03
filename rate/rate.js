@@ -305,10 +305,10 @@ var beer_db = function () {
 			items[class_id] = items[class_id] || [];
 			items[class_id].push(
 				'<a class="list-group-item list-group-item-action" id="' + entry_id + '" href="#" data-toggle="modal" data-target="#beer-popup">'
-				+ '<span class="float-xs-right" id="rating-display-' + entry_id + '">'
+				+ '<span class="float-right" id="rating-display-' + entry_id + '">'
 				+ get_rating_string(rating)
 				+ '</span>'
-				+ '<span class="float-xs-right" id="medal-display-' + entry_id + '" style="padding-right: 10px;"></span>'
+				+ '<span class="float-right" id="medal-display-' + entry_id + '" style="padding-right: 10px;"></span>'
 				+ '<span class="beer-number">' + beer.entry_code + '</span>. '
 				+ '<span class="beer-name">' + beer.name + '</span><br>'
 				+ '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
@@ -450,7 +450,7 @@ var beer_db = function () {
 			} else {
 				alert('error medal value=' + medal);
 			}
-			medal_span.html('<span class="tag" style="background-color: ' + color + ';">'
+			medal_span.html('<span class="badge" style="background-color: ' + color + ';">'
 				+ value_str + "</label>");
 		}
 	}

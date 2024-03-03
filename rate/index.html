@@ -1,176 +1,187 @@
 <!DOCTYPE html> <!-- -*- coding: utf-8 -*- -->
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="content-language" content="sv">
-    <title>SHBF Ölträff</title>
-    
-    <link rel="stylesheet"
-	  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css">
-    <link rel="stylesheet"
-	  href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="rate.css" />
-    <link rel="shortcut icon" href="data:image/x-icon;,"type="image/x-icon">
-  </head>
-  <body>
-    <nav class="navbar navbar-light" style="background-color: #d89200;">
-      <a class="navbar-brand" href="#" style="padding: 0px;">
-	<img alt="SHBF" src="logo.png" width="40">
-      </a>
-      <ul class="nav navbar-nav">
-	<li class="nav-item dropdown">
-          <a href="#" id="class-dropdown-button"
-	     class="nav-link dropdown-toggle" data-toggle="dropdown">Klasser</a>
-          <ul id="class-dropdown" class="dropdown-menu">
-	    <!-- Javascript will insert menu item per voting class here. -->
-	  </ul>
-	</li>
-	<li class="nav-item dropdown">
-          <a href="#" id="sort-dropdown-button"
-	     class="nav-link dropdown-toggle" data-toggle="dropdown">Sortera</a>
-          <ul id="sort-dropdown" class="dropdown-menu">
-	    <li class="dropdown-item"><a href="#" id="menu-item-sort-by-entry-code">Nummerordning</a></li>
-	    <li class="dropdown-item"><a href="#" id="menu-item-sort-by-style">Öltypsordning</a></li>
-	    <li class="dropdown-item"><a href="#" id="menu-item-sort-by-rating">Bedömningsordning</a></li>
-	  </ul>
-	</li>
-	<li class="nav-item voting">
-	  <a class="nav-link" data-toggle="modal" href="#vote-popup">Folkets val</a>
-	</li>
-      </ul>
-    </nav>
-      
-    <div class="tab-content">
-      
-      <!-- Javascript will insert one tab per voting class here. -->
 
-    </div>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="content-language" content="sv">
+	<title>SHBF Ölträff</title>
 
-    <div id="vote-popup" class="modal" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>
-              <button type="button" class="btn btn-secondary pull-right"
-		      data-dismiss="modal">Stäng</button>
-	      Folkets val
-	    </h3>
-          </div>
-          <div class="modal-body">
-	    <div id="vote-competition-status"></div>
-	    <div class="votes-dirty-field d-inline-block alert
-			alert-danger hidden-xs-up">Det finns osparade röster.
-	    </div>
-	    <div class="votes-registered-field d-inline-block
-			hidden-xs-up">Alla röster sparade.
-	    </div>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+		integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
-	    <form>
-	      <div class="row">
-		<div class="col-sm-8 col-xs-10">
-		  <div class="form-group">
-		    <label for="vote-code" class="form-control-label">Röstningskod</label>
-		    <input type="text" class="form-control" id="vote-code"
-			   maxlength="6" placeholder="Röstningskod">
-		    <small id="vote-code-help" class="form-control-feedback"
-			   class="form-text text-muted">Se programbladet
-		      för att hitta din röstningskod.</small>
-		  </div>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="rate.css" />
+	<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+</head>
+
+<body>
+	<nav class="navbar navbar-expand navbar-light" style="background-color: #d89200;">
+		<a class="navbar-brand" href="#" style="padding: 0px;">
+			<img alt="SHBF" src="logo.png" width="40">
+		</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="nav navbar-nav">
+				<li class="nav-item dropdown">
+					<a href="#" id="class-dropdown-button" class="nav-link dropdown-toggle"
+						data-toggle="dropdown">Klasser</a>
+					<ul id="class-dropdown" class="dropdown-menu">
+						<!-- Javascript will insert menu item per voting class here. -->
+					</ul>
+				</li>
+				<li class="nav-item dropdown">
+					<a href="#" id="sort-dropdown-button" class="nav-link dropdown-toggle"
+						data-toggle="dropdown">Sortera</a>
+					<ul id="sort-dropdown" class="dropdown-menu">
+						<li class="dropdown-item"><a href="#" id="menu-item-sort-by-entry-code">Nummerordning</a></li>
+						<li class="dropdown-item"><a href="#" id="menu-item-sort-by-style">Öltypsordning</a></li>
+						<li class="dropdown-item"><a href="#" id="menu-item-sort-by-rating">Bedömningsordning</a></li>
+					</ul>
+				</li>
+				<li class="nav-item voting">
+					<a class="nav-link" data-toggle="modal" href="#vote-popup">Folkets val</a>
+				</li>
+			</ul>
 		</div>
-	      </div>
-	    </form>
-	    
-	    <form>
-	      <div class="row">
-		<div class="col-xs-3"></div>
-		<div class="col-xs-3">
-		  Guld
-		</div>
-		<div class="col-xs-3">
-		  Silver
-		</div>
-		<div class="col-xs-3">
-		  Brons
-		</div>
-	      </div>
-	      <div id="vote-form-rows">
-	      </div>
-	    </form>
-	  </div>
+	</nav>
+
+	<div class="tab-content">
+
+		<!-- Javascript will insert one tab per voting class here. -->
+
 	</div>
-      </div>
-    </div>
 
-    <div id="beer-popup" class="modal" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>
-	      <button type="button" class="btn btn-secondary pull-right"
-		      data-dismiss="modal">Stäng</button>
-	      <span id="popup-header">XXX Ölnamn</span></br>
-              <span id="popup-style" class="beer-style">Ölklass</span>
-	    </h3>
-          </div>
-          <div class="modal-body">
-            <p>Bryggare: <span id="popup-brewer">Bryggare</span></p>
-            <p>OG:&nbsp;<span id="popup-og">1,000</span>,
-              FG:&nbsp;<span id="popup-fg">1,000</span>,
-              Alkohol:&nbsp;<span id="popup-alcohol">0.0</span>&nbsp;%,
-              IBU:&nbsp;<span id="popup-ibu">0</span></p>
-	    <form>
-	      <fieldset class="rating">
-		<legend style="font-size: 1rem;">Omdöme:</legend>
-		<input type="radio" id="popup-rating-star-0" name="popup-rating" value=""/>
-		<label for="popup-rating-star-0" class="rating-clear-button">ta bort</label>
-		<input type="radio" id="popup-rating-star-1" name="popup-rating" value="1"/>
-		<label for="popup-rating-star-1">1</label>
-		<input type="radio" id="popup-rating-star-2" name="popup-rating" value="2"/>
-		<label for="popup-rating-star-2">2</label>
-		<input type="radio" id="popup-rating-star-3" name="popup-rating" value="3"/>
-		<label for="popup-rating-star-3">3</label>
-		<input type="radio" id="popup-rating-star-4" name="popup-rating" value="4"/>
-		<label for="popup-rating-star-4">4</label>
-		<input type="radio" id="popup-rating-star-5" name="popup-rating" value="5"/>
-		<label for="popup-rating-star-5">5</label>
-	      </fieldset>
-	      <fieldset>
-		<legend style="font-size: 1rem;">Kommentar:</legend>
-		<textarea id="popup-comment" rows="3"></textarea>
-	      </fieldset>
-	      <fieldset class="voting">
-		<legend style="font-size: 1rem;">Folkets val-röst:</legend>
-		<div id="popup-medal-group" class="btn-group" data-toggle="buttons">
-		  <label class="btn btn-primary" id="popup-medal-0-button">
-		    <input type="radio" name="popup-medal"
-			   value="0"><span class="fa fa-ban"></span></input>
-		  </label>
-		  <label class="btn btn-primary" id="popup-medal-1-button">
-		    <input type="radio" name="popup-medal" value="1">Guld</input>
-		  </label>
-		  <label class="btn btn-primary" id="popup-medal-2-button">
-		    <input type="radio" name="popup-medal"value="2">Silver</input>
-		  </label>
-		  <label class="btn btn-primary" id="popup-medal-3-button">
-		    <input type="radio" name="popup-medal" value="3">Brons</input>
-		  </label>
+	<div id="vote-popup" class="modal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title float-left">
+						
+						Folkets val
+					</h3>
+					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button>
+				</div>
+				<div class="modal-body">
+					<div id="vote-competition-status"></div>
+					<div class="votes-dirty-field d-inline-block alert
+			alert-danger hidden-xs-up">Det finns osparade röster.
+					</div>
+					<div class="votes-registered-field d-inline-block
+			hidden-xs-up">Alla röster sparade.
+					</div>
+
+					<form>
+						<div class="row">
+							<div class="col-sm-8 col-xs-10">
+								<div class="form-group">
+									<label for="vote-code" class="form-control-label">Röstningskod</label>
+									<input type="text" class="form-control" id="vote-code" maxlength="6"
+										placeholder="Röstningskod">
+									<small id="vote-code-help" class="form-control-feedback"
+										class="form-text text-muted">Se programbladet
+										för att hitta din röstningskod.</small>
+								</div>
+							</div>
+						</div>
+					</form>
+
+					<form>
+						<div class="row">
+							<div class="col-xs-3"></div>
+							<div class="col-xs-3">
+								Guld
+							</div>
+							<div class="col-xs-3">
+								Silver
+							</div>
+							<div class="col-xs-3">
+								Brons
+							</div>
+						</div>
+						<div id="vote-form-rows">
+						</div>
+					</form>
+				</div>
+			</div>
 		</div>
-		<div id="popup-alert-no-vote-code"
-		     class="d-inline-block alert alert-danger hidden-xs-up">
-		  Mata in din röstningskod från programbladet för att
-		  registrera rösterna!
+	</div>
+
+	<div id="beer-popup" class="modal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title float-left">
+						
+						<span id="popup-header">XXX Ölnamn</span></br>
+						<span id="popup-style" class="beer-style">Ölklass</span>
+					</h3>
+					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button>
+				</div>
+				<div class="modal-body">
+					<p>Bryggare: <span id="popup-brewer">Bryggare</span></p>
+					<p>OG:&nbsp;<span id="popup-og">1,000</span>,
+						FG:&nbsp;<span id="popup-fg">1,000</span>,
+						Alkohol:&nbsp;<span id="popup-alcohol">0.0</span>&nbsp;%,
+						IBU:&nbsp;<span id="popup-ibu">0</span></p>
+					<form>
+						<fieldset class="rating">
+							<legend style="font-size: 1rem;">Omdöme:</legend>
+							<input type="radio" id="popup-rating-star-0" name="popup-rating" value="" />
+							<label for="popup-rating-star-0" class="rating-clear-button">ta bort</label>
+							<input type="radio" id="popup-rating-star-1" name="popup-rating" value="1" />
+							<label for="popup-rating-star-1">1</label>
+							<input type="radio" id="popup-rating-star-2" name="popup-rating" value="2" />
+							<label for="popup-rating-star-2">2</label>
+							<input type="radio" id="popup-rating-star-3" name="popup-rating" value="3" />
+							<label for="popup-rating-star-3">3</label>
+							<input type="radio" id="popup-rating-star-4" name="popup-rating" value="4" />
+							<label for="popup-rating-star-4">4</label>
+							<input type="radio" id="popup-rating-star-5" name="popup-rating" value="5" />
+							<label for="popup-rating-star-5">5</label>
+						</fieldset>
+						<fieldset>
+							<legend style="font-size: 1rem;">Kommentar:</legend>
+							<textarea id="popup-comment" rows="3"></textarea>
+						</fieldset>
+						<fieldset class="voting">
+							<legend style="font-size: 1rem;">Folkets val-röst:</legend>
+							<div id="popup-medal-group" class="btn-group btn-group-toggle" data-toggle="buttons">
+								<label class="btn btn-primary" id="popup-medal-0-button">
+									<input type="radio" name="popup-medal" value="0"><span
+										class="fa fa-ban"></span></input>
+								</label>
+								<label class="btn btn-primary" id="popup-medal-1-button">
+									<input type="radio" name="popup-medal" value="1">Guld</input>
+								</label>
+								<label class="btn btn-primary" id="popup-medal-2-button">
+									<input type="radio" name="popup-medal" value="2">Silver</input>
+								</label>
+								<label class="btn btn-primary" id="popup-medal-3-button">
+									<input type="radio" name="popup-medal" value="3">Brons</input>
+								</label>
+							</div>
+							<div id="popup-alert-no-vote-code" class="d-inline-block alert alert-danger hidden-xs-up">
+								Mata in din röstningskod från programbladet för att
+								registrera rösterna!
+							</div>
+						</fieldset>
+					</form>
+				</div>
+			</div>
 		</div>
-	      </fieldset>
-	    </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js"></script>
-    <script src="rate.js" type="text/javascript"></script>
-  </body>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
+	
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
+		integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
+		crossorigin="anonymous"></script>
+	<script src="rate.js" type="text/javascript"></script>
+</body>
+
 </html>
