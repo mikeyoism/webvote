@@ -319,9 +319,9 @@ class DbAccess
                 
                 $ratingScore = $ratingScore === null ? 'null' : $ratingScore;
                 $drankCheck = $drankCheck === null ? 'null' : $drankCheck;
-                $ratingComment = $ratingComment === null ? 'null' : $ratingComment;
+                $ratingComment = $ratingComment === null ? 'null' : "'".$ratingComment."'";
 
-                $sql = 'update ratings set ratingScore=' . $this->escape($ratingScore) . ', ratingComment=' . $this->escape($ratingComment). ', drankCheck=' . $this->escape($drankCheck) . ' where id=' . $row['id'];
+                $sql = 'update ratings set ratingScore=' . $this->escape($ratingScore) . ', ratingComment=' . $ratingComment. ', drankCheck=' . $this->escape($drankCheck) . ' where id=' . $row['id'];
                 $stmt = $this->getConnection()->prepare($sql) or die("storeRating: prepare failed: $sql");
                 $stmt->execute() or die("storeRating: Execute failed: $sql");
             
@@ -336,12 +336,12 @@ class DbAccess
     {
         $ratingScore = $ratingScore === null ? 'null' : $ratingScore;
         $drankCheck = $drankCheck === null ? 'null' : $drankCheck;
-        $ratingComment = $ratingComment === null ? 'null' : $ratingComment;
+        $ratingComment = $ratingComment === null ? 'null' : "'".$ratingComment."'";
 
         $sql = 'insert into ratings ' .
             '(id, voteCodeId, categoryId, beerEntryId, ratingScore, ratingComment, drankCheck,ratingMethod, creationTime) ' .
             'values (null, ' . $voteCodeId . ', ' .
-            $this->escape($categoryId) . ', ' . $this->escape($beerEntryId) . ', ' . $this->escape($ratingScore) . ', ' . $this->escape($ratingComment). ', ' . $this->escape($drankCheck) . ', "web", null)';
+            $this->escape($categoryId) . ', ' . $this->escape($beerEntryId) . ', ' . $this->escape($ratingScore) . ', ' . $ratingComment. ', ' . $this->escape($drankCheck) . ', "web", null)';
 
         $stmt = $this->getConnection()->prepare($sql) or die("insertRating: prepare failed: $sql");
         $stmt->execute() or die("insertRating: Execute failed: $sql");
