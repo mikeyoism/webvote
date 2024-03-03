@@ -5,12 +5,15 @@ $enableVoting = 1;
 
 
 $files = [
-    array( 'class_id' => '5', 'name' => 'Klass 1', 'description' => 'Lager och Underjäst öl', 'filename' => 'data/list_fv1.txt' ),
-    array( 'class_id' => '6', 'name' => 'Klass 2', 'description' => 'Maltdominerad öl', 'filename' => 'data/list_fv2.txt' ),
-    array( 'class_id' => '7', 'name' => 'Klass 3', 'description' => 'Humledominerad öl', 'filename' => 'data/list_fv3.txt' ),
-    array( 'class_id' => '8', 'name' => 'Klass 4', 'description' => 'Jästdominerad öl', 'filename' => 'data/list_fv4.txt' ),
-    array( 'class_id' => '9', 'name' => 'Klass 5', 'description' => 'Syrligt och Spontanjäst öl', 'filename' => 'data/list_fv5.txt' ),
-    array( 'class_id' => '10', 'name' => 'Klass 6', 'description' => 'Övriga öl', 'filename' => 'data/list_fv6.txt' )
+    array( 'class_id' => '92', 'name' => 'Klass 1', 'description' => 'Lager och Underjäst öl', 'filename' => 'data/list_fv1.txt' ),
+    array( 'class_id' => '93', 'name' => 'Klass 2', 'description' => 'Maltdominerad öl', 'filename' => 'data/list_fv2.txt' ),
+    array( 'class_id' => '94', 'name' => 'Klass 3', 'description' => 'Humledominerad öl', 'filename' => 'data/list_fv3.txt' ),
+    array( 'class_id' => '95', 'name' => 'Klass 4', 'description' => 'Jästdominerad öl', 'filename' => 'data/list_fv4.txt' ),
+    array( 'class_id' => '96', 'name' => 'Klass 5', 'description' => 'Syrligt och Spontanjäst öl', 'filename' => 'data/list_fv5.txt' ),
+    array( 'class_id' => '97', 'name' => 'Klass 6', 'description' => 'Övriga öl', 'filename' => 'data/list_fv6.txt' )
+    //98 Cider och Mjöd
+    //99 Folköl
+    //100 Bästa etikett
 ];
 
 $classes = array();

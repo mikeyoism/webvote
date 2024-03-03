@@ -24,7 +24,7 @@
 //-COMPETITION SETUP START
 
 //for testing/used if not set by param
-define("COMPETITION_ID", 1);
+define("COMPETITION_ID", 42);
 
 define("CONST_SETTING_SHOW_HELP_POPUP", true);
 //visar hjälppopup med mer info för användaren
