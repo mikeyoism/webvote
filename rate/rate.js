@@ -176,6 +176,7 @@ var beer_db = function () {
 			var comment = $("#popup-comment").val();
 			var rating = $("input[type='radio'][name='popup-rating']:checked").val()
 			var medal = $("input[type='radio'][name='popup-medal']:checked").val();
+			var drank =$("input[type='checkbox'][name='popup-drankcheck']").is(":checked");
 
 			set_medal(current_popup_item_id, medal);
 
@@ -196,7 +197,7 @@ var beer_db = function () {
 			var rating = rating_class[current_popup_item_id] = {
 				ratingScore: rating,
 				ratingComment: comment,
-				drankCheck: 1,
+				drankCheck: drank === true ? 1 : 0,
 				categoryId: class_id,
 				beerEntryId: beer_entry_id
 			};
