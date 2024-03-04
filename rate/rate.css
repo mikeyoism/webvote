@@ -42,13 +42,23 @@
 .rating > label:before {
     visibility: visible;
     content: '\2605';
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    display: inline-block; /*fa 5*/
+    padding-right: 3px;
+    vertical-align: middle;
+    font-weight: 900;
+    margin-top: 0.25rem;
 }
 
 .rating > label.rating-clear-button:before {
     visibility: visible;
     content: '\f05e';
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    display: inline-block;
+    padding-right: 3px;
+    margin-top: 0.25rem; /*mt-1*/
+    vertical-align: middle;
+    font-weight: 900;
     color: black;
 }
 
