@@ -230,15 +230,15 @@ var beer_db = function () {
 		if (enable_voting) {
 			fill_vote_form();
 		} else {
-			$('.voting').addClass('hidden-xs-up');
+			$('.voting').addClass('d-none');
 		}
 	}
 
 	function update_no_vote_code_alert() {
 		if (vote_code_ok) {
-			$('#popup-alert-no-vote-code').addClass('hidden-xs-up');
+			$('#popup-alert-no-vote-code').addClass('d-none');
 		} else {
-			$('#popup-alert-no-vote-code').removeClass('hidden-xs-up');
+			$('#popup-alert-no-vote-code').removeClass('d-none');
 		}
 	}
 
@@ -325,7 +325,7 @@ var beer_db = function () {
 
 			pages.push('<h1 class="display-4">' + vote_class.name + '</h1>');
 
-			pages.push('<div class="votes-dirty-field d-inline-block alert alert-danger hidden-xs-up">Det finns osparade röster.</div>');
+			pages.push('<div class="votes-dirty-field d-inline-block alert alert-danger d-none">Det finns osparade röster.</div>');
 
 			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group">');
 			pages.push(items[vote_class.id].join(''));
@@ -498,12 +498,12 @@ var beer_db = function () {
 		var votes_dirty_field = $('.votes-dirty-field');
 		var votes_registered_field = $('.votes-registered-field');
 		if (votes_dirty) {
-			votes_dirty_field.removeClass('hidden-xs-up');
-			votes_registered_field.addClass('hidden-xs-up');
+			votes_dirty_field.removeClass('d-none');
+			votes_registered_field.addClass('d-none');
 		}
 		else {
-			votes_dirty_field.addClass('hidden-xs-up');
-			votes_registered_field.removeClass('hidden-xs-up');
+			votes_dirty_field.addClass('d-none');
+			votes_registered_field.removeClass('d-none');
 		}
 	}
 
@@ -524,12 +524,12 @@ var beer_db = function () {
 
 		var input_field = $('#vote-code');
 		var form_group = input_field.closest('.form-group');
-		input_field.removeClass('form-control-success');
-		input_field.removeClass('form-control-warning');
-		input_field.removeClass('form-control-danger');
-		form_group.removeClass('has-success');
-		form_group.removeClass('has-warning');
-		form_group.removeClass('has-danger');
+		//input_field.removeClass('form-control-success');
+		input_field.removeClass('is-valid');
+		input_field.removeClass('is-invalid');
+		 form_group.removeClass('text-danger');
+		 form_group.removeClass('text-success');
+		 
 		if (code.length == 6) {
 			read_votes();
 			read_ratings();
@@ -537,8 +537,8 @@ var beer_db = function () {
 		else {
 			vote_code_ok = false;
 			if (code.length != 0) {
-				form_group.addClass('has-warning');
-				input_field.addClass('form-control-warning');
+				form_group.addClass('text-danger');
+				input_field.addClass('is-invalid');
 			}
 		}
 	}
@@ -563,15 +563,15 @@ var beer_db = function () {
 					vote_code_ok = true;
 					var vote_code = response.vote_code; // uppercased etc
 					input_field.val(vote_code);
-					form_group.addClass('has-success');
-					input_field.addClass('form-control-success');
+					form_group.addClass('text-success');
+					input_field.addClass('is-valid');
 					user_data.vote_code = vote_code;
 					saveToLocalStorage();
 				}
 				else {
 					vote_code_ok = false;
-					form_group.addClass('has-danger');
-					input_field.addClass('form-control-danger');
+					form_group.addClass('text-danger');
+					input_field.addClass('is-invalid');
 				}
 
 
