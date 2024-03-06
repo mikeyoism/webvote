@@ -69,22 +69,16 @@
 .rating > input:checked + label {
     color: gold;
 }
-.rotateimg180 {
-    -webkit-transform:rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    transform: rotate(180deg);
-  }
+
+/*drank checkbox, as a rotating glass*/
 
 .drank  input[type='checkbox'] {
     display:none;
 }
  .drank   input[type='checkbox']+ label:before {
-    --fa-rotate-angle: 180deg;
     display: inline-block;
     font-family: 'Font Awesome 5 Free';
-    content: "\f5ce";
+    content: "\f4e3"; /*fas fa-wine-glass-alt*/
 	font-size:1.5rem;
 	cursor:pointer;
     font-weight: 600;
@@ -94,10 +88,23 @@
  }
  .drank  input[type='checkbox']:checked + label:before {
     font-family: 'Font Awesome 5 Free';
-    content: "\f4e3";
+    content: "\f5ce"; /*fas fa-wine-glass*/
 	font-size:1.5rem;
 	cursor:pointer;
     font-weight: 900;
     color: #FFD43B;
     
  }
+
+.rotate{
+    -moz-transition: all 0.35s linear;
+    -webkit-transition: all 0.35s linear;
+    transition: all 0.35s linear;
+}
+
+.rotate.down{
+    -ms-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+}

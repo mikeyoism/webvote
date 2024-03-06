@@ -403,10 +403,17 @@ class DbAccess
 
         while ($row = $result->fetch_assoc()) {
             //insert rating to ratings array
-            if ($row['beerEntryId'] !== null) {
-                array_push($ratings, array('categoryId' => $row['categoryId'], 'beerEntryId' => $row['beerEntryId'], 'drankCheck' => $row['drankCheck'], 'ratingScore' => $row['ratingScore'], 'ratingComment' =>  $row['ratingComment'] !== null ? htmlspecialchars_decode($row['ratingComment']) : null ));
+            // if ($row['beerEntryId'] !== null) {
+            //     array_push($ratings, array('categoryId' => $row['categoryId'], 'beerEntryId' => $row['beerEntryId'], 'drankCheck' => $row['drankCheck'], 'ratingScore' => $row['ratingScore'], 'ratingComment' =>  $row['ratingComment'] !== null ? htmlspecialchars_decode($row['ratingComment']) : null ));
 
+            // }
+            //create lists of ratings grouped by key = categoryId
+             if (!array_key_exists($row['categoryId'], $ratings)) {
+                  $ratings[$row['categoryId']] = array();
             }
+            array_push($ratings[$row['categoryId']], array('categoryId' => $row['categoryId'], 'beerEntryId' => $row['beerEntryId'], 'drankCheck' => $row['drankCheck'], 'ratingScore' => $row['ratingScore'], 'ratingComment' =>  $row['ratingComment'] !== null ? htmlspecialchars_decode($row['ratingComment']) : null ));
+
+
         }
         
 

@@ -12,19 +12,19 @@ var beer_db = function () {
 	var classes = null;
 	var beers = null;
 
-	// This is stored in localStorage. user_beers and user_votes are
+	// This is stored in localStorage, and poulated from backend
 	// just references to user_data.beers and user_data.votes, respectively.
 	var user_data = null;
-	var user_beers = null;
-	var user_votes = null;
-	var user_ratings = null;
+	//var user_beers = null; //todo remove, replaced with user_data.ratings
+	var user_votes = null; //just reference to user_data.votes
+	
 
 	var votes_dirty = false;
 	var vote_code_ok = false;
 
 	var current_popup_item_id = null;
 
-	
+
 	var vote_status_timer = null;
 	var DEBUGMODE = false;
 	var VOTE_STATUS_INTERVAL = 10000;
@@ -32,37 +32,37 @@ var beer_db = function () {
 
 	function getVoteSettings() {
 
-        return $.ajax({
-            type: "POST",
-            url: "../vote/ajax/jssettings.php",
-            dataType: 'json',
-            cache: false,
-            async: true,
-            data: {
-                operation: 'getjssettings',
-                source: 'index.php',
-                subset: ''
-            },
-            success: function (response) {
-                if (response.msgtype == "ok") {
-                    DEBUGMODE = response.CONST_SYS_JS_DEBUG;
-                    VOTE_STATUS_INTERVAL = response.SETTING_SYSSTATUS_INTERVAL;
-                    VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
+		return $.ajax({
+			type: "POST",
+			url: "../vote/ajax/jssettings.php",
+			dataType: 'json',
+			cache: false,
+			async: true,
+			data: {
+				operation: 'getjssettings',
+				source: 'index.php',
+				subset: ''
+			},
+			success: function (response) {
+				if (response.msgtype == "ok") {
+					DEBUGMODE = response.CONST_SYS_JS_DEBUG;
+					VOTE_STATUS_INTERVAL = response.SETTING_SYSSTATUS_INTERVAL;
+					VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
 
-                    if (DEBUGMODE) console.log(response);
-                }
-                else {
+					if (DEBUGMODE) console.log(response);
+				}
+				else {
 
-                    printInfobar('#statusdiv', 'warning', 'serverfel 1-1');
-                }
+					printInfobar('#statusdiv', 'warning', 'serverfel 1-1');
+				}
 
-            },
+			},
 			error: function (xhr, textStatus, errorThrown) {
 				console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
 				//alert("error: " + textStatus + ", responseText: " + xhr.responseText);
-			}			
-        });
-    };
+			}
+		});
+	};
 
 	function get_competition_data() {
 		return $.ajax({
@@ -87,31 +87,33 @@ var beer_db = function () {
 	}
 
 	function init() {
-		getVoteSettings().done(function() {
-			get_competition_data().done(function() {
-				if (DEBUGMODE){ console.log('init done, comptetition_id: ' + competition_id + ', classes: '); console.log(classes);}
+		getVoteSettings().done(function () {
+			get_competition_data().done(function () {
+
+				if (DEBUGMODE) { console.log('init done, comptetition_id: ' + competition_id + ', classes: '); console.log(classes); }
 
 				var user_data_string = localStorage.getItem("user_data_" + competition_id);
 				if (user_data_string != null) {
 					user_data = JSON.parse(user_data_string);
 				}
 				else {
-					user_data = { beers: {}, vote_code: '', votes: {}, ratings: {}};
+					user_data = { beers: {}, vote_code: '', votes: {}, ratings: {} };
 					$.each(classes, function (i, vote_class) {
 						user_data.votes[vote_class.id] = {};
 					});
 					$.each(classes, function (i, vote_class) {
-						user_data.ratings[vote_class.id] = {};
+						user_data.ratings[vote_class.id] = [];
 					});
 
 				}
 
-				user_beers = user_data.beers;
+				//user_beers = user_data.beers;
 				user_votes = user_data.votes;
-				user_ratings = user_data.ratings;
 
-				initialize_html();
+				if (DEBUGMODE) { console.log('@user_ratings) '); console.log(user_data.ratings); }
 				update_vote_code(user_data.vote_code);
+				initialize_html();
+
 
 				// Now that the competition information is known we can handle
 				// vote code changes.
@@ -137,13 +139,14 @@ var beer_db = function () {
 				var cid = UrlParameters('cid'); //competition id
 
 				if (bid && cid && cid == competition_id) {
-					popup_beer(bid, null,true);
+					popup_beer(bid, null, true);
 					$('#beer-popup').modal('show');
 				}
 
+
 			});
 		});
-	
+
 	}
 
 	function initialize_html() {
@@ -171,47 +174,71 @@ var beer_db = function () {
 			var current_tab = get_current_tab_hash();
 			fill_beer_lists(compare_beers_by_rating, current_tab);
 		});
-
+		//popup close event
 		$("#beer-popup").on('hidden.bs.modal', function (event) {
-			var comment = $("#popup-comment").val();
-			var rating = $("input[type='radio'][name='popup-rating']:checked").val()
-			var medal = $("input[type='radio'][name='popup-medal']:checked").val();
-			var drank =$("input[type='checkbox'][name='popup-drankcheck']").is(":checked");
+			if (user_data.vote_code.length == VOTE_CODE_LEN) {
+				var comment = $("#popup-comment").val();
+				var ratingVal = $("input[type='radio'][name='popup-rating']:checked").val()
+				var medal = $("input[type='radio'][name='popup-medal']:checked").val();
+				var drank = $("input[type='checkbox'][name='popup-drankcheck']").is(":checked");
 
-			set_medal(current_popup_item_id, medal);
+				set_medal(current_popup_item_id, medal);
 
-			user_beers[current_popup_item_id] = {
-				rating: rating,
-				comment: comment
-			};
+				var class_id = beers[current_popup_item_id].class;
+				var beer_entry_id = beers[current_popup_item_id].entry_code;
+				//one array for each class
+				var user_rating_class = user_data.ratings[class_id];
+				if (user_rating_class == undefined) {
+					user_rating_class = [];
+				}
 
-			var class_id = beers[current_popup_item_id].class;
-			var beer_entry_id = beers[current_popup_item_id].entry_code;
-			//one array for each class
-			var rating_class = user_ratings[class_id];
-			if (rating_class == undefined) {
-				rating_class = {};
-			}
+
 				
-			//add/update user rating 
-			var rating = rating_class[current_popup_item_id] = {
-				ratingScore: rating,
-				ratingComment: comment,
-				drankCheck: drank === true ? 1 : 0,
-				categoryId: class_id,
-				beerEntryId: beer_entry_id
-			};
+				var rating = {
+					categoryId: class_id,
+					beerEntryId: beer_entry_id,
+					drankCheck: drank === true ? '1' : '0',
+					ratingScore: ratingVal,
+					ratingComment: comment === "" ? null : comment,
 
-			saveToLocalStorage();
-			store_ratings();
+				};
+				var ratingPos = -1;
+				//if the beer is already rated, update the rating
+				$.each(user_rating_class, function (i, obj) {
+					if (obj.beerEntryId == beer_entry_id) {
+						ratingPos = i;
+						user_rating_class[ratingPos] = rating;
+						return false;
+					}
+				});
 
-			update_rating_in_beer_list(current_popup_item_id, rating.ratingScore);
+				if (ratingPos == -1) {
+					user_rating_class.push(rating);
+				}
+
+				saveToLocalStorage();
+				store_ratings();
+
+				update_rating_in_beer_list(current_popup_item_id, rating.ratingScore);
+				update_drank_in_beer_list(current_popup_item_id, rating.drankCheck);
+			}
 		});
 
 		$("#popup-medal-group").click(function (event) {
 			update_no_vote_code_alert();
 		});
 
+		$("#popup-drank-rot").click(function (event) {
+			//rotate the icon 180 degrees and toggle the checkbox
+
+			$("#popup-drank-rot").toggleClass('down');
+			$("input[type='checkbox'][name='popup-drankcheck']").is(":checked") ? $("input[type='checkbox'][name='popup-drankcheck']").prop("checked", false) : $("input[type='checkbox'][name='popup-drankcheck']").prop("checked", true);
+
+			if (DEBUGMODE) console.log('drank click, ' + ($("#popup-drank-rot").hasClass('down') == true ? "down" : "up") + " checked=" + $("input[type='checkbox'][name='popup-drankcheck']").is(":checked"));
+
+			event.preventDefault();  //block the regular checkbox event
+
+		});
 		fill_beer_lists(compare_beers_by_entry_code, '#page-' + classes[0].id);
 
 		// Workaround for tabs not being inactivated coorectly.
@@ -245,7 +272,7 @@ var beer_db = function () {
 
 	function saveToLocalStorage() {
 		localStorage.setItem('user_data_' + competition_id, JSON.stringify(user_data));
-		
+
 	}
 
 	function compare_beers_by_entry_code(a, b) {
@@ -270,17 +297,41 @@ var beer_db = function () {
 
 	function compare_beers_by_rating(a, b) {
 		var a_rating = 0;
-		if (a in user_beers) {
-			a_rating = user_beers[a].rating;
+		if (a in user_data.ratings) {
+			a_rating = user_data.ratings[a].rating;
 		}
 		var b_rating = 0;
-		if (b in user_beers) {
-			b_rating = user_beers[b].rating;
+		if (b in user_data.ratings) {
+			b_rating = user_data.ratings[b].rating;
 		}
 		if (a_rating != b_rating) {
 			return b_rating - a_rating;
 		}
 		return compare_beers_by_entry_code(a, b);
+	}
+	function get_ratings_in_class(class_id) {
+		var ratings = user_data.ratings[class_id];
+		if (ratings == undefined) {
+			ratings = [];
+		}
+		return ratings;
+	}
+	function get_rating(class_id,beer_entry_id) {
+		var rating = {
+			categoryId: class_id,
+			beerEntryId: beer_entry_id,
+			drankCheck: '0',
+			ratingScore: null,
+			ratingComment: null,
+			
+		};
+		$.each(user_data.ratings[class_id], function (i, obj) {
+			if (obj.beerEntryId == beer_entry_id) {
+				rating = obj;
+				return false;
+			}
+		});
+		return rating;
 	}
 
 	function fill_beer_lists(compare_function, active_tab_hash) {
@@ -298,22 +349,27 @@ var beer_db = function () {
 			var beer = beers[entry_id];
 			var class_id = beer['class'];
 
-			var rating = 0;
-			if (entry_id in user_beers) {
-				rating = user_beers[entry_id].rating;
-			}
+			//var rating = 0;
+			// if (entry_id in user_data.ratings) {
+			// 	rating = user_data.ratings[entry_id].rating;
+			// }
+			var rating = get_rating(class_id,beer.entry_code);
 
 			items[class_id] = items[class_id] || [];
 			items[class_id].push(
 				'<a class="list-group-item list-group-item-action" id="' + entry_id + '" href="#" data-toggle="modal" data-target="#beer-popup">'
 				+ '<span class="float-right" id="rating-display-' + entry_id + '">'
-				+ get_rating_string(rating)
+				+ get_rating_string(rating.ratingScore == null ? 0 : rating.ratingScore)
 				+ '</span>'
+				+ '<span class="float-right" id="drank-display-' + entry_id + '" style="padding-right: 10px;">'
+				+ get_drank_string(rating.drankCheck)
+				+'</span>'
 				+ '<span class="float-right" id="medal-display-' + entry_id + '" style="padding-right: 10px;"></span>'
 				+ '<span class="beer-number">' + beer.entry_code + '</span>. '
 				+ '<span class="beer-name">' + beer.name + '</span><br>'
 				+ '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
 				+ '</a>');
+				
 		});
 
 		// For each class, remove any previous tab-page, create it, and fill it with its list of beers.
@@ -351,7 +407,7 @@ var beer_db = function () {
 		// list so there are no medals shown by default.
 		$.each(sorted_beers, function (i, entry_id) {
 			var medal = 0;
-			if (entry_id in user_beers) {
+			if (entry_id in user_data.ratings) {
 				medal = get_medal(entry_id);
 				update_medal_in_beer_list(entry_id, medal);
 			}
@@ -379,8 +435,7 @@ var beer_db = function () {
 	}
 
 	function popup_beer(item_id, e, isentry_code = false) {
-		if (isentry_code)
-		{
+		if (isentry_code) {
 			var found = false;
 			$.each(beers, function (i, beer) {
 				if (beer.entry_code == item_id) {
@@ -405,16 +460,43 @@ var beer_db = function () {
 
 		var comment = '';
 		var rating = '';
-		if (item_id in user_beers) {
-			comment = user_beers[item_id].comment;
-			rating = user_beers[item_id].rating;
+		var drank = false;
+		//find item_id (entry_code) in user_data.ratings (array of objects with rating, comment, drankcheck, beerEntryId, categoryId
+		//if found, set rating, comment and drankcheck
+		var class_id = beer.class;
+		var beer_entry_id = beer.entry_code;
+		var user_rating_class = user_data.ratings[class_id];
+		if (user_rating_class != undefined) {
+			$.each(user_rating_class, function (i, obj) {
+				if (obj.beerEntryId == beer_entry_id) {
+					rating = obj.ratingScore;
+					comment = obj.ratingComment;
+					drank = (obj.drankCheck === "1" || obj.drankCheck === 1 || obj.drankCheck === true) ? true : false;
+					return false;
+				}
+			});
 		}
+
+
+
+
 		var medal = get_medal(item_id);
 
 		$("#popup-comment").val(comment);
 		$("#popup-medal-" + medal + "-button").button('toggle');
 
 		$('input[name="popup-rating"][value="' + rating + '"]').prop('checked', true);
+		//drank check
+		$("input[type='checkbox'][name='popup-drankcheck']").prop("checked", drank);
+		if (drank === true) {
+			//raise glass
+			$("#popup-drank-rot").removeClass('down');
+		} //reset previous rotation, from previous popup of other beer (if any)
+		else if (!$("#popup-drank-rot").hasClass('down'))
+		{
+			
+			 $("#popup-drank-rot").addClass('down');
+		}
 
 		update_no_vote_code_alert();
 
@@ -433,6 +515,14 @@ var beer_db = function () {
 		// return '<span class="fa fa-star fa-fw gold"></span>'.repeat(rating)
 		//    + '<span class="fa fa-star fa-fw grey"></span>'.repeat(5 - rating);
 	}
+	function update_drank_in_beer_list(entry_id, drank) {
+		var drank_span = $('#drank-display-' + entry_id);
+		drank_span.html(get_drank_string(drank));
+	}
+	function get_drank_string(drank) {
+		return (drank === 1 || drank === "1" || drank === "true") ? '<span class="fas fa-wine-glass" style="color: #FFD43B;"></span>' : '';
+	}
+	
 
 	function update_medal_in_beer_list(entry_id, medal) {
 		var medal_span = $('#medal-display-' + entry_id);
@@ -528,11 +618,11 @@ var beer_db = function () {
 		//input_field.removeClass('form-control-success');
 		input_field.removeClass('is-valid');
 		input_field.removeClass('is-invalid');
-		 form_group.removeClass('text-danger');
-		 form_group.removeClass('text-success');
-		 
-		if (code.length == 6) {
-			read_votes();
+		form_group.removeClass('text-danger');
+		form_group.removeClass('text-success');
+
+		if (code.length == VOTE_CODE_LEN) {
+			//read_votes();
 			read_ratings();
 		}
 		else {
@@ -557,7 +647,7 @@ var beer_db = function () {
 			}),
 
 			success: function (response) {
-				if (DEBUGMODE) { console.log("@read_votes"); console.log(response)};
+				if (DEBUGMODE) { console.log("@read_votes"); console.log(response) };
 				var input_field = $('#vote-code');
 				var form_group = input_field.closest('.form-group');
 				if ("vote_code" in response) {
@@ -586,31 +676,50 @@ var beer_db = function () {
 	//read ratings
 	function read_ratings() {
 		$.ajax({
-			type: "POST", 
+			type: "POST",
 			url: "../vote/ajax/rate.php",
 			contentType: 'application/json',
 			dataType: 'json',
 			cache: false,
-			
+
 			data: JSON.stringify({
 				operation: 'getratings',
 				vote_code: user_data.vote_code,
 				competition_id: competition_id
 			}),
 			success: function (response) {
-				if (DEBUGMODE) { console.log("@read_ratings"); console.log(response)};
+				if (DEBUGMODE) { console.log("@read_ratings"); console.log(response) };
+				var input_field = $('#vote-code');
+				var form_group = input_field.closest('.form-group');
+				if ("vote_code" in response) {
+					vote_code_ok = true;
+					var vote_code = response.vote_code; // uppercased etc
+					input_field.val(vote_code);
+					form_group.addClass('text-success');
+					input_field.addClass('is-valid');
+					user_data.vote_code = vote_code;
+					user_data.ratings = response.ratings;
+
+					saveToLocalStorage();
+				}
+				else {
+					vote_code_ok = false;
+					form_group.addClass('text-danger');
+					input_field.addClass('is-invalid');
+				}
+
 			},
 			error: function (xhr, textStatus, errorThrown) {
 				if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
 			}
-			
+
 		});
 	}
 	//store ratings
 	function store_ratings() {
 		$.ajax({
 			type: "POST",
-			url: "../vote/ajax/rate.php",	
+			url: "../vote/ajax/rate.php",
 			contentType: 'application/json',
 			dataType: 'json',
 			cache: false,
@@ -618,10 +727,14 @@ var beer_db = function () {
 				operation: 'setratings',
 				vote_code: user_data.vote_code,
 				competition_id: competition_id,
-				ratings: user_ratings
+				ratings: user_data.ratings
 			}),
 			success: function (response) {
-				if (DEBUGMODE) { console.log("@store_ratings"); console.log(response)};
+				//replicate the ratings to localstorage
+				saveToLocalStorage();
+
+				if (DEBUGMODE) { console.log("@pre_store_ratings"); console.log(user_data.ratings) };
+				if (DEBUGMODE) { console.log("@store_ratings"); console.log(response) };
 			},
 			error: function (xhr, textStatus, errorThrown) {
 				if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
@@ -637,9 +750,9 @@ var beer_db = function () {
 			contentType: 'application/json',
 			dataType: 'json',
 			cache: false,
-            data: JSON.stringify({
-                competition_id: competition_id
-            }),
+			data: JSON.stringify({
+				competition_id: competition_id
+			}),
 			success: function (response) {
 				//if (DEBUGMODE) console.log(response);
 				if (response.competition_id != competition_id) {
@@ -693,10 +806,10 @@ var beer_db = function () {
 			sURLVariables = sPageURL.split('&'),
 			sParameterName,
 			i;
-	
+
 		for (i = 0; i < sURLVariables.length; i++) {
 			sParameterName = sURLVariables[i].split('=');
-	
+
 			if (sParameterName[0] === sParam) {
 				return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
 			}
