@@ -3,6 +3,7 @@ require_once '_config.php';
 class DbAccess
 {
     private $dbConn = null;
+    private $dbConnDb2_Eventreg = null;
 
     function __construct()
     {
@@ -14,6 +15,23 @@ class DbAccess
             mysqli_close($this->dbConn);
         }
         $this->dbConn = 0;
+
+        if ($this->dbConnDb2_Eventreg != null) {
+            mysqli_close($this->dbConnDb2_Eventreg);
+        }
+    }
+    private function getConnectionDb2_Eventreg()
+    {
+        if ($this->dbConnDb2_Eventreg === null) {
+            $settings = parse_ini_file('config.ini', true);
+            $db = $settings['db2_shbfevent'];
+
+            $this->dbConnDb2_Eventreg = mysqli_connect($db['host'], $db['user'], $db['password'])
+                or die('Unable to connect to database: ' . mysqli_connect_error());
+            $this->dbConnDb2_Eventreg->select_db($db['database']);
+            $this->dbConnDb2_Eventreg->set_charset('utf8');
+        }
+        return $this->dbConnDb2_Eventreg;
     }
 
     private function getConnection()
@@ -29,6 +47,7 @@ class DbAccess
         }
         return $this->dbConn;
     }
+
 
     public function login($user, $password)
     {
@@ -93,6 +112,7 @@ class DbAccess
         );
     }
 
+
     /*
      * Computes some practical information from the competitino open and close times.
      * This is separate from getting the competition information itself for the benefit of caching.
@@ -156,31 +176,134 @@ class DbAccess
         $stmt->execute() or die("setCompetitionOpenForTestUntil: Execute failed: $sql");
     }
 
-    public function getCategories($competitionId)
+
+
+    
+    //get eventreg event_id corresponding to our $compentionId
+    public function getEventReg_EventId($competitionId)
+    {
+        $sql = 'SELECT event_id, event_name FROM events WHERE deleted= 0 AND votesys_competition_id=' . $this->escape($competitionId);
+        $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getEventId: Query failed: $sql");
+        if ($result->num_rows < 1)
+            die("Invalid eventreg competition id." . $competitionId);
+        
+        //return list of event_ids (typiskt FV + etikett tävling)
+        $events = array();
+        while ($row = $result->fetch_assoc()) {
+            array_push($events,$row['event_id']);
+        }
+        return $events;
+    }
+
+    //get beer info from eventreg database
+    public function getBeers($competitionId, $grouped = false)
+    {
+
+        $evenreg_event_ids = $this->getEventReg_EventId($competitionId);
+        if (count($evenreg_event_ids) < 1)
+            die("Invalid eventreg competition id." . $competitionId);
+
+        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, ' .
+            'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
+            'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
+            'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
+
+            'WHERE Beers_in_event.event_id IN (' . implode(',', $evenreg_event_ids) .   ') ' .
+            'AND Beers_in_event.deleted = 0 ' .
+            'AND Beer_data.deleted = 0 AND Beers.deleted = 0 ' .
+            'AND Users.deleted = 0 AND User_data.deleted = 0 ' .
+            'ORDER BY Beer_data.main_class, Beer_data.sub_class ASC';;
+
+        $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getBeers: Query failed: $sql");
+
+        //the result is grouped by main_class, so we need to create a new array to store the beers
+        if ($result->num_rows < 1)
+            die("Invalid eventreg competition id." . $competitionId);
+
+        $classes = $this->getCategories($competitionId, true);
+        $beers = array();
+        $nextEntryId = 1;
+        $classOffset = CONST_SETTING_CATEGORY_OFFSET -1;
+        $class = 0;
+        while ($row = $result->fetch_assoc()) {
+            //store beer info in arrays grouped by FvMainClass
+            if ($row['fv_competition_no'] >= 900){ //etikett tävling (övriga fält lika som för ditto öl)
+                $fv_class_id_nr = 8;
+                $class = $classOffset + $fv_class_id_nr + 1;
+            }else{
+                $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+                $class = $classOffset + $fv_class_id_nr;
+            }
+
+            //find the class name in $classes by array key Id
+            $className = $classes[$fv_class_id_nr]['description'];
+            $entryId = $nextEntryId++;
+            // if ($row['event_id'] == 31) {
+            //     $entryId = $entryId;
+            // }
+            $beer = array(
+                'class' => $class, //must always match id in categories/competitions
+                'entry_id' => $entryId,
+                'entry_code' => $row['fv_competition_no'],
+                'styleId' => $row['main_class'] . $row['sub_class'],
+                'styleName' => $className,
+                'name' => $row['beer_name'],
+                'brewer' => $row['name'],
+                'alk' => $row['alc'],
+                'OG' => $row['og'],
+                'FG' => $row['fg'],
+                'IBU' => $row['bu']
+            );
+            //note: no offset in arrayposition, as we use the entryId as key
+            if ($grouped == true) {
+                if (!array_key_exists($fv_class_id_nr, $beers)) {
+                    $beers[$fv_class_id_nr] = array();
+                }
+
+                array_push($beers[$fv_class_id_nr], $beer);
+            } else {
+
+                $beers[$entryId] = $beer;
+            }
+        }
+
+        return $beers;
+    }
+
+    public function getCategories($competitionId, $NoEntries = false)
     {
         $sql = 'select id, name, description from categories ' .
             'where competitionId="' . $this->escape($competitionId) . '"';
         $result = $this->getConnection()->query($sql) or die("getCategories: Query failed: $sql");
 
         $categories = array();
+        $useOffset = false;//CONST_SETTING_CONNECT_EVENTREG_DB > 1 ? true : false;
+        $idStartPos = 0;
 
         while ($row = $result->fetch_assoc()) {
             $id = $row['id'];
             $name = $row['name'];
             $description = $row['description'];
-
-            $sql = "select entryCode from entries where categoryId=$id order by entryCode";
-            $result2 = $this->getConnection()->query($sql) or die("getCategories: Query failed: $sql");
-            $entries = array_map(function ($a) {
-                return $a[0];
-            }, $result2->fetch_all());
-
-            $categories[$id] = array(
+            
+            //when we don't want to get entries, we can skip the entries query
+            //(ie rating-mode where entries are fetched separately fram the eventreg database)
+            if ($NoEntries) {
+                $entries = array();
+            } else {
+                $sql = "select entryCode from entries where categoryId=$id order by entryCode";
+                $result2 = $this->getConnection()->query($sql) or die("getCategories: Query failed: $sql");
+                $entries = array_map(function ($a) {
+                    return $a[0];
+                }, $result2->fetch_all());
+            }
+            $idStartPos = $useOffset ? $id  : $idStartPos;
+            $categories[$idStartPos] = array(
                 'id' => $id,
                 'name' => $name,
                 'description' => $description,
                 'entries' => $entries
             );
+            $idStartPos++;
             // Notice there is also color field that could be filled in if added to the database.
         }
 
@@ -308,26 +431,22 @@ class DbAccess
         $result = $this->getConnection()->query($sql) or die("storeRating: Query failed: $sql");
 
         if ($result->num_rows == 0) {
-            
+
             if ($this->insertRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck) === true)
                 return true;
-                         
         } else {
             $row = $result->fetch_assoc();
             //update rating if it has changed
             if ($row['ratingScore'] != $ratingScore || $row['ratingComment'] != $ratingComment || $row['drankCheck'] != $drankCheck) {
-                
+
                 $ratingScore = $ratingScore === null ? 'null' : $ratingScore;
                 $drankCheck = $drankCheck === null ? 'null' : $drankCheck;
-                $ratingComment = $ratingComment === null ? 'null' : "'".$ratingComment."'";
+                $ratingComment = $ratingComment === null ? 'null' : "'" . $ratingComment . "'";
 
-                $sql = 'update ratings set ratingScore=' . $this->escape($ratingScore) . ', ratingComment=' . $ratingComment. ', drankCheck=' . $this->escape($drankCheck) . ' where id=' . $row['id'];
+                $sql = 'update ratings set ratingScore=' . $this->escape($ratingScore) . ', ratingComment=' . $ratingComment . ', drankCheck=' . $this->escape($drankCheck) . ' where id=' . $row['id'];
                 $stmt = $this->getConnection()->prepare($sql) or die("storeRating: prepare failed: $sql");
                 $stmt->execute() or die("storeRating: Execute failed: $sql");
-            
             }
-            
-
         }
         return true;
     }
@@ -336,12 +455,12 @@ class DbAccess
     {
         $ratingScore = $ratingScore === null ? 'null' : $ratingScore;
         $drankCheck = $drankCheck === null ? 'null' : $drankCheck;
-        $ratingComment = $ratingComment === null ? 'null' : "'".$ratingComment."'";
+        $ratingComment = $ratingComment === null ? 'null' : "'" . $ratingComment . "'";
 
         $sql = 'insert into ratings ' .
             '(id, voteCodeId, categoryId, beerEntryId, ratingScore, ratingComment, drankCheck,ratingMethod, creationTime) ' .
             'values (null, ' . $voteCodeId . ', ' .
-            $this->escape($categoryId) . ', ' . $this->escape($beerEntryId) . ', ' . $this->escape($ratingScore) . ', ' . $ratingComment. ', ' . $this->escape($drankCheck) . ', "web", null)';
+            $this->escape($categoryId) . ', ' . $this->escape($beerEntryId) . ', ' . $this->escape($ratingScore) . ', ' . $ratingComment . ', ' . $this->escape($drankCheck) . ', "web", null)';
 
         $stmt = $this->getConnection()->prepare($sql) or die("insertRating: prepare failed: $sql");
         $stmt->execute() or die("insertRating: Execute failed: $sql");
@@ -402,22 +521,16 @@ class DbAccess
         $ratings = array();
 
         while ($row = $result->fetch_assoc()) {
-            //insert rating to ratings array
-            // if ($row['beerEntryId'] !== null) {
-            //     array_push($ratings, array('categoryId' => $row['categoryId'], 'beerEntryId' => $row['beerEntryId'], 'drankCheck' => $row['drankCheck'], 'ratingScore' => $row['ratingScore'], 'ratingComment' =>  $row['ratingComment'] !== null ? htmlspecialchars_decode($row['ratingComment']) : null ));
 
-            // }
             //create lists of ratings grouped by key = categoryId
-             if (!array_key_exists($row['categoryId'], $ratings)) {
-                  $ratings[$row['categoryId']] = array();
+            if (!array_key_exists($row['categoryId'], $ratings)) {
+                $ratings[$row['categoryId']] = array();
             }
-            array_push($ratings[$row['categoryId']], array('categoryId' => $row['categoryId'], 'beerEntryId' => $row['beerEntryId'], 'drankCheck' => $row['drankCheck'], 'ratingScore' => $row['ratingScore'], 'ratingComment' =>  $row['ratingComment'] !== null ? htmlspecialchars_decode($row['ratingComment']) : null ));
-
-
+            array_push($ratings[$row['categoryId']], array('categoryId' => $row['categoryId'], 'beerEntryId' => $row['beerEntryId'], 'drankCheck' => $row['drankCheck'], 'ratingScore' => $row['ratingScore'], 'ratingComment' =>  $row['ratingComment'] !== null ? htmlspecialchars_decode($row['ratingComment']) : null));
         }
-        
 
-        
+
+
         return $ratings;
     }
 
@@ -563,4 +676,82 @@ function redirectToSelf()
 
     header("Location: http://$host$uri$query");
     exit;
+}
+
+
+// Returns FV class as string or numeric based on the main and sub class of the beer
+// this is a copy of the function in the eventreg code
+//TODO store in database instead of hardcoding
+
+function FvClass($low_alc, $main_class, $sub_class)
+{
+    // $classesCurrentCompteition is an array of categories for the current competition, as returned by getCategories
+    // if it is null, the function will just fetch default to values defined in this fuction (will match the eventreg database, but not out competition-database!)
+    $as_numeric = true;
+    if (!empty($low_alc)) {
+        $fv_class = !$as_numeric ? 'Folköl' : '8';
+    } elseif (($main_class == 1) || ($main_class == 2)) {
+        $fv_class = !$as_numeric ? 'Lager och underjäst öl' : '1';
+    } elseif ((($main_class == 3) && ($sub_class != 'F')) ||
+        (($main_class == 4) && ($sub_class == 'A')) ||
+        (($main_class == 4) && ($sub_class == 'B')) ||
+        (($main_class == 4) && ($sub_class == 'F')) ||
+        (($main_class == 4) && ($sub_class == 'G')) ||
+        (($main_class == 5) && ($sub_class == 'A')) ||
+        (($main_class == 5) && ($sub_class == 'G')) ||
+        (($main_class == 5) && ($sub_class == 'H')) ||
+        ($main_class == 7) ||
+        ($main_class == 8) ||
+        (($main_class == 9) && ($sub_class == 'B')) ||
+        (($main_class == 9) && ($sub_class == 'E')) ||
+        (($main_class == 11) && ($sub_class == 'E')) ||
+        (($main_class == 11) && ($sub_class == 'K'))
+    ) {
+        $fv_class = !$as_numeric ? 'Maltdominerad öl' : '2';
+    } elseif ((($main_class == 3) && ($sub_class == 'F')) ||
+        (($main_class == 4) && ($sub_class == 'C')) ||
+        (($main_class == 4) && ($sub_class == 'D')) ||
+        (($main_class == 4) && ($sub_class == 'E')) ||
+        (($main_class == 5) && ($sub_class == 'B')) ||
+        (($main_class == 5) && ($sub_class == 'C')) ||
+        (($main_class == 5) && ($sub_class == 'D')) ||
+        (($main_class == 5) && ($sub_class == 'E')) ||
+        (($main_class == 5) && ($sub_class == 'F')) ||
+        (($main_class == 6) && ($sub_class == 'F'))
+    ) {
+        $fv_class = !$as_numeric ? 'Humledominerad öl' : '3';
+    } elseif ((($main_class == 6) && ($sub_class != 'F')) ||
+        (($main_class == 9) && ($sub_class == 'A')) ||
+        (($main_class == 9) && ($sub_class == 'C')) ||
+        (($main_class == 9) && ($sub_class == 'D')) ||
+        (($main_class == 9) && ($sub_class == 'F')) ||
+        (($main_class == 9) && ($sub_class == 'G')) ||
+        (($main_class == 9) && ($sub_class == 'H')) ||
+        (($main_class == 9) && ($sub_class == 'I')) ||
+        (($main_class == 9) && ($sub_class == 'J')) ||
+        (($main_class == 9) && ($sub_class == 'K'))
+    ) {
+        $fv_class = !$as_numeric ? 'Jästdominerad öl' : '4';
+    } elseif (($main_class == 10) ||
+        (($main_class == 11) && ($sub_class == 'C'))
+    ) {
+        $fv_class = !$as_numeric ? 'Syrligt och spontanjäst öl' : '5';
+    } elseif ((($main_class == 11) && ($sub_class == 'A')) ||
+        (($main_class == 11) && ($sub_class == 'B')) ||
+        (($main_class == 11) && ($sub_class == 'D')) ||
+        (($main_class == 11) && ($sub_class == 'F')) ||
+        (($main_class == 11) && ($sub_class == 'G')) ||
+        (($main_class == 11) && ($sub_class == 'H')) ||
+        (($main_class == 11) && ($sub_class == 'I')) ||
+        (($main_class == 11) && ($sub_class == 'J')) ||
+        (($main_class == 11) && ($sub_class == 'L'))
+    ) {
+        $fv_class = !$as_numeric ?  'Övriga öl' : '6';
+    } elseif (($main_class == 12)) {
+        $fv_class = !$as_numeric ? 'Cider och mjöd' : '7';
+    } else {
+        $fv_class = !$as_numeric ? 'Okänd': '0';
+    }
+
+    return $fv_class;
 }

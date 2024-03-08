@@ -51,6 +51,11 @@ define("CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL",true);
 //(sysstatus = fönsterat som visar hur länge tävlig är öppen/stängd mm i klienten)
 define("SETTING_SYSSTATUS_INTERVAL",10000);
 
+//läs ölinfo från eventreg-database (annars från csv-filer)
+define("CONST_SETTING_CONNECT_EVENTREG_DB",true);
+define("CONST_SETTING_CATEGORY_OFFSET",92); ///1=No Offset in Category-table, TODO; fix this
+
+
 //----END OF COMPETITION SETTINGS-----
 
 //output js & php script debug i klient? Viktigt att sätta false i produktion
