@@ -382,7 +382,7 @@ var beer_db = function () {
 
 			pages.push('<h1 class="display-4">' + vote_class.name + '</h1>');
 
-			pages.push('<div class="votes-dirty-field d-inline-block alert alert-danger d-none">Det finns osparade röster.</div>');
+			pages.push('<div class="votes-dirty-field d-inline-block alert alert-danger d-none">Det finns osparade rösters.</div>');
 
 			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group">');
 			pages.push(items[vote_class.id].join(''));

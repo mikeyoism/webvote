@@ -220,6 +220,10 @@ class DbAccess
         if ($result->num_rows < 1)
             die("Invalid eventreg competition id." . $competitionId);
 
+
+        //get all brewers participating in this brew from Brewers_of_beer (user_data.name is just the registering brewer))
+
+
         $classes = $this->getCategories($competitionId, true);
         $beers = array();
         $nextEntryId = 1;
@@ -234,13 +238,29 @@ class DbAccess
                 $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
                 $class = $classOffset + $fv_class_id_nr;
             }
-
+ 
             //find the class name in $classes by array key Id
             $className = $classes[$fv_class_id_nr]['description'];
             $entryId = $nextEntryId++;
-            // if ($row['event_id'] == 31) {
-            //     $entryId = $entryId;
-            // }
+
+            $sql2 = 
+            'SELECT Brewers_of_beer.brewer_id, Brewers.brewer_name FROM Brewers_of_beer ' .
+            'INNER JOIN Brewers USING (brewer_id) ' .
+            'WHERE Brewers_of_beer.beer_id =' . $row['beer_id'] . ' ' .
+            'AND Brewers_of_beer.deleted = 0';
+            $result2 = $this->getConnectionDb2_Eventreg()->query($sql2) or die("getBeers: Query failed: $sql2");
+            $i = 0;
+            $brewer_names = "";
+            while ($row2 = mysqli_fetch_array($result2)) {
+                if ($i > 0) {
+                  $brewer_names = $brewer_names . ", " . $row2['brewer_name'];
+                } else {
+                  $brewer_names = $row2['brewer_name'];
+            
+                }
+                $i++;
+              }
+
             $beer = array(
                 'class' => $class, //must always match id in categories/competitions
                 'entry_id' => $entryId,
@@ -248,7 +268,7 @@ class DbAccess
                 'styleId' => $row['main_class'] . $row['sub_class'],
                 'styleName' => $className,
                 'name' => $row['beer_name'],
-                'brewer' => $row['name'],
+                'brewer' => $brewer_names,
                 'alk' => $row['alc'],
                 'OG' => $row['og'],
                 'FG' => $row['fg'],
