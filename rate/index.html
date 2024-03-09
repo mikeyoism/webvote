@@ -42,7 +42,8 @@
 					</ul>
 				</li>
 				<li class="nav-item voting">
-					<a class="nav-link" data-toggle="modal" href="#vote-popup">Folkets val</a>
+					<!-- <a class="nav-link" data-toggle="modal" href="#vote-popup">Folkets val</a> -->
+					<a class="nav-link" data-toggle="modal" href="#welcome-popup">Start</a>
 				</li>
 			</ul>
 		</div>
@@ -52,6 +53,33 @@
 
 		<!-- Javascript will insert one tab per voting class here. -->
 
+	</div>
+
+
+	<div id="welcome-popup" class="modal" role="dialog" data-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title float-left">
+						Välkommen!
+					</h3>
+					<!-- <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button> -->
+				</div>
+				<div class="modal-body">
+					<p>På <strong>programbladets</strong> baksida hittar du din personliga röstkod.</p>
+					<form>
+						<div class="form-group">
+							<label for="vote-code" class="col-form-label">Skriv in röstkoden för att fortsätta:</label>
+							<input type="text" class="form-control" id="vote-code" maxlength="6" placeholder="Röstkod, 6 tecken">
+							<small id="vote-code-help" class="invalid-feedback" class="form-text text-muted">Se programbladet för att hitta din röstkod.</small>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="vote-proceed-button" class="btn btn-primary" data-dismiss="modal" disabled>Fortsätt</button>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<div id="vote-popup" class="modal" role="dialog">
@@ -164,7 +192,7 @@
 								<label class="btn btn-primary" id="popup-medal-1-button">
 									<input type="radio" name="popup-medal" value="1">Guld</input>
 								</label>
-								<label class="btn btn-primary" id="popup-medal-2-button">
+								<label class="btn btn-primary " id="popup-medal-2-button">
 									<input type="radio" name="popup-medal" value="2">Silver</input>
 								</label>
 								<label class="btn btn-primary" id="popup-medal-3-button">

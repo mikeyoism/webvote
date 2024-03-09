@@ -3,6 +3,7 @@ require_once '../../vote/php/_config.php';
 $competitionId = COMPETITION_ID;
 $enableVoting = 1;
 require_once '../../vote/php/common.inc';
+//TODO: cashed file option & apc memcache for db
 
 if (!CONST_SETTING_CONNECT_EVENTREG_DB) {
     //Read from files
