@@ -412,37 +412,31 @@ var beer_db = function () {
 		});
 		return rating;
 	}
-	var active_classId = 1
-	var current_Sort_ClassId = 0;
+	
+	
 	function fill_beer_lists(compare_function, active_tab_hash) {
 
-		//active_tab_hash like "#page-92" (class id), grab the number
-		// active_classId = active_tab_hash.match(/\d+/);
-		// active_classId = parseInt(active_classId[0]);
+
 		// Order beers by sort order
-		var sorted_beers = [];
+
 		var sorted_beers_by_class = [];
 
 		$.each(beers, function (i, beer) {
-			// if (parseInt(active_classId[0]) !== beer.class) 
-			// 	return;
-			sorted_beers.push(i);
 
 			var class_id = beer['class'];
 			if (sorted_beers_by_class[class_id] == undefined)
 				sorted_beers_by_class[class_id] = [];
+
 			sorted_beers_by_class[class_id].push(i);
-
-
-
 		});
+		
 		//if (DEBUGMODE) {console.log("beers"); console.log(beers)};
 		
 
-		//loop through the classes and sort the beers in each class (note: classes might be in random order, use .id to get the class id)
+		//loop through the classes and sort the beers in each class (note: classes might be in random order, use .id )
 		$.each(classes, function (no_use, vote_class) {
 			//sort the beers in each class with current compare_function
-			current_Sort_ClassId = vote_class.id; //help variable for sorting
+			
 			sorted_beers_by_class[vote_class.id].sort(compare_function);
 			//if (DEBUGMODE) console.log("sorted_beers_by_class[" + vote_class.id + "]"); console.log(sorted_beers_by_class[vote_class.id]);
 
