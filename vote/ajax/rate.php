@@ -99,7 +99,9 @@ function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings)
         foreach ($catOfRatings as $clientKey => $rating) {
             if ($rating->beerEntryId > 0 && $categoryId == $rating->categoryId) { //exta check
                 
-                //ratingScore, garantera att det är en int eller null
+                //ratingScore, garantera att den finns, +  att det är en int eller null
+                if (!$rating->ratingScore)
+                    $rating->ratingScore = "";
                 $ratingScore = $rating->ratingScore  == "" ?  null : $rating->ratingScore;
                 if ($ratingScore !== null && ($ratingScore = filter_var($ratingScore, FILTER_VALIDATE_INT)) === false) {
                     return array("WARNING", "ogiltig röst, ej heltal @ " . $rating->beerEntryId); //ska aldrig hända, men...

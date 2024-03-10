@@ -228,19 +228,29 @@ class DbAccess
         $beers = array();
         $nextEntryId = 1;
         $classOffset = CONST_SETTING_CATEGORY_OFFSET -1;
-        $class = 0;
+        $classIndex = 0;
         while ($row = $result->fetch_assoc()) {
             //store beer info in arrays grouped by FvMainClass
             if ($row['fv_competition_no'] >= 900){ //etikett tävling (övriga fält lika som för ditto öl)
                 $fv_class_id_nr = 8;
-                $class = $classOffset + $fv_class_id_nr + 1;
+                $classIndex = $classOffset + $fv_class_id_nr + 1;
             }else{
                 $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-                $class = $classOffset + $fv_class_id_nr;
+                $classIndex = $classOffset + $fv_class_id_nr;
             }
  
+            
+            //find classes.id in $classes
+            $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
+                return ($var['id'] == $classIndex);
+            }));
+
+            if (!array_key_exists(0, $class))
+                die("Invalid class id." . $classIndex);
             //find the class name in $classes by array key Id
-            $className = $classes[$fv_class_id_nr]['description'];
+
+
+            $className = $class[0]['description']; //$classes[$fv_class_id_nr-1]['description'];
             $entryId = $nextEntryId++;
 
             $sql2 = 
@@ -262,7 +272,7 @@ class DbAccess
               }
 
             $beer = array(
-                'class' => $class, //must always match id in categories/competitions
+                'class' =>  $class[0]['id'], //must always match id in categories/competitions
                 'entry_id' => $entryId,
                 'entry_code' => $row['fv_competition_no'],
                 'styleId' => $row['main_class'] . $row['sub_class'],
@@ -700,7 +710,7 @@ function redirectToSelf()
 
 
 // Returns FV class as string or numeric based on the main and sub class of the beer
-// this is a copy of the function in the eventreg code
+// this is a copy of the function in the eventreg code, *but with returned numerics adusted to order in the competition table*
 //TODO store in database instead of hardcoding
 
 function FvClass($low_alc, $main_class, $sub_class)
