@@ -80,7 +80,7 @@ var beer_db = function () {
 				enable_voting = response.enable_voting;
 				classes = response.classes;
 				beers = response.beers;
-				if (DEBUGMODE) {console.log("@competition_data"); console.log(response);}
+				if (DEBUGMODE) { console.log("@competition_data"); console.log(response); }
 
 			},
 			error: function (xhr, textStatus, errorThrown) {
@@ -182,16 +182,16 @@ var beer_db = function () {
 
 	}
 
-	
+
 	function initialize_html(startupClass = 0) {
-		
+
 		var startupClassIndex = 0;
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
 		$.each(classes, function (i, vote_class) {
 			class_dropdown.append('<li class="dropdown-item"><a data-toggle="tab" href="#page-' + vote_class.id
 				+ '" id="menu-item-' + vote_class.id + '">' + vote_class.name + '</a></li>');
-			
+
 			if (vote_class.id == startupClass) {
 				startupClassIndex = i;
 			}
@@ -203,31 +203,31 @@ var beer_db = function () {
 
 		// Add click handlers for the sort menu items.
 		$('#menu-item-sort-by-entry-code').on("click", function () {
-			
+
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
 			if (activeTab > "")
 				fill_beer_lists(compare_beers_by_entry_code, activeTab);
 		});
 
 		$('#menu-item-sort-by-style').on("click", function () {
-			
+
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
 			if (activeTab > "")
 				fill_beer_lists(compare_beers_by_style, activeTab);
 		});
 
 		$('#menu-item-sort-by-rating').on("click", function () {
-			
+
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
 			if (activeTab > "")
 				fill_beer_lists(compare_beers_by_rating, activeTab);
 		});
-		
 
-		
+
+
 		// on tab shown, set the activeTab variable to the new active tab
 		$('.nav-item').on('shown.bs.tab', 'a', function (e) {
-			if (e.target){
+			if (e.target) {
 				activeTab = e.target.hash; //$(e.target).attr('href');
 				$(e.target).removeClass('active'); //remove active class from the tab, so that it can be set again
 			}
@@ -326,6 +326,41 @@ var beer_db = function () {
 		} else {
 			$('.voting').addClass('d-none');
 		}
+
+
+
+		$('#search-beer').on('keyup', function (e) {
+			var searchstr = $(this).val();
+			if (searchstr.length >= 3) {
+				//find the beer(s) with the searchstr
+				var searchstr = searchstr.toLowerCase();
+				var searchstr = searchstr.replace(/[^a-z0-9]/g, ''); //remove non-alphanumeric characters
+				//look in the beers array for the searchstr
+				var found = false;
+				$.each(beers, function (i, beer) {
+					//sökning på namn funger men blir rörigt vid multipla träffar på strängen (första träff öppnas)
+					//så stängar av det...
+					//var beername = beer.name.toLowerCase();
+					//var beername = beername.replace(/[^a-z0-9]/g, ''); //remove non-alphanumeric characters
+					if (/*beername.indexOf(searchstr) > -1 ||*/ beer.entry_code.indexOf(searchstr) > -1) {
+						popup_beer_by_id(beer.entry_code);
+						//change the active tab to the class of the found beer
+						$.each(classes, function (i, vote_class) {
+							if (vote_class.id == beer.class) {
+								$('#menu-item-' + vote_class.id).trigger('click');
+								return false;
+							}
+						});
+						found = true;
+						return false;
+					}
+				});
+
+
+			}
+			return false;
+		});
+
 	}
 	function popup_beer_by_id(beer_id) {
 
@@ -365,8 +400,8 @@ var beer_db = function () {
 		//find a in beers, to get the entry_code
 		var a_entry_code = beers[a].entry_code;
 		var a_classId = beers[a].class;
-		
-	
+
+
 		//find a_entry_code in user_data.ratings, if found, set a_rating to the rating
 		$.each(user_data.ratings[a_classId], function (i, obj) {
 			if (obj.beerEntryId == a_entry_code) {
@@ -387,20 +422,20 @@ var beer_db = function () {
 				if (obj.ratingScore != null)
 					b_rating = parseInt(obj.ratingScore);
 				b_drank = (obj.drankCheck === "1" || obj.drankCheck === 1 || obj.drankCheck === true) ? 1 : 0;
-				return false;	
-			}	
+				return false;
+			}
 		});
 
-		 if (a_rating != b_rating) {
-		
-		 	return b_rating - a_rating;
-		 }
-		 if (a_drank != b_drank) {
-		
+		if (a_rating != b_rating) {
+
+			return b_rating - a_rating;
+		}
+		if (a_drank != b_drank) {
+
 			return a_drank > b_drank ? -1 : a_drank == b_drank ? 0 : 1;
 		}
 		//for unrated beers...
-     	var ret  = compare_beers_by_entry_code(a, b);
+		var ret = compare_beers_by_entry_code(a, b);
 		return ret;
 	}
 	function compare_beers_by_style(a, b) {
@@ -441,8 +476,8 @@ var beer_db = function () {
 		});
 		return rating;
 	}
-	
-	
+
+
 	function fill_beer_lists(compare_function, active_tab_hash) {
 
 
@@ -458,14 +493,14 @@ var beer_db = function () {
 
 			sorted_beers_by_class[class_id].push(i);
 		});
-		
+
 		//if (DEBUGMODE) {console.log("beers"); console.log(beers)};
-		
+
 
 		//loop through the classes and sort the beers in each class (note: classes might be in random order, use .id )
 		$.each(classes, function (no_use, vote_class) {
 			//sort the beers in each class with current compare_function
-			
+
 			sorted_beers_by_class[vote_class.id].sort(compare_function);
 			//if (DEBUGMODE) console.log("sorted_beers_by_class[" + vote_class.id + "]"); console.log(sorted_beers_by_class[vote_class.id]);
 
@@ -497,7 +532,7 @@ var beer_db = function () {
 					+ get_drank_string(rating.drankCheck)
 					+ '</span>'
 					+ '<span class="float-right" id="medal-display-' + entry_id + '" style="padding-right: 10px;"></span>'
-					+ '<span class="beer-number">'  +  beer.entry_code + '</span>. '
+					+ '<span class="beer-number">' + beer.entry_code + '</span>. '
 					+ '<span class="beer-name">' + beer.name + '</span><br>'
 					+ '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
 					+ '</a>');
