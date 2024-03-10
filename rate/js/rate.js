@@ -180,8 +180,7 @@ var beer_db = function () {
 
 
 		activeTab = "#page-" + classes[0].id; //default to the first class
-		// Default to the first class (this only sets the pill text -- by default the first tab is selected.
-		$('#menu-item-' + classes[0].id).trigger('shown.bs.tab');
+
 
 		// Add click handlers for the sort menu items.
 		$('#menu-item-sort-by-entry-code').on("click", function () {
@@ -209,10 +208,14 @@ var beer_db = function () {
 		
 		// on tab shown, set the activeTab variable to the new active tab
 		$('.nav-item').on('shown.bs.tab', 'a', function (e) {
-			if (e.target)
+			if (e.target){
 				activeTab = e.target.hash; //$(e.target).attr('href');
+				$(e.target).removeClass('active'); //remove active class from the tab, so that it can be set again
+			}
 		})
 
+		// Default to the first class this triggers shown.bs.tab
+		$('#menu-item-' + classes[0].id).trigger('click');
 
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
