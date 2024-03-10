@@ -32,6 +32,7 @@ var beer_db = function () {
 	//url parameters competition id and beer id
 	var cid = null;
 	var bid = null;
+	var activeTab = null; //current active tab of the class dropdown
 
 	function getVoteSettings() {
 
@@ -168,7 +169,7 @@ var beer_db = function () {
 
 	}
 
-
+	
 	function initialize_html() {
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
@@ -177,29 +178,42 @@ var beer_db = function () {
 				+ '" id="menu-item-' + vote_class.id + '">' + vote_class.name + '</a></li>');
 		});
 
-		// Default to the first class (this only sets the pill text -- by default the first tab is selected.
-		$('#menu-item-' + classes[0].id).trigger('click');
 
+		activeTab = "#page-" + classes[0].id; //default to the first class
+		// Default to the first class (this only sets the pill text -- by default the first tab is selected.
+		$('#menu-item-' + classes[0].id).trigger('shown.bs.tab');
+
+		// Add click handlers for the sort menu items.
 		$('#menu-item-sort-by-entry-code').on("click", function () {
-			var current_tab = get_current_tab_hash();
-			if (DEBUGMODE) console.log('current_tab=' + current_tab);
-			if (current_tab > "")
-				fill_beer_lists(compare_beers_by_entry_code, current_tab);
+			
+			if (DEBUGMODE) console.log('current_tab=' + activeTab);
+			if (activeTab > "")
+				fill_beer_lists(compare_beers_by_entry_code, activeTab);
 		});
 
 		$('#menu-item-sort-by-style').on("click", function () {
-			var current_tab = get_current_tab_hash();
-			if (DEBUGMODE) console.log('current_tab=' + current_tab);
-			if (current_tab > "")
-				fill_beer_lists(compare_beers_by_style, current_tab);
+			
+			if (DEBUGMODE) console.log('current_tab=' + activeTab);
+			if (activeTab > "")
+				fill_beer_lists(compare_beers_by_style, activeTab);
 		});
 
 		$('#menu-item-sort-by-rating').on("click", function () {
-			var current_tab = get_current_tab_hash();
-			if (DEBUGMODE) console.log('current_tab=' + current_tab);
-			if (current_tab > "")
-				fill_beer_lists(compare_beers_by_rating, current_tab);
+			
+			if (DEBUGMODE) console.log('current_tab=' + activeTab);
+			if (activeTab > "")
+				fill_beer_lists(compare_beers_by_rating, activeTab);
 		});
+		
+
+		
+		// on tab shown, set the activeTab variable to the new active tab
+		$('.nav-item').on('shown.bs.tab', 'a', function (e) {
+			if (e.target)
+				activeTab = e.target.hash; //$(e.target).attr('href');
+		})
+
+
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
 			// if (user_data.vote_code.length != VOTE_CODE_LEN) {
@@ -278,13 +292,6 @@ var beer_db = function () {
 
 		fill_beer_lists(compare_beers_by_entry_code, '#page-' + classes[0].id);
 
-		// Workaround for tabs not being inactivated coorectly.
-		// Remove when bootstrap fixes this (hopefully in 4alpha6).
-		$('.nav-item').on('shown.bs.tab', 'a', function (e) {
-			if (e.relatedTarget) {
-				$(e.relatedTarget).removeClass('active');
-			}
-		})
 
 		$(window).on('hashchange', function (e) {
 			if (window.location.hash != '#modal-beer-popup') {
@@ -507,15 +514,15 @@ var beer_db = function () {
 			});
 		});
 
-		// Maybe display a medal for some items (do not call if 0 -- we just created the
-		// list so there are no medals shown by default.
-		$.each(sorted_beers, function (i, entry_id) {
-			var medal = 0;
-			if (entry_id in user_data.ratings) {
-				medal = get_medal(entry_id);
-				update_medal_in_beer_list(entry_id, medal);
-			}
-		});
+		// // Maybe display a medal for some items (do not call if 0 -- we just created the
+		// // list so there are no medals shown by default.
+		// $.each(sorted_beers, function (i, entry_id) {
+		// 	var medal = 0;
+		// 	if (entry_id in user_data.ratings) {
+		// 		medal = get_medal(entry_id);
+		// 		update_medal_in_beer_list(entry_id, medal);
+		// 	}
+		// });
 	}
 
 	function fill_vote_form() {
@@ -698,18 +705,6 @@ var beer_db = function () {
 		else {
 			votes_dirty_field.addClass('d-none');
 			votes_registered_field.removeClass('d-none');
-		}
-	}
-
-	// Get the current tab hash, if it is one of the class tabs.
-	// Otherwise, return the empty string.
-	function get_current_tab_hash() {
-		var as = $("ul#class-dropdown a.active");
-		if (as.length == 1) {
-			return as[0].hash;
-		}
-		else {
-			return '';
 		}
 	}
 
