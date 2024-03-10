@@ -117,9 +117,30 @@ var beer_db = function () {
 				//user_beers = user_data.beers;
 				user_votes = user_data.votes;
 
+				var startupClass = 0;
+				//if url-parmeters for bid and cid are set (qr-code url's), we should open the popup for that beer
+				bid = UrlParameters('bid'); //beer id aka entry_id
+				var comp_id = UrlParameters('cid'); //competition id
+
+				//if comp_id from url is correct, set cid for later use (otherwise ignore it)
+				if (bid && comp_id && comp_id == competition_id) {
+					cid = comp_id;
+					//find class_id for the bid (entry_id)
+					$.each(beers, function (i, beer) {
+						if (beer.entry_code == bid) {
+							startupClass = beer.class;
+							return false;
+						}
+					});
+
+				}
+				else
+					cid = bid = null;
+
+
 				if (DEBUGMODE) { console.log('@user_ratings) '); console.log(user_data.ratings); }
 				update_vote_code(user_data.vote_code);
-				initialize_html();
+				initialize_html(startupClass);
 
 
 				// Now that the competition information is known we can handle
@@ -143,15 +164,7 @@ var beer_db = function () {
 				}
 
 
-				//if url-parmeters for bid and cid are set (qr-code url's), we should open the popup for that beer
-				bid = UrlParameters('bid'); //beer id aka entry_id
-				var comp_id = UrlParameters('cid'); //competition id
-				//if comp_id from url is correct, set cid for later use (otherwise ignore it)
-				if (bid && comp_id && comp_id == competition_id) {
-					cid = comp_id;
-				}
-				else
-					cid = bid = null;
+
 
 
 				//open welcome-popup if no vote code is set
@@ -170,16 +183,22 @@ var beer_db = function () {
 	}
 
 	
-	function initialize_html() {
+	function initialize_html(startupClass = 0) {
+		
+		var startupClassIndex = 0;
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
 		$.each(classes, function (i, vote_class) {
 			class_dropdown.append('<li class="dropdown-item"><a data-toggle="tab" href="#page-' + vote_class.id
 				+ '" id="menu-item-' + vote_class.id + '">' + vote_class.name + '</a></li>');
+			
+			if (vote_class.id == startupClass) {
+				startupClassIndex = i;
+			}
 		});
 
 
-		activeTab = "#page-" + classes[0].id; //default to the first class
+		activeTab = "#page-" + classes[startupClassIndex].id; //default to the first class
 
 
 		// Add click handlers for the sort menu items.
@@ -215,7 +234,7 @@ var beer_db = function () {
 		})
 
 		// Default to the first class this triggers shown.bs.tab
-		$('#menu-item-' + classes[0].id).trigger('click');
+		$('#menu-item-' + classes[startupClassIndex].id).trigger('click');
 
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
@@ -293,7 +312,7 @@ var beer_db = function () {
 
 		});
 
-		fill_beer_lists(compare_beers_by_entry_code, '#page-' + classes[0].id);
+		fill_beer_lists(compare_beers_by_entry_code, activeTab);
 
 
 		$(window).on('hashchange', function (e) {
