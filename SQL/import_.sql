@@ -115,11 +115,11 @@ CREATE TABLE `votesys_users` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `votecodes`
+-- Table structure for table `voteCodes`
 --
 
-DROP TABLE IF EXISTS `votecodes`;
-CREATE TABLE `votecodes` (
+DROP TABLE IF EXISTS `voteCodes`;
+CREATE TABLE `voteCodes` (
   `id` int(11) NOT NULL,
   `competitionId` int(11) NOT NULL,
   `code` char(6) NOT NULL
@@ -208,9 +208,9 @@ ALTER TABLE `votesys_users`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `votecodes`
+-- Indexes for table `voteCodes`
 --
-ALTER TABLE `votecodes`
+ALTER TABLE `voteCodes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `competitionId` (`competitionId`);
 
@@ -273,9 +273,9 @@ ALTER TABLE `votesys_users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `votecodes`
+-- AUTO_INCREMENT for table `voteCodes`
 --
-ALTER TABLE `votecodes`
+ALTER TABLE `voteCodes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -323,7 +323,7 @@ ALTER TABLE `ratings`
 --
 -- Constraints for table `votecodes`
 --
-ALTER TABLE `votecodes`
+ALTER TABLE `voteCodes`
   ADD CONSTRAINT `voteCodes_ibfk_1` FOREIGN KEY (`competitionId`) REFERENCES `competitions` (`id`);
 
 --

@@ -202,7 +202,9 @@ class DbAccess
         $evenreg_event_ids = $this->getEventReg_EventId($competitionId);
         if (count($evenreg_event_ids) < 1)
             die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
-
+        //set big selects - one.com requires this, not oderlan (we should probably improve the sql query instead of using this setting, atm the query is as in the eventreg code)
+        $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
+        //get all beers in the competition
         $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
             'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
