@@ -880,9 +880,9 @@ var beer_db = function () {
 	function store_ratings() {
 		$.ajax({
 			type: "POST",
-			url: "../../vote/ajax/rate.php",
+			url: "../vote/ajax/rate.php",
 			contentType: 'application/json',
-			dataType: 'json',
+			dataType: 'json', 
 			cache: false,
 			data: JSON.stringify({
 				operation: 'setratings',
