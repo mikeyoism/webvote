@@ -54,7 +54,7 @@ class DbAccess
         # We make two queries so that we can differentiate between the user
         # not found (or wrong password), and the case where the user has insufficient
         # privileges.
-        $sql = 'SELECT id, username FROM users '
+        $sql = 'SELECT id, username FROM vote2_users '
             . 'WHERE username="' . $this->escape($user) . '" '
             . 'AND password=password("' . $this->escape($password) . '")';
         $result = mysqli_query($this->getConnection(), $sql) or die("login: Query failed: $sql");
@@ -182,15 +182,15 @@ class DbAccess
     //get eventreg event_id corresponding to our $compentionId
     public function getEventReg_EventId($competitionId)
     {
-        $sql = 'SELECT event_id, event_name FROM events WHERE deleted= 0 AND votesys_competition_id=' . $this->escape($competitionId);
+        $sql = 'SELECT event_id, event_name FROM Events WHERE deleted= 0 AND votesys_competition_id=' . $this->escape($competitionId);
         $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getEventId: Query failed: $sql");
         if ($result->num_rows < 1)
-            die("Invalid eventreg competition id." . $competitionId);
+            die("Invalid eventreg competition id." . $competitionId . " num_rows: " . $result->num_rows);
         
         //return list of event_ids (typiskt FV + etikett tävling)
         $events = array();
         while ($row = $result->fetch_assoc()) {
-            array_push($events,$row['event_id']);
+            array_push($events,$row['event_id']); 
         }
         return $events;
     }
@@ -201,7 +201,7 @@ class DbAccess
 
         $evenreg_event_ids = $this->getEventReg_EventId($competitionId);
         if (count($evenreg_event_ids) < 1)
-            die("Invalid eventreg competition id." . $competitionId);
+            die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
 
         $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
@@ -218,7 +218,7 @@ class DbAccess
 
         //the result is grouped by main_class, so we need to create a new array to store the beers
         if ($result->num_rows < 1)
-            die("Invalid eventreg competition id." . $competitionId);
+            die("Invalid getBeers result id=" . $competitionId  . " num_rows: " . $result->num_rows . " sql: " . $sql . " event_ids: " . implode(',', $evenreg_event_ids));
 
 
         //get all brewers participating in this brew from Brewers_of_beer (user_data.name is just the registering brewer))

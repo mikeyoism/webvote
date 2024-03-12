@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 03, 2024 at 08:43 PM
+-- Generation Time: Mar 12, 2024 at 08:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,8 +18,11 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `webvote`
+-- Database: `webvote3`
 --
+DROP DATABASE IF EXISTS `webvote3`;
+CREATE DATABASE IF NOT EXISTS `webvote3` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `webvote3`;
 
 -- --------------------------------------------------------
 
@@ -27,6 +30,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `categories`
 --
 
+DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `id` int(11) NOT NULL,
   `competitionId` int(11) NOT NULL,
@@ -40,6 +44,7 @@ CREATE TABLE `categories` (
 -- Table structure for table `competitions`
 --
 
+DROP TABLE IF EXISTS `competitions`;
 CREATE TABLE `competitions` (
   `id` int(11) NOT NULL,
   `name` varchar(100) DEFAULT NULL,
@@ -54,6 +59,7 @@ CREATE TABLE `competitions` (
 -- Table structure for table `entries`
 --
 
+DROP TABLE IF EXISTS `entries`;
 CREATE TABLE `entries` (
   `id` int(11) NOT NULL,
   `categoryId` int(11) DEFAULT NULL,
@@ -66,6 +72,7 @@ CREATE TABLE `entries` (
 -- Table structure for table `privileges`
 --
 
+DROP TABLE IF EXISTS `privileges`;
 CREATE TABLE `privileges` (
   `id` int(11) NOT NULL,
   `user` int(11) NOT NULL,
@@ -79,6 +86,7 @@ CREATE TABLE `privileges` (
 -- Table structure for table `ratings`
 --
 
+DROP TABLE IF EXISTS `ratings`;
 CREATE TABLE `ratings` (
   `id` int(11) NOT NULL,
   `voteCodeId` int(11) NOT NULL,
@@ -94,10 +102,11 @@ CREATE TABLE `ratings` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Table structure for table `vote2_users`
 --
 
-CREATE TABLE `users` (
+DROP TABLE IF EXISTS `vote2_users`;
+CREATE TABLE `vote2_users` (
   `username` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
   `id` int(11) NOT NULL
@@ -109,6 +118,7 @@ CREATE TABLE `users` (
 -- Table structure for table `votecodes`
 --
 
+DROP TABLE IF EXISTS `votecodes`;
 CREATE TABLE `votecodes` (
   `id` int(11) NOT NULL,
   `competitionId` int(11) NOT NULL,
@@ -121,6 +131,7 @@ CREATE TABLE `votecodes` (
 -- Table structure for table `votes`
 --
 
+DROP TABLE IF EXISTS `votes`;
 CREATE TABLE `votes` (
   `id` int(11) NOT NULL,
   `voteCodeId` int(11) NOT NULL,
@@ -138,6 +149,7 @@ CREATE TABLE `votes` (
 -- Table structure for table `vote_weights_and_labels`
 --
 
+DROP TABLE IF EXISTS `vote_weights_and_labels`;
 CREATE TABLE `vote_weights_and_labels` (
   `id` int(11) NOT NULL,
   `category` int(11) NOT NULL,
@@ -192,7 +204,7 @@ ALTER TABLE `ratings`
 --
 -- Indexes for table `users`
 --
-ALTER TABLE `users`
+ALTER TABLE `vote2_users`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -255,9 +267,9 @@ ALTER TABLE `ratings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT for table `vote2_users`
 --
-ALTER TABLE `users`
+ALTER TABLE `vote2_users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -298,7 +310,7 @@ ALTER TABLE `entries`
 -- Constraints for table `privileges`
 --
 ALTER TABLE `privileges`
-  ADD CONSTRAINT `privileges_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `privileges_ibfk_1` FOREIGN KEY (`user`) REFERENCES `vote2_users` (`id`),
   ADD CONSTRAINT `privileges_ibfk_2` FOREIGN KEY (`competition`) REFERENCES `competitions` (`id`);
 
 --

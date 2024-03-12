@@ -38,7 +38,7 @@ var beer_db = function () {
 
 		return $.ajax({
 			type: "POST",
-			url: "../../vote/ajax/jssettings.php",
+			url: "../vote/ajax/jssettings.php",
 			dataType: 'json',
 			cache: false,
 			async: true,
@@ -795,7 +795,7 @@ var beer_db = function () {
 	function read_votes() {
 		$.ajax({
 			type: "POST",
-			url: "../../vote/ajax/vote.php",
+			url: "../vote/ajax/vote.php",
 			contentType: 'application/json',
 			dataType: 'json',
 			cache: false,
@@ -835,7 +835,7 @@ var beer_db = function () {
 	function read_ratings() {
 		$.ajax({
 			type: "POST",
-			url: "../../vote/ajax/rate.php",
+			url: "../vote/ajax/rate.php",
 			contentType: 'application/json',
 			dataType: 'json',
 			cache: false,
@@ -908,7 +908,7 @@ var beer_db = function () {
 	function get_competition_status(args) {
 		$.ajax({
 			type: "POST",
-			url: "../../vote/ajax/status.php",
+			url: "../vote/ajax/status.php",
 			contentType: 'application/json',
 			dataType: 'json',
 			cache: false,
