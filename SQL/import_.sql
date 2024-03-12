@@ -102,11 +102,11 @@ CREATE TABLE `ratings` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `vote2_users`
+-- Table structure for table `votesys_users`
 --
 
-DROP TABLE IF EXISTS `vote2_users`;
-CREATE TABLE `vote2_users` (
+DROP TABLE IF EXISTS `votesys_users`;
+CREATE TABLE `votesys_users` (
   `username` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
   `id` int(11) NOT NULL
@@ -202,9 +202,9 @@ ALTER TABLE `ratings`
   ADD KEY `ratings_ibfk_3` (`categoryId`,`beerEntryId`);
 
 --
--- Indexes for table `users`
+-- Indexes for table `votesys_users`
 --
-ALTER TABLE `vote2_users`
+ALTER TABLE `votesys_users`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -267,9 +267,9 @@ ALTER TABLE `ratings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `vote2_users`
+-- AUTO_INCREMENT for table `votesys_users`
 --
-ALTER TABLE `vote2_users`
+ALTER TABLE `votesys_users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -310,7 +310,7 @@ ALTER TABLE `entries`
 -- Constraints for table `privileges`
 --
 ALTER TABLE `privileges`
-  ADD CONSTRAINT `privileges_ibfk_1` FOREIGN KEY (`user`) REFERENCES `vote2_users` (`id`),
+  ADD CONSTRAINT `privileges_ibfk_1` FOREIGN KEY (`user`) REFERENCES `votesys_users` (`id`),
   ADD CONSTRAINT `privileges_ibfk_2` FOREIGN KEY (`competition`) REFERENCES `competitions` (`id`);
 
 --

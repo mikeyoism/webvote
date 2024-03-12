@@ -54,7 +54,7 @@ class DbAccess
         # We make two queries so that we can differentiate between the user
         # not found (or wrong password), and the case where the user has insufficient
         # privileges.
-        $sql = 'SELECT id, username FROM vote2_users '
+        $sql = 'SELECT id, username FROM votesys_users '
             . 'WHERE username="' . $this->escape($user) . '" '
             . 'AND password=password("' . $this->escape($password) . '")';
         $result = mysqli_query($this->getConnection(), $sql) or die("login: Query failed: $sql");
