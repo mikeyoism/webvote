@@ -33,7 +33,7 @@ var beer_db = function () {
 	var cid = null;
 	var bid = null;
 	var activeTab = null; //current active tab of the class dropdown
-	var last_compare_function = null;
+	var last_compare_function = null; //stored to localStorage
 
 	function getVoteSettings() {
 
@@ -118,7 +118,7 @@ var beer_db = function () {
 					//name of function is stored, set last_compare_function
 					switch (user_data.last_compare_function_name) {
 						case 'compare_beers_by_entry_code':
-							last_compare_function = compare_beers_by_entry_code; 
+							last_compare_function = compare_beers_by_entry_code;
 							break;
 						case 'compare_beers_by_rating':
 							last_compare_function = compare_beers_by_rating;
@@ -127,7 +127,7 @@ var beer_db = function () {
 							last_compare_function = compare_beers_by_style;
 							break;
 						default:
-							last_compare_function = compare_beers_by_entry_code; 
+							last_compare_function = compare_beers_by_entry_code;
 					}
 
 				}
@@ -219,25 +219,31 @@ var beer_db = function () {
 		$('#menu-item-sort-by-entry-code').on("click", function () {
 
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
-			if (activeTab > "")
+			if (activeTab > "") {
 				last_compare_function = compare_beers_by_entry_code;
-			fill_beer_lists(last_compare_function, activeTab);
+				fill_beer_lists(last_compare_function, activeTab);
+				saveToLocalStorage();
+			}
 		});
 
 		$('#menu-item-sort-by-style').on("click", function () {
 
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
-			if (activeTab > "")
+			if (activeTab > "") {
 				last_compare_function = compare_beers_by_style;
-			fill_beer_lists(last_compare_function, activeTab);
+				fill_beer_lists(last_compare_function, activeTab);
+				saveToLocalStorage();
+			}
 		});
 
 		$('#menu-item-sort-by-rating').on("click", function () {
 
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
-			if (activeTab > "")
+			if (activeTab > "") {
 				last_compare_function = compare_beers_by_rating;
-			fill_beer_lists(last_compare_function, activeTab);
+				fill_beer_lists(last_compare_function, activeTab);
+				saveToLocalStorage();
+			}
 		});
 
 
