@@ -326,11 +326,17 @@ var beer_db = function () {
 					user_rating_class.push(rating);
 				}
 
-				saveToLocalStorage();
-				store_ratings();
+				//saveToLocalStorage();
+				store_ratings().done(function () {
+					//find the validated rating from the server, now in user_data.ratings
+					var rating = get_rating(class_id, beer_entry_id);
+					
 
-				update_rating_in_beer_list(current_popup_item_id, rating.ratingScore);
-				update_drank_in_beer_list(current_popup_item_id, rating.drankCheck);
+					update_rating_in_beer_list(current_popup_item_id, rating.ratingScore);
+					update_drank_in_beer_list(current_popup_item_id, rating.drankCheck);
+				});
+
+
 			}
 		});
 
@@ -926,7 +932,7 @@ var beer_db = function () {
 	}
 	//store ratings
 	function store_ratings() {
-		$.ajax({
+		return $.ajax({
 			type: "POST",
 			url: "../vote/ajax/rate.php",
 			contentType: 'application/json',
@@ -939,10 +945,16 @@ var beer_db = function () {
 				ratings: user_data.ratings
 			}),
 			success: function (response) {
-				//replicate the ratings to localstorage
-				saveToLocalStorage();
-
 				if (DEBUGMODE) { console.log("@pre_store_ratings"); console.log(user_data.ratings) };
+				//if the server accepted the ratings, save them to localstorage
+				if (response.msgtype == 'OK'){
+					saveToLocalStorage();
+				}else{
+					user_data.ratings = response.ratings; //reset to what was stored and accepted by server
+				}
+
+
+				
 				if (DEBUGMODE) { console.log("@store_ratings"); console.log(response) };
 			},
 			error: function (xhr, textStatus, errorThrown) {
