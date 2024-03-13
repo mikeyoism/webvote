@@ -33,6 +33,7 @@ var beer_db = function () {
 	var cid = null;
 	var bid = null;
 	var activeTab = null; //current active tab of the class dropdown
+	var last_compare_function = null;
 
 	function getVoteSettings() {
 
@@ -113,7 +114,21 @@ var beer_db = function () {
 					});
 
 				}
+				if (user_data.last_compare_function_name != null) {
+					//name of function is stored, set last_compare_function
+					switch (user_data.last_compare_function_name) {
+						case 'compare_beers_by_entry_code':
+							last_compare_function = compare_beers_by_entry_code; 
+							break;
+						case 'compare_beers_by_rating':
+							last_compare_function = compare_beers_by_rating;
+							break;
+						case 'compare_beers_by_style':
+							last_compare_function = compare_beers_by_style;
+							break;
+					}
 
+				}
 				//user_beers = user_data.beers;
 				user_votes = user_data.votes;
 
@@ -138,7 +153,7 @@ var beer_db = function () {
 					cid = bid = null;
 
 
-				if (DEBUGMODE) { console.log('@user_ratings) '); console.log(user_data.ratings); }
+				if (DEBUGMODE) { console.log('@user_ratings for votecode=' + user_data.vote_code); console.log(user_data.ratings); }
 				update_vote_code(user_data.vote_code);
 				initialize_html(startupClass);
 
@@ -162,9 +177,6 @@ var beer_db = function () {
 						VOTE_STATUS_INTERVAL);
 					get_competition_status();
 				}
-
-
-
 
 
 				//open welcome-popup if no vote code is set
@@ -206,21 +218,24 @@ var beer_db = function () {
 
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
 			if (activeTab > "")
-				fill_beer_lists(compare_beers_by_entry_code, activeTab);
+				last_compare_function = compare_beers_by_entry_code;
+			fill_beer_lists(last_compare_function, activeTab);
 		});
 
 		$('#menu-item-sort-by-style').on("click", function () {
 
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
 			if (activeTab > "")
-				fill_beer_lists(compare_beers_by_style, activeTab);
+				last_compare_function = compare_beers_by_style;
+			fill_beer_lists(last_compare_function, activeTab);
 		});
 
 		$('#menu-item-sort-by-rating').on("click", function () {
 
 			if (DEBUGMODE) console.log('current_tab=' + activeTab);
 			if (activeTab > "")
-				fill_beer_lists(compare_beers_by_rating, activeTab);
+				last_compare_function = compare_beers_by_rating;
+			fill_beer_lists(last_compare_function, activeTab);
 		});
 
 
@@ -250,7 +265,7 @@ var beer_db = function () {
 		$("input[type='radio'][name='popup-rating']").on("click", function (event) {
 			if ($("input[type='radio'][name='popup-rating']:checked").val() >= 1) {
 				//if not already drank
-				if ($("#popup-drank-rot").hasClass('down') === true){
+				if ($("#popup-drank-rot").hasClass('down') === true) {
 					$("#popup-drank-rot").removeClass('down');
 					$("input[type='checkbox'][name='popup-drankcheck']").prop("checked", true);
 
@@ -325,8 +340,6 @@ var beer_db = function () {
 
 		});
 
-		fill_beer_lists(compare_beers_by_entry_code, activeTab);
-
 
 		$(window).on('hashchange', function (e) {
 			if (window.location.hash != '#modal-beer-popup') {
@@ -393,6 +406,10 @@ var beer_db = function () {
 	}
 
 	function saveToLocalStorage() {
+		//set user_data.last_compare_function_name
+		if (last_compare_function !== null)
+			user_data.last_compare_function_name = last_compare_function.name;
+
 		localStorage.setItem('user_data_' + competition_id, JSON.stringify(user_data));
 
 	}
@@ -874,6 +891,11 @@ var beer_db = function () {
 					user_data.ratings = response.ratings;
 
 					saveToLocalStorage();
+					//default
+					if (last_compare_function == null)
+						last_compare_function = compare_beers_by_entry_code;
+
+					fill_beer_lists(last_compare_function, activeTab);
 				}
 				else {
 					vote_code_ok = false;
