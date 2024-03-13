@@ -126,6 +126,8 @@ var beer_db = function () {
 						case 'compare_beers_by_style':
 							last_compare_function = compare_beers_by_style;
 							break;
+						default:
+							last_compare_function = compare_beers_by_entry_code; 
 					}
 
 				}
