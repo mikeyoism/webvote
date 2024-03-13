@@ -246,6 +246,19 @@ var beer_db = function () {
 				bid = null; //once opened, clear the bid
 			}
 		});
+		//on popup-rating click on a star, also set drankcheck if rating >= 1
+		$("input[type='radio'][name='popup-rating']").on("click", function (event) {
+			if ($("input[type='radio'][name='popup-rating']:checked").val() >= 1) {
+				//if not already drank
+				if ($("#popup-drank-rot").hasClass('down') === true){
+					$("#popup-drank-rot").removeClass('down');
+					$("input[type='checkbox'][name='popup-drankcheck']").prop("checked", true);
+
+				}
+			}
+		});
+
+
 		//popup close event
 		$("#beer-popup").on('hidden.bs.modal', function (event) {
 			if (user_data.vote_code.length == VOTE_CODE_LEN) {
@@ -882,7 +895,7 @@ var beer_db = function () {
 			type: "POST",
 			url: "../vote/ajax/rate.php",
 			contentType: 'application/json',
-			dataType: 'json', 
+			dataType: 'json',
 			cache: false,
 			data: JSON.stringify({
 				operation: 'setratings',
