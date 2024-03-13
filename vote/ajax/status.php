@@ -37,6 +37,7 @@ $jsonReply['competition_open'] = $openTimes['open'];
 $jsonReply['competition_status'] = $openTimes['openCloseText'];
 $jsonReply['competition_seconds_to_open'] = $competition['openTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
 $jsonReply['competition_seconds_to_close'] = $competition['closeTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
+$jsonReply['competition_closes_hhmm'] = $competition['closeTime']->format('H:i');
 
 header('Content-Type: application/json', true);
 echo  json_encode($jsonReply);

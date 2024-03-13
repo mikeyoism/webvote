@@ -68,9 +68,9 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h3 class="modal-title float-left">
-						Välkommen!
+						Välkommen till <span id="competition-name">SHBF Ölträff</span>!
 					</h3>
-					<!-- <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button> -->
+					
 				</div>
 				<div class="modal-body">
 					<p>På <strong>programbladets</strong> baksida hittar du din personliga röstkod.</p>
@@ -83,6 +83,7 @@
 								programbladet för att hitta din röstkod.</small>
 						</div>
 					</form>
+					<div class="competition-status badge-pill" id="beer-popup-competition-status"></div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" id="vote-proceed-button" class="btn btn-primary" data-dismiss="modal"
@@ -103,7 +104,7 @@
 					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button>
 				</div>
 				<div class="modal-body">
-					<div id="vote-competition-status"></div>
+					<!-- <div id="vote-competition-status"></div> -->
 					<div class="votes-dirty-field d-none d-inline-block alert alert-danger">Det finns osparade röster.
 					</div>
 					<div class="votes-registered-field d-none d-inline-block">Alla röster sparade.
@@ -215,6 +216,7 @@
 							</div>
 						</fieldset>
 					</form>
+					<div class=" badge-pill competition-status" id="beer-popup-competition-status"></div>
 				</div>
 			</div>
 		</div>

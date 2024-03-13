@@ -8,6 +8,7 @@ $(function (event) {
 var beer_db = function () {
 	// These are read from the server using ajax
 	var competition_id = null;
+	
 	var enable_voting;
 	var classes = null;
 	var beers = null;
@@ -29,6 +30,7 @@ var beer_db = function () {
 	var DEBUGMODE = false;
 	var VOTE_STATUS_INTERVAL = 10000;
 	var VOTE_CODE_LEN = 6;
+	var competition_name = "";
 	//url parameters competition id and beer id
 	var cid = null;
 	var bid = null;
@@ -586,9 +588,12 @@ var beer_db = function () {
 			pages.push('<div id="page-' + vote_class.id + '" class="tab-pane '
 				+ ('#page-' + vote_class.id == active_tab_hash ? ' active' : '') + '">');
 
-			pages.push('<h1 class="display-4">' + vote_class.name + '</h1>');
+			pages.push('<div class="">');	
+			pages.push('<h1 class="display-4 ml-1">' + vote_class.name + '</h1>');
 
-			pages.push('<div class="votes-dirty-field d-inline-block alert alert-danger d-none">Det finns osparade rösters.</div>');
+			
+			pages.push('<div class="competition-status alert"></div>');
+			pages.push('</div>');
 
 			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group">');
 			pages.push(items[vote_class.id].join(''));
@@ -973,31 +978,41 @@ var beer_db = function () {
 						VOTE_STATUS_INTERVAL);
 					if (DEBUGMODE) console.log('vote status interval updated to ' + VOTE_STATUS_INTERVAL);
 				}
-
-				var style_class = 'rounded d-inline-block p-1 mb-1';
+				if (response.competition_name != null && response.competition_name !== competition_name) {
+					competition_name = response.competition_name;
+					$('#competition-name').html(competition_name);
+				}
+				var style_class = 'd-inline-block pl-3 pr-3 ml-2 mr-2 mb-2';
 				if (response.competition_open) {
 					if (response.competition_seconds_to_close < 60) {
 						style_class += ' bg-danger text-white'
 					} else if (response.competition_seconds_to_close < 600) {
 						style_class += ' bg-warning text-white'
 					} else {
-						style_class += ' bg-faded'
+						style_class += ' bg-info text-white'
 					}
-					var open_closed_text = 'Röstningen stänger om '
-						+ secondsToString(response.competition_seconds_to_close) + '.';
+					var open_closed_text ='Betygsätt fram till kl. ' + response.competition_closes_hhmm + ', det är  '
+						+ secondsToRemainString(response.competition_seconds_to_close) + ' kvar.';
 				} else {
 					if (response.competition_seconds_to_open < 0) {
 						style_class += ' bg-danger text-white';
-						var open_closed_text = 'Röstningen har stängt.';
+						var open_closed_text = 'Betygsättningen har stängt.';
 					} else {
-						style_class += ' bg-faded';
-						var open_closed_text = 'Röstningen öppnar om '
+						style_class += ' bg-warning';
+						var open_closed_text = 'Betygsättningen öppnar om '
 							+ secondsToString(response.competition_seconds_to_open) + '.';
 					}
 				}
-				$('#vote-competition-status').html(
-					'<div class="' + style_class + '">'
-					+ open_closed_text + '</div>');
+
+				
+				// $(".competition-status").html(
+				// 		'<div class="' + style_class + '">'
+				// 		+ open_closed_text + '</div>');
+				//allow for customization with badge/alert classes at different locations
+				$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);
+					
+
+				 
 			},
 			error: function (xhr, textStatus, errorThrown) {
 				console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
@@ -1027,6 +1042,37 @@ var beer_db = function () {
 		var minutes = Math.floor(s / 60) % 60;
 		var seconds = s % 60;
 		return [hours, minutes, seconds].map(v => v < 10 ? "0" + v : v).join(":")
+	}
+	//seconds to string hh timmar och mm minuter
+	function secondsToRemainString(s) {
+		var hours = Math.floor(s / 3600);
+		var minutes = Math.floor(s / 60) % 60;
+		var seconds = s % 120;
+		
+		var ret = '';
+		if (hours < 1) {
+			if (minutes >= 2)
+				ret = minutes + ' minuter';
+			else
+				ret = seconds + ' sekunder';
+		}
+		else if (hours == 1) {
+			if (minutes > 1)
+				ret = hours + ' timma och ' + minutes + ' minuter';
+			else if (minutes == 1)
+				ret = hours + ' timma och ' + minutes + ' minut';
+			else
+				ret = hours + ' timma';
+		}
+		else {
+			if (minutes > 1)
+				ret = hours + ' timmar och ' + minutes + ' minuter';
+			else if (minutes == 1)
+				ret = hours + ' timmar och ' + minutes + ' minut';
+			else
+				ret = hours + ' timmar';
+		}
+		return ret;
 	}
 
 
