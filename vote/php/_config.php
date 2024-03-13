@@ -21,6 +21,8 @@
  *home brewing events arranged by the swedish home brewing association (www.SHBF.se)
 */
 
+//För korrekt beräkning av tävligstider
+date_default_timezone_set("Europe/Stockholm");
 //-COMPETITION SETUP START
 
 //for testing/used if not set by param
