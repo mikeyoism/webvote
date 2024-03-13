@@ -16,11 +16,15 @@ if (!preg_match('/^[1-9][0-9]{0,4}$/', $competitionId)) {
 
 $dbAccess = new DbAccess();
 
-//$competition = apc_fetch('competition-' . $competitionId);
-//if ($competition === false) {
+if (APC_CACHE_ENABLED) {
+    $competition = apc_fetch('competition-' . $competitionId);
+    if ($competition === false) {
+        $competition = $dbAccess->getCompetition($competitionId);
+     apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
+    }
+} else {
     $competition = $dbAccess->getCompetition($competitionId);
-//    apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
-//}
+}
 
 $openTimes = dbAccess::calcCompetitionTimes($competition);
 
