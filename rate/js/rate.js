@@ -329,6 +329,7 @@ var beer_db = function () {
 				//saveToLocalStorage();
 				store_ratings().done(function () {
 					//find the validated rating from the server, now in user_data.ratings
+					//(not updated if competition is closed etc)
 					var rating = get_rating(class_id, beer_entry_id);
 					
 
