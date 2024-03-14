@@ -8,7 +8,7 @@ $(function (event) {
 var beer_db = function () {
 	// These are read from the server using ajax
 	var competition_id = null;
-	
+
 	var enable_voting;
 	var classes = null;
 	var beers = null;
@@ -55,12 +55,12 @@ var beer_db = function () {
 					DEBUGMODE = response.CONST_SYS_JS_DEBUG;
 					VOTE_STATUS_INTERVAL = response.SETTING_SYSSTATUS_INTERVAL;
 					VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
-
+					
 					if (DEBUGMODE) console.log(response);
 				}
 				else {
-
-					printInfobar('#statusdiv', 'warning', 'serverfel 1-1');
+					setErrorAndSpinner("serverfel 1-1, Kontakta tävlingsledningen.");
+					if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
 				}
 
 			},
@@ -87,6 +87,7 @@ var beer_db = function () {
 
 			},
 			error: function (xhr, textStatus, errorThrown) {
+				setErrorAndSpinner("serverfel 1-2, Kontakta tävlingsledningen.");
 				if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
 				//alert("error: " + textStatus + ", responseText: " + xhr.responseText);
 			}
@@ -133,6 +134,7 @@ var beer_db = function () {
 					}
 
 				}
+				
 				//user_beers = user_data.beers;
 				user_votes = user_data.votes;
 
@@ -191,6 +193,7 @@ var beer_db = function () {
 					popup_beer_by_id(bid);
 					bid = null; //once opened, clear the bid
 				}
+				setErrorAndSpinner(""); //clear any previous error message and hide spinner
 
 
 			});
@@ -331,7 +334,7 @@ var beer_db = function () {
 					//find the validated rating from the server, now in user_data.ratings
 					//(not updated if competition is closed etc)
 					var rating = get_rating(class_id, beer_entry_id);
-					
+
 
 					update_rating_in_beer_list(current_popup_item_id, rating.ratingScore);
 					update_drank_in_beer_list(current_popup_item_id, rating.drankCheck);
@@ -595,7 +598,7 @@ var beer_db = function () {
 			pages.push('<div id="page-' + vote_class.id + '" class="tab-pane '
 				+ ('#page-' + vote_class.id == active_tab_hash ? ' active' : '') + '">');
 
-			pages.push('<div class="">');	
+			pages.push('<div class="container-fluid">');
 			pages.push('<h1 class="display-4 ml-1">' + vote_class.name + '</h1>');
 
 			
@@ -948,14 +951,14 @@ var beer_db = function () {
 			success: function (response) {
 				if (DEBUGMODE) { console.log("@pre_store_ratings"); console.log(user_data.ratings) };
 				//if the server accepted the ratings, save them to localstorage
-				if (response.msgtype == 'OK'){
+				if (response.msgtype == 'OK') {
 					saveToLocalStorage();
-				}else{
+				} else {
 					user_data.ratings = response.ratings; //reset to what was stored and accepted by server
 				}
 
 
-				
+
 				if (DEBUGMODE) { console.log("@store_ratings"); console.log(response) };
 			},
 			error: function (xhr, textStatus, errorThrown) {
@@ -995,7 +998,7 @@ var beer_db = function () {
 					competition_name = response.competition_name;
 					$('#competition-name').html(competition_name);
 				}
-				var style_class = 'd-inline-block pl-3 pr-3 ml-2 mr-2 mb-2';
+				var style_class = 'd-inline-block pl-3 pr-3 mb-3 ml-2';
 				if (response.competition_open) {
 					if (response.competition_seconds_to_close < 60) {
 						style_class += ' bg-danger text-white'
@@ -1004,7 +1007,7 @@ var beer_db = function () {
 					} else {
 						style_class += ' bg-info text-white'
 					}
-					var open_closed_text ='Betygsätt fram till kl. ' + response.competition_closes_hhmm + ', det är  '
+					var open_closed_text = 'Betygsätt fram till kl. ' + response.competition_closes_hhmm + ', det är  '
 						+ secondsToRemainString(response.competition_seconds_to_close) + ' kvar.';
 				} else {
 					if (response.competition_seconds_to_open < 0) {
@@ -1017,15 +1020,15 @@ var beer_db = function () {
 					}
 				}
 
-				
+
 				// $(".competition-status").html(
 				// 		'<div class="' + style_class + '">'
 				// 		+ open_closed_text + '</div>');
 				//allow for customization with badge/alert classes at different locations
 				$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);
-					
 
-				 
+
+
 			},
 			error: function (xhr, textStatus, errorThrown) {
 				console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
@@ -1049,6 +1052,29 @@ var beer_db = function () {
 		}
 		return false;
 	};
+	//only with a message to display, for unepected severe server/data errers
+	//or message=''; to clear the error message & the loading spinner
+	function setErrorAndSpinner(message, spinner = false) {
+		var status = $('#error-status');
+		if (message === '') { 
+			
+			status.hide();
+			
+		}
+		else {
+			status.html("<strong>" + message + "</strong>");
+			status.removeClass('d-none');
+			status.show();
+		}
+		if (spinner) {
+			//$('#loading-spinner').show();
+			$('#loading-spinner').html('<div class="cssload-container"><div class="cssload-speeding-wheel"></div>');
+		}
+		else {
+			//$('#loading-spinner').hide();
+			$('#loading-spinner').html('');
+		}
+	}
 
 	function secondsToString(s) {
 		var hours = Math.floor(s / 3600);
@@ -1061,7 +1087,7 @@ var beer_db = function () {
 		var hours = Math.floor(s / 3600);
 		var minutes = Math.floor(s / 60) % 60;
 		var seconds = s % 120;
-		
+
 		var ret = '';
 		if (hours < 1) {
 			if (minutes >= 2)

@@ -31,7 +31,7 @@
 					<ul id="class-dropdown" class="dropdown-menu">
 						<!-- Javascript will insert menu item per voting class here. -->
 					</ul>
-				</li>  
+				</li>
 				<li class="nav-item dropdown">
 					<a href="#" id="sort-dropdown-button" class="nav-link dropdown-toggle"
 						data-toggle="dropdown">Sortera</a>
@@ -47,14 +47,33 @@
 				</li>
 			</ul>
 
-			
-				<div class="input-group-sm col-xs-1 float-right">
-					<input class="form-control py-2 border-right-0 border" type="search" value="" placeholder="Sök nr..."  id="search-beer">
-				</div>
 
-			
+			<div class="input-group-sm col-xs-1 float-right">
+				<input class="form-control py-2 border-right-0 border" type="search" value="" placeholder="Sök nr..."
+					id="search-beer">
+			</div>
+
+
 		</div>
 	</nav>
+	
+
+	<!--status-->
+	<div class="container-fluid">
+		<!--this will only show during intial load-->
+		<div id="loading-spinner">
+			<div class="cssload-container">
+				<div class="cssload-speeding-wheel"></div>
+			</div>
+		</div>
+		<!--this will only show on severe error-->
+		<div class="row">
+			<div class="col-auto ">
+				<div class="alert alert-danger d-none mb-0 mt-2 ml-2" id="error-status" role="alert">
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<div class="tab-content">
 
@@ -70,7 +89,7 @@
 					<h3 class="modal-title float-left">
 						Välkommen till <span id="competition-name">SHBF Ölträff</span>!
 					</h3>
-					
+
 				</div>
 				<div class="modal-body">
 					<p>På <strong>programbladets</strong> baksida hittar du din personliga röstkod.</p>
