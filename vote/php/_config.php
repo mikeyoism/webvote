@@ -28,6 +28,8 @@ date_default_timezone_set("Europe/Stockholm");
 //for testing/used if not set by param
 define("COMPETITION_ID", 42);
 
+define("ENABLE_RATING", true);
+
 define("CONST_SETTING_SHOW_HELP_POPUP", true);
 //visar hjälppopup med mer info för användaren
 define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true);
@@ -83,4 +85,3 @@ define("APC_CACHE_ENABLED", false);
 //     $firephp->registerAssertionHandler($convertAssertionErrorsToExceptions=true, $throwAssertionExceptions=false);    
 // }
 
-?>

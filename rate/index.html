@@ -96,7 +96,7 @@
 					<form>
 						<div class="form-group">
 							<label for="vote-code" class="col-form-label">Skriv in röstkoden för att fortsätta:</label>
-							<input type="text" class="form-control" id="vote-code" maxlength="6"
+							<input type="text" class="form-control" tabindex="1" id="vote-code" maxlength="6"
 								placeholder="Röstkod, 6 tecken">
 							<small id="vote-code-help" class="invalid-feedback" class="form-text text-muted">Se
 								programbladet för att hitta din röstkod.</small>
@@ -105,61 +105,11 @@
 					<div class="competition-status badge-pill" id="beer-popup-competition-status"></div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" id="vote-proceed-button" class="btn btn-primary" data-dismiss="modal"
+					<button type="button" id="vote-proceed-no-code-button" tabindex="3" class="btn btn-link text-muted mr-5" data-dismiss="modal">
+					Fortsätt utan kod</button>
+
+					<button type="button" id="vote-proceed-button" tabindex="2" class="btn btn-primary" data-dismiss="modal"
 						disabled>Fortsätt</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div id="vote-popup" class="modal" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3 class="modal-title float-left">
-
-						Folkets val
-					</h3>
-					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button>
-				</div>
-				<div class="modal-body">
-					<!-- <div id="vote-competition-status"></div> -->
-					<div class="votes-dirty-field d-none d-inline-block alert alert-danger">Det finns osparade röster.
-					</div>
-					<div class="votes-registered-field d-none d-inline-block">Alla röster sparade.
-					</div>
-
-					<form>
-						<div class="row">
-							<div class="col-sm-8 col-xs-10">
-								<div class="form-group">
-									<label for="vote-code" class="col-form-label">Röstningskod</label>
-									<input type="text" class="form-control" id="vote-code" maxlength="6"
-										placeholder="Röstningskod">
-									<small id="vote-code-help" class="invalid-feedback" class="form-text text-muted ">Se
-										programbladet
-										för att hitta din röstningskod.</small>
-								</div>
-							</div>
-						</div>
-					</form>
-
-					<form>
-						<div class="row">
-							<div class="col-xs-3"></div>
-							<div class="col-xs-3">
-								Guld
-							</div>
-							<div class="col-xs-3">
-								Silver
-							</div>
-							<div class="col-xs-3">
-								Brons
-							</div>
-						</div>
-						<div id="vote-form-rows">
-						</div>
-					</form>
 				</div>
 			</div>
 		</div>
@@ -193,7 +143,7 @@
 							</div>
 						</fieldset>
 
-						<fieldset class="rating">
+						<fieldset class="rating" disabled>
 							<legend style="font-size: 1rem;">Omdöme:</legend>
 							<input type="radio" id="popup-rating-star-0" name="popup-rating" value="" />
 							<label for="popup-rating-star-0" class="rating-clear-button">ta bort</label>
@@ -208,33 +158,15 @@
 							<input type="radio" id="popup-rating-star-5" name="popup-rating" value="5" />
 							<label for="popup-rating-star-5">5</label>
 						</fieldset>
-						<fieldset>
+						<fieldset class="rating-comment">
 							<legend style="font-size: 1rem;">Kommentar:</legend>
 							<textarea id="popup-comment" rows="3"></textarea>
 						</fieldset>
-						<fieldset class="voting">
-							<legend style="font-size: 1rem;">Folkets val-röst:</legend>
-							<div id="popup-medal-group" class="btn-group btn-group-toggle" data-toggle="buttons">
-								<label class="btn btn-primary" id="popup-medal-0-button">
-									<input type="radio" name="popup-medal" value="0"><span
-										class="fa fa-ban mt-1"></span></input>
-								</label>
-								<label class="btn btn-primary" id="popup-medal-1-button">
-									<input type="radio" name="popup-medal" value="1">Guld</input>
-								</label>
-								<label class="btn btn-primary " id="popup-medal-2-button">
-									<input type="radio" name="popup-medal" value="2">Silver</input>
-								</label>
-								<label class="btn btn-primary" id="popup-medal-3-button">
-									<input type="radio" name="popup-medal" value="3">Brons</input>
-								</label>
-							</div>
-							<div id="popup-alert-no-vote-code" class="d-inline-block alert alert-danger hidden-xs-up">
-								Mata in din röstningskod från programbladet för att
-								registrera rösterna!
-							</div>
-						</fieldset>
 					</form>
+					<div class="alert alert-warning" id="popup-alert-no-vote-code" >
+						För att betygsätta: Klicka här för att ange <strong>röstkod</strong>.
+					</div>
+
 					<div class=" badge-pill competition-status" id="beer-popup-competition-status"></div>
 				</div>
 			</div>

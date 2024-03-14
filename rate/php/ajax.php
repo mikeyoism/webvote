@@ -1,7 +1,7 @@
 <?php // -*- coding: utf-8 -*-
 require_once '../../vote/php/_config.php';
 $competitionId = COMPETITION_ID;
-$enableVoting = 1;
+
 require_once '../../vote/php/common.inc';
 //TODO: cashed file option & apc memcache for db
 
@@ -64,7 +64,6 @@ else
 header('Content-Type: application/json', true);
 echo json_encode(array(
     'competition_id' => $competitionId,
-    'enable_voting' => $enableVoting,
     'classes' => $classes,
     'beers' => $beers
 ));

@@ -38,13 +38,16 @@ if(isset($_POST['operation']))
         
         $jsonReply["SETTING_SYSSTATUS_INTERVAL"] = SETTING_SYSSTATUS_INTERVAL;
         $jsonReply["CONST_SYS_JS_DEBUG"] = CONST_SYS_JS_DEBUG;
-        $jsonReply["CONST_SETTING_SHOW_HELP_POPUP"] =CONST_SETTING_SHOW_HELP_POPUP;
-               
+        $jsonReply["ENABLE_RATING"] =ENABLE_RATING;
+        $jsonReply["CONST_SETTING_VOTE_CODE_LENGTH"] = CONST_SETTING_VOTE_CODE_LENGTH;        
+        
+        
 
-        $jsonReply["CONST_SETTING_VOTE_CODE_LENGTH"] = CONST_SETTING_VOTE_CODE_LENGTH;
+        //legacy vote settings - not used for rating
+        $jsonReply["ENABLE_VOTING"] =ENABLE_RATING; //same as ENABLE_RATING
+        $jsonReply["CONST_SETTING_SHOW_HELP_POPUP"] =CONST_SETTING_SHOW_HELP_POPUP;
         $jsonReply["CONST_SETTING_BEERID_NUMBERSPAN_LENGTH"] = CONST_SETTING_BEERID_NUMBERSPAN_LENGTH;
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY"] = CONST_SETTING_VOTES_PER_CATEGORY;
-
         //används nu i backend only
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY_SAME"] = CONST_SETTING_VOTES_PER_CATEGORY_SAME;
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL"] = CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL;
@@ -55,4 +58,3 @@ if(isset($_POST['operation']))
 
     }
 }
-?>
