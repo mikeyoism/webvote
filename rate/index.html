@@ -56,7 +56,7 @@
 
 		</div>
 	</nav>
-	
+
 
 	<!--status-->
 	<div class="container-fluid">
@@ -92,7 +92,7 @@
 
 				</div>
 				<div class="modal-body">
-					<p>På <strong>programbladets</strong> baksida hittar du din personliga röstkod.</p>
+					<p class="mb-0">På <strong>programbladets</strong> baksida hittar du din personliga röstkod.</p>
 					<form>
 						<div class="form-group">
 							<label for="vote-code" class="col-form-label">Skriv in röstkoden för att fortsätta:</label>
@@ -102,14 +102,53 @@
 								programbladet för att hitta din röstkod.</small>
 						</div>
 					</form>
-					<div class="competition-status badge-pill" id="beer-popup-competition-status"></div>
+					<div class="competition-status alert-info" id="beer-popup-competition-status"></div>
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title mt-0" Id="welcome-popup-infoheader">Information 
+								<a href="#" class="card-link float-right "
+									>
+									<i class="fas fa-angle-double-up rotate down" Id="welcome-popup-lesshelp"></i></a></h5>
+							<div id="welcome-help-card">
+								<h6 class="card-subtitle text-muted">På den här sidan hittar du alla öl som är med i
+									tävlingen.</h6>
+								<p class="card-text mb-0 mt-0">
+									Varje öl har även en <strong>QR-kod</strong> du kan scanna med mobilens kamera för
+									snabbåtkomst.
+								</p>
+								<p class="card-text">
+									Håll koll på <strong>provsmakade</strong> öl genom att trycka på <i
+										class="fas fa-wine-glass" style="color:#FFD43B;">.</i>
+									Du <strong>röstar</strong> på provsmakade öl genom att betygsätta dem med
+									<strong>1-5 stjärnor</strong> <i class="fas fa-star" style="color: gold;">.</i>
+								</p>
+
+								<p class="card-text text-muted mb-0">
+									<small>Systemet viktar automatiskt dina stjärnor till tävlingspoäng.
+										<a href="#" class="card-link " Id="welcome-popup-morehelp">Mer info <i
+												class="fas fa-arrow-down"></i></a></small>
+								<p class="card-text text-muted " Id="welcome-popup-showmore">
+									<small>5 stjärnor är bästa betyg. Tävlingspoängen som systemet räknar fram baseras
+										bla. på
+										antal öl du betygsatt och antal öl i tävlingsklassen
+										(att betygsätta enbart en enstaka öl med 5 stjärnor ger alltså inte maximal
+										tävlingspoäng till den
+										ölen)</small>
+								</p>
+								</p>
+								</p>
+
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" id="vote-proceed-no-code-button" tabindex="3" class="btn btn-link text-muted mr-5" data-dismiss="modal">
-					Fortsätt utan kod</button>
+					<button type="button" id="vote-proceed-no-code-button" tabindex="3"
+						class="btn btn-link text-muted mr-5" data-dismiss="modal">
+						Fortsätt utan kod</button>
 
-					<button type="button" id="vote-proceed-button" tabindex="2" class="btn btn-primary" data-dismiss="modal"
-						disabled>Fortsätt</button>
+					<button type="button" id="vote-proceed-button" tabindex="2" class="btn btn-primary"
+						data-dismiss="modal" disabled>Fortsätt</button>
 				</div>
 			</div>
 		</div>
@@ -163,7 +202,7 @@
 							<textarea id="popup-comment" rows="3"></textarea>
 						</fieldset>
 					</form>
-					<div class="alert alert-warning" id="popup-alert-no-vote-code" >
+					<div class="alert alert-warning" id="popup-alert-no-vote-code">
 						För att betygsätta: Klicka här för att ange <strong>röstkod</strong>.
 					</div>
 

@@ -14,7 +14,7 @@ var beer_db = function () {
 	// This is stored in localStorage, and poulated from backend
 	// contins user_data.vote_code, user_data.beers and user_data.ratings etc.
 	var user_data = null;
-	
+
 	var vote_code_ok = false;
 	var current_popup_item_id = null;
 
@@ -64,7 +64,7 @@ var beer_db = function () {
 			},
 			error: function (xhr, textStatus, errorThrown) {
 				console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
-				
+
 			}
 		});
 	};
@@ -86,7 +86,7 @@ var beer_db = function () {
 			error: function (xhr, textStatus, errorThrown) {
 				setErrorAndSpinner("serverfel 1-2, Kontakta tävlingsledningen.");
 				if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
-				
+
 			}
 		});
 	}
@@ -187,8 +187,8 @@ var beer_db = function () {
 
 		//set #vote-code max length
 		$('#vote-code').attr('maxlength', VOTE_CODE_LEN);
-		
-		
+
+
 		// handle vote code changes.
 		$('#vote-code').on('keyup', function (e) {
 			var code = $(this).val();
@@ -213,7 +213,7 @@ var beer_db = function () {
 			//trigger validation of the vote-code input field
 			$('#vote-code').trigger('keyup');
 		});
-		
+
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
 
@@ -222,8 +222,23 @@ var beer_db = function () {
 				bid = null; //once opened, clear the bid
 			}
 		});
+		$('#welcome-popup-showmore').hide();
+		//welcome-popup-morehelp arrow down click
+		$('#welcome-popup-morehelp').on('click', function (e) {
+			$('#welcome-popup-showmore').toggle();
 
 
+		});
+		//welcome-popup-lesshelp click
+		$('#welcome-popup-infoheader').on('click', function (e) {
+			
+			//rotate the icon 180 degrees
+			$("#welcome-popup-lesshelp").toggleClass('down');			
+			
+			$('#welcome-help-card').toggle();
+			//scroll to bottom of the modal, to show "Fortsätt" (for small mopbile screens, like iphone SE)
+			$('#welcome-popup').scrollTop($('#welcome-popup')[0].scrollHeight); 
+		});
 		var startupClassIndex = 0;
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
@@ -303,10 +318,10 @@ var beer_db = function () {
 			if (user_data.vote_code.length == VOTE_CODE_LEN) {
 				var comment = $("#popup-comment").val();
 				var ratingVal = $("input[type='radio'][name='popup-rating']:checked").val()
-				
+
 				var drank = $("input[type='checkbox'][name='popup-drankcheck']").is(":checked");
 
-				
+
 
 				var class_id = beers[current_popup_item_id].class;
 				var beer_entry_id = beers[current_popup_item_id].entry_code;
@@ -425,8 +440,8 @@ var beer_db = function () {
 	function update_no_vote_code_alert() {
 		if (vote_code_ok) {
 			$('#popup-alert-no-vote-code').hide();
-			
-			
+
+
 		} else {
 			$('#popup-alert-no-vote-code').show();
 		}
@@ -434,11 +449,11 @@ var beer_db = function () {
 	}
 	//enable/disable fieldsets
 	function update_rating_allowed() {
-		
-		
+
+
 		if (!ENABLE_RATING || !competition_open) {
 			$('.rating').prop('disabled', true);
-		}else{
+		} else {
 			$('.rating').prop('disabled', !vote_code_ok);
 		}
 		//disable all changes if rating is disabled by competition sys-setting
@@ -447,15 +462,14 @@ var beer_db = function () {
 			$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
 			$('.rating-comment').prop('disabled', true);
 		}
-		else{
+		else {
 			//disable drank and comment if competition has not yet opened
 			//it's ok to leave comments and drank-checks, after competition/rating has closed
 			if (!competition_open && !competition_has_closed) {
 				$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
 				$('.rating-comment').prop('disabled', true);
 			}
-			else
-			{
+			else {
 				$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", !vote_code_ok);
 				$('.rating-comment').prop('disabled', !vote_code_ok);
 			}
@@ -602,7 +616,7 @@ var beer_db = function () {
 				var beer = beers[entry_id];
 				var class_id = beer['class'];
 
-	
+
 				var rating = get_rating(class_id, beer.entry_code);
 
 				items[class_id] = items[class_id] || [];
@@ -614,7 +628,7 @@ var beer_db = function () {
 					+ '<span class="float-right" id="drank-display-' + entry_id + '" style="padding-right: 10px;margin-top:5px;">'
 					+ get_drank_string(rating.drankCheck)
 					+ '</span>'
-					
+
 					+ '<span class="beer-number">' + beer.entry_code + '</span>. '
 					+ '<span class="beer-name">' + beer.name + '</span><br>'
 					+ '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
@@ -707,10 +721,10 @@ var beer_db = function () {
 
 
 
-		
+
 
 		$("#popup-comment").val(comment);
-		
+
 
 		$('input[name="popup-rating"][value="' + rating + '"]').prop('checked', true);
 		//drank check
@@ -799,7 +813,7 @@ var beer_db = function () {
 				var proceed_button = $('#vote-proceed-button');
 				if ("vote_code" in response) {
 					vote_code_ok = true;
-					
+
 					var vote_code = response.vote_code; // uppercased etc
 					input_field.val(vote_code);
 					form_group.addClass('text-success');
@@ -883,9 +897,9 @@ var beer_db = function () {
 					if (DEBUGMODE) console.log('competition id mismatch');
 					return;
 				}
-				if (response.ENABLE_RATING != null && response.ENABLE_RATING !== ENABLE_RATING){
+				if (response.ENABLE_RATING != null && response.ENABLE_RATING !== ENABLE_RATING) {
 					ENABLE_RATING = response.ENABLE_RATING;
-					
+
 				}
 
 
@@ -901,8 +915,8 @@ var beer_db = function () {
 					$('#competition-name').html(competition_name);
 				}
 
-				
-				var style_class = 'd-inline-block pl-3 pr-3 mb-3 ml-2';
+
+				var style_class = 'd-inline-block pl-3 pr-3 mb-3';
 				if (ENABLE_RATING === false) {
 					style_class += ' bg-danger text-white';
 					var open_closed_text = 'Betygsättningen är avstängd av tävlingsledningen';
@@ -943,7 +957,7 @@ var beer_db = function () {
 			error: function (xhr, textStatus, errorThrown) {
 				setErrorAndSpinner("Kunde inte hämta tävlingsstatus", false);
 				console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
-				
+
 			}
 		});
 	}
