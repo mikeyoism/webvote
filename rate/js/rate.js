@@ -90,6 +90,49 @@ var beer_db = function () {
 			}
 		});
 	}
+	function init_user_data(reset = false)
+	{
+		//cached data, or new session
+		var user_data_string = null;
+
+		if (reset !== true) {
+			user_data_string = localStorage.getItem("user_data_" + competition_id);
+		}
+		if (user_data_string != null) {
+				user_data = JSON.parse(user_data_string);
+		}
+		else {
+			user_data = { beers: {}, vote_code: '', votes: {}, ratings: {} };
+			$.each(classes, function (i, vote_class) {
+				user_data.votes[vote_class.id] = {};
+			});
+			$.each(classes, function (i, vote_class) {
+				user_data.ratings[vote_class.id] = [];
+			});
+
+		}
+		if (user_data.last_compare_function_name != null) {
+			//name of function is stored, set last_compare_function
+			switch (user_data.last_compare_function_name) {
+				case 'compare_beers_by_entry_code':
+					last_compare_function = compare_beers_by_entry_code;
+					break;
+				case 'compare_beers_by_rating':
+					last_compare_function = compare_beers_by_rating;
+					break;
+				case 'compare_beers_by_style':
+					last_compare_function = compare_beers_by_style;
+					break;
+				default:
+					last_compare_function = compare_beers_by_entry_code;
+			}
+
+		}
+		//store emply user_data to localstorage, for next reload etc
+		if (reset === true) {
+			saveToLocalStorage();
+		}
+	}
 
 	function init() {
 		getRateSettings().done(function () {
@@ -98,39 +141,8 @@ var beer_db = function () {
 				if (DEBUGMODE) { console.log('init done, comptetition_id: ' + competition_id + ', classes: '); console.log(classes); }
 
 
+				init_user_data();
 
-				//cached data, or new session
-				var user_data_string = localStorage.getItem("user_data_" + competition_id);
-				if (user_data_string != null) {
-					user_data = JSON.parse(user_data_string);
-				}
-				else {
-					user_data = { beers: {}, vote_code: '', votes: {}, ratings: {} };
-					$.each(classes, function (i, vote_class) {
-						user_data.votes[vote_class.id] = {};
-					});
-					$.each(classes, function (i, vote_class) {
-						user_data.ratings[vote_class.id] = [];
-					});
-
-				}
-				if (user_data.last_compare_function_name != null) {
-					//name of function is stored, set last_compare_function
-					switch (user_data.last_compare_function_name) {
-						case 'compare_beers_by_entry_code':
-							last_compare_function = compare_beers_by_entry_code;
-							break;
-						case 'compare_beers_by_rating':
-							last_compare_function = compare_beers_by_rating;
-							break;
-						case 'compare_beers_by_style':
-							last_compare_function = compare_beers_by_style;
-							break;
-						default:
-							last_compare_function = compare_beers_by_entry_code;
-					}
-
-				}
 
 
 				var startupClass = 0;
@@ -203,7 +215,7 @@ var beer_db = function () {
 		//fortsätt utan kod
 		$('#vote-proceed-no-code-button').on('click', function (e) {
 			$('#welcome-popup').modal('hide');
-			update_vote_code('');
+			update_vote_code('', true); //reset vote code
 			return false;
 		});
 		//welcome-popup open event
@@ -231,14 +243,18 @@ var beer_db = function () {
 		});
 		//welcome-popup-lesshelp click
 		$('#welcome-popup-infoheader').on('click', function (e) {
-			
+
 			//rotate the icon 180 degrees
-			$("#welcome-popup-lesshelp").toggleClass('down');			
-			
+			$("#welcome-popup-lesshelp").toggleClass('down');
+
 			$('#welcome-help-card').toggle();
 			//scroll to bottom of the modal, to show "Fortsätt" (for small mopbile screens, like iphone SE)
-			$('#welcome-popup').scrollTop($('#welcome-popup')[0].scrollHeight); 
+			$('#welcome-popup').scrollTop($('#welcome-popup')[0].scrollHeight);
 		});
+		//hide fortätt utan kod button if bid is set (qr-code url), or confusing to user
+		if (bid != null) {
+			$('#vote-proceed-no-code-button').hide();
+		}
 		var startupClassIndex = 0;
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
@@ -372,8 +388,12 @@ var beer_db = function () {
 
 		//popup-drank click
 		$("#popup-drank-rot").on("click", function (event) {
+			if (!drank_checking_allowed) {
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
+			}
 			//rotate the icon 180 degrees and toggle the checkbox
-
 			$("#popup-drank-rot").toggleClass('down');
 			$("input[type='checkbox'][name='popup-drankcheck']").is(":checked") ? $("input[type='checkbox'][name='popup-drankcheck']").prop("checked", false) : $("input[type='checkbox'][name='popup-drankcheck']").prop("checked", true);
 
@@ -447,6 +467,9 @@ var beer_db = function () {
 		}
 		update_rating_allowed();
 	}
+	
+	//workaround variable for click event on the drank icon
+	var drank_checking_allowed = true;
 	//enable/disable fieldsets
 	function update_rating_allowed() {
 
@@ -459,18 +482,22 @@ var beer_db = function () {
 		//disable all changes if rating is disabled by competition sys-setting
 		if (!ENABLE_RATING) {
 			//popup-drank child checkbox
-			$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
+			//$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
+			drank_checking_allowed = false;
+
 			$('.rating-comment').prop('disabled', true);
 		}
 		else {
 			//disable drank and comment if competition has not yet opened
 			//it's ok to leave comments and drank-checks, after competition/rating has closed
 			if (!competition_open && !competition_has_closed) {
-				$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
+				//$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
+				drank_checking_allowed = false;
 				$('.rating-comment').prop('disabled', true);
 			}
 			else {
-				$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", !vote_code_ok);
+				//$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", !vote_code_ok);
+				drank_checking_allowed = vote_code_ok;
 				$('.rating-comment').prop('disabled', !vote_code_ok);
 			}
 		}
@@ -671,6 +698,7 @@ var beer_db = function () {
 			});
 		});
 
+		get_competition_status();
 
 	}
 
@@ -766,8 +794,13 @@ var beer_db = function () {
 
 
 	function update_vote_code(code) {
-		user_data.vote_code = code;
 
+		
+		if (code !== user_data.vote_code) {
+			//init new user_data
+			init_user_data(true);
+		}
+		user_data.vote_code = code;
 		var input_field = $('#vote-code');
 		//proceed button
 		var proceed_button = $('#vote-proceed-button');
@@ -789,6 +822,7 @@ var beer_db = function () {
 				input_field.addClass('is-invalid');
 				proceed_button.prop('disabled', true);
 			}
+			fill_beer_lists(last_compare_function, activeTab); //show all beers, no ratings
 		}
 	}
 
@@ -891,6 +925,7 @@ var beer_db = function () {
 			}),
 			success: function (response) {
 				//if (DEBUGMODE) console.log(response);
+				//todo: break out the competition status to a separate function for instant calls (see refs in the code below)
 				if (response.competition_id != competition_id) {
 					showErrorAndSpinner("Tävlings-id stämmer inte", false);
 					competition_open = false;
