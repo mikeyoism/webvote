@@ -105,10 +105,10 @@
 					<div class="competition-status alert-info" id="beer-popup-competition-status"></div>
 					<div class="card">
 						<div class="card-body">
-							<h5 class="card-title mt-0" Id="welcome-popup-infoheader">Information 
-								<a href="#" class="card-link float-right "
-									>
-									<i class="fas fa-angle-double-up rotate down" Id="welcome-popup-lesshelp"></i></a></h5>
+							<h5 class="card-title mt-0" Id="welcome-popup-infoheader">Information
+								<a href="#" class="card-link float-right ">
+									<i class="fas fa-angle-double-up rotate down" Id="welcome-popup-lesshelp"></i></a>
+							</h5>
 							<div id="welcome-help-card">
 								<h6 class="card-subtitle text-muted">På den här sidan hittar du alla öl som är med i
 									tävlingen.</h6>
@@ -172,41 +172,68 @@
 						Alkohol:&nbsp;<span id="popup-alcohol">0.0</span>&nbsp;%,
 						IBU:&nbsp;<span id="popup-ibu">0</span></p>
 					<form>
-						<fieldset class="" id="popup-drank">
-							<legend style="font-size: 1rem;">Provsmakat:</legend>
-							<div class=" d-inline-flex">
-								<div class="drank rotate down" id="popup-drank-rot">
-									<input type="checkbox" id="popup-drankcheck" name="popup-drankcheck" />
-									<label for="popup-drankcheck" d="popup-drankcheck-label" class="ml-1"></label>
+
+						<div class="card border-warning mb-3 bg-light">
+
+							<div class="card-body">
+								<div class="row">
+									<div class="col">
+										<fieldset class="" id="popup-drank">
+											<legend style="font-size: 1rem;">Provsmakat:</legend>
+											<div class=" d-inline-flex">
+												<div class="drank rotate down" id="popup-drank-rot">
+													<input type="checkbox" id="popup-drankcheck"
+														name="popup-drankcheck" />
+													<label for="popup-drankcheck" d="popup-drankcheck-label"
+														class="ml-1"></label>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+									<div class="col-auto">
+										<fieldset class="rating" disabled>
+											<legend style="font-size: 1rem;">Betyg:</legend>
+											<input type="radio" id="popup-rating-star-0" name="popup-rating" value="" />
+											<label for="popup-rating-star-0" class="rating-clear-button mr-2">ta bort</label>
+											<input type="radio" id="popup-rating-star-1" name="popup-rating"
+												value="1" />
+											<label for="popup-rating-star-1">1</label>
+											<input type="radio" id="popup-rating-star-2" name="popup-rating"
+												value="2" />
+											<label for="popup-rating-star-2">2</label>
+											<input type="radio" id="popup-rating-star-3" name="popup-rating"
+												value="3" />
+											<label for="popup-rating-star-3">3</label>
+											<input type="radio" id="popup-rating-star-4" name="popup-rating"
+												value="4" />
+											<label for="popup-rating-star-4">4</label>
+											<input type="radio" id="popup-rating-star-5" name="popup-rating"
+												value="5" />
+											<label for="popup-rating-star-5">5</label>
+										</fieldset>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col">
+
+										<fieldset class="rating-comment mt-2">
+											<legend style="font-size: 1rem;" title="Valfri feedback om ölet. Bryggaren kan se kommentaren efter att tävlingen är avslutad">Omdöme/kommentar till bryggaren</legend>
+											<textarea   class="form-control" d="popup-comment" maxlength="500" rows="3" placeholder="Valfri kommentar om ölet. Bryggaren kan läsa kommentaren efter tävlingen."></textarea>
+										</fieldset>
+									</div>
 								</div>
 							</div>
-						</fieldset>
+						</div>
 
-						<fieldset class="rating" disabled>
-							<legend style="font-size: 1rem;">Omdöme:</legend>
-							<input type="radio" id="popup-rating-star-0" name="popup-rating" value="" />
-							<label for="popup-rating-star-0" class="rating-clear-button">ta bort</label>
-							<input type="radio" id="popup-rating-star-1" name="popup-rating" value="1" />
-							<label for="popup-rating-star-1">1</label>
-							<input type="radio" id="popup-rating-star-2" name="popup-rating" value="2" />
-							<label for="popup-rating-star-2">2</label>
-							<input type="radio" id="popup-rating-star-3" name="popup-rating" value="3" />
-							<label for="popup-rating-star-3">3</label>
-							<input type="radio" id="popup-rating-star-4" name="popup-rating" value="4" />
-							<label for="popup-rating-star-4">4</label>
-							<input type="radio" id="popup-rating-star-5" name="popup-rating" value="5" />
-							<label for="popup-rating-star-5">5</label>
-						</fieldset>
-						<fieldset class="rating-comment">
-							<legend style="font-size: 1rem;">Kommentar:</legend>
-							<textarea id="popup-comment" rows="3"></textarea>
-						</fieldset>
+
+
+
 					</form>
 					<div class="alert alert-warning" id="popup-alert-no-vote-code">
 						För att betygsätta: Klicka här för att ange <strong>röstkod</strong>.
 					</div>
 
-					<div class=" badge-pill competition-status" id="beer-popup-competition-status"></div>
+					<div class=" alert competition-status" id="beer-popup-competition-status"></div>
 				</div>
 			</div>
 		</div>
