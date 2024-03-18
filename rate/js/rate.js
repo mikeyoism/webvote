@@ -1,6 +1,7 @@
 // -*- coding: utf-8 -*-
 "use strict";
 
+
 $(function (event) {
 	beer_db.init();
 });
@@ -90,8 +91,7 @@ var beer_db = function () {
 			}
 		});
 	}
-	function init_user_data(reset = false)
-	{
+	function init_user_data(reset = false) {
 		//cached data, or new session
 		var user_data_string = null;
 
@@ -99,7 +99,7 @@ var beer_db = function () {
 			user_data_string = localStorage.getItem("user_data_" + competition_id);
 		}
 		if (user_data_string != null) {
-				user_data = JSON.parse(user_data_string);
+			user_data = JSON.parse(user_data_string);
 		}
 		else {
 			user_data = { beers: {}, vote_code: '', votes: {}, ratings: {} };
@@ -127,6 +127,9 @@ var beer_db = function () {
 					last_compare_function = compare_beers_by_entry_code;
 			}
 
+		}
+		else {
+			last_compare_function = compare_beers_by_entry_code; //default
 		}
 		//store emply user_data to localstorage, for next reload etc
 		if (reset === true) {
@@ -197,6 +200,7 @@ var beer_db = function () {
 
 	function initialize_html(startupClass = 0) {
 
+
 		//set #vote-code max length
 		$('#vote-code').attr('maxlength', VOTE_CODE_LEN);
 
@@ -229,10 +233,8 @@ var beer_db = function () {
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
 
-			if (bid != null) { //open beer-popup if url parameters are set
-				popup_beer_by_id(bid);
-				bid = null; //once opened, clear the bid
-			}
+			introDriverObj.drive();
+
 		});
 		$('#welcome-popup-showmore').hide();
 		//welcome-popup-morehelp arrow down click
@@ -241,6 +243,49 @@ var beer_db = function () {
 
 
 		});
+		//driver.js offers richer funtionality than bootstrap popovers
+		const driver = window.driver.js.driver;
+		const introDriverObj = driver({
+			animate: true,
+			showProgress: true,
+			progressText: 'Intro {{current}} av {{total}}',
+			showButtons: true,
+			closeBtnText: 'Stäng',
+			nextBtnText: 'Nästa',
+			prevBtnText: 'Föregående',
+			doneBtnText: 'Stäng!',
+			steps: [
+				{ element: '#beer-class-dropdown-button', popover: { title: 'Välj tävlingsklass', description: 'Välj tävlingsklass i menyn.' } },
+				{
+					element: 'tab-content', popover: {
+						title: 'Aktuell tävlingsklass', description: 'Alla tävlande öl i den valda klassen visas här. Tryck på ett öl för att rösta!',
+						side: "right",
+						align: 'start'
+					}
+				},
+				{ element: '#sort-dropdown-button', popover: { title: 'Sortera', description: 'Sortera ölen efter tävlingsnummer, stil eller betyg.' } },
+
+				{ element: '#menu-rate-start', popover: { title: 'Aktivera röstkod', description: 'Tryck här för att aktivera eller byta röstkod samt få mer information om tävlingen.' } },
+				{ element: '#menu-search-beer', popover: { title: 'Snabbsökning', description: 'Sök på tävlingsnummer för direktvisning av ölet. Exempel: "123" <p>Alternativt går det även att använda mobilens kamera (utanför appen) för att scanna ölets QR-kod.</p>' } }
+		
+
+			]
+			,
+			onDestroyed: function () {
+				//if bid is set (qr-code url), open the beer-popup
+				if (bid != null) {
+					popup_beer_by_id(bid);
+					bid = null; //once opened, clear the bid
+				}
+			}
+		});
+
+
+
+		
+
+
+
 		//welcome-popup-lesshelp click
 		$('#welcome-popup-infoheader').on('click', function (e) {
 
@@ -329,7 +374,7 @@ var beer_db = function () {
 		});
 
 
-		//popup close event
+		//popup beer close event
 		$("#beer-popup").on('hidden.bs.modal', function (event) {
 			if (user_data.vote_code.length == VOTE_CODE_LEN) {
 				var comment = $("#popup-comment").val();
@@ -415,7 +460,7 @@ var beer_db = function () {
 			}
 		});
 
-		$('#search-beer').on('keyup', function (e) {
+		$('#class-search-beer').on('keyup', function (e) {
 			var searchstr = $(this).val();
 			if (searchstr.length >= 3) {
 				//find the beer(s) with the searchstr
@@ -447,7 +492,8 @@ var beer_db = function () {
 			return false;
 		});
 
-	}
+	} //end of initialize_html
+
 	function popup_beer_by_id(beer_id) {
 
 		if (beer_id != null) {
@@ -467,7 +513,7 @@ var beer_db = function () {
 		}
 		update_rating_allowed();
 	}
-	
+
 	//workaround variable for click event on the drank icon
 	var drank_checking_allowed = true;
 	//enable/disable fieldsets
@@ -673,13 +719,13 @@ var beer_db = function () {
 				+ ('#page-' + vote_class.id == active_tab_hash ? ' active' : '') + '">');
 
 			pages.push('<div class="container-fluid">');
-			pages.push('<h1 class="display-4 ml-1">' + vote_class.name + '</h1>');
+			pages.push('<h1 class="display-4 ml-1 "><span class="beer-class-header" id="beer-class-header">' + vote_class.name + '</span></h1>');
 
 
-			pages.push('<div class="competition-status alert"></div>');
+			pages.push('<div class="competition-status alert "></div>');
 			pages.push('</div>');
 
-			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group">');
+			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group ">');
 			pages.push(items[vote_class.id].join(''));
 			pages.push('</div>');
 			pages.push('</div>');
@@ -795,7 +841,7 @@ var beer_db = function () {
 
 	function update_vote_code(code) {
 
-		
+
 		if (code !== user_data.vote_code) {
 			//init new user_data
 			init_user_data(true);

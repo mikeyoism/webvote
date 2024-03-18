@@ -112,7 +112,12 @@ function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings)
                     return array("WARNING", "ogiltig drankCheck, ej heltal @ " . $rating->beerEntryId); //ska aldrig händ
                 }
                 //ratingComment
-                $ratingComment = $rating->ratingComment  == "" ?  null : $rating->ratingComment;
+                $ratingComment = null;
+                if (isset($rating->ratingComment) && $rating->ratingComment !== ""
+                    && strlen($rating->ratingComment) > 0 && strlen($rating->ratingComment) <= 500) {
+                    $ratingComment = $rating->ratingComment;
+                }
+                
                 if ($ratingComment !== null ) {
                     $ratingComment = htmlspecialchars($ratingComment,ENT_QUOTES); //sanitera
                 }
