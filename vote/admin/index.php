@@ -70,7 +70,7 @@ if ($privilegeLevel < 1) {
 } else {
 ?>
     <form method='post'>
-    <label>Användare:</label><?= $username ?>
+    <label>Användare:</label><?= $username ?> 
     <button type="submit" name='logout'>Logga ut</button>
     </form>
     <hr>
@@ -89,7 +89,22 @@ if (!$openTimes['open'] && !$openTimes['timeBeforeOpen']->invert) {
 ?>
     
 <hr>
-
+<p>Aktuellt tävlings-ID är: <?=$competitionId?>
+<?php
+//if no EventReg competition id is set, show a warning
+$eventRegIds = $competition['eventReg_ids'];
+if ((!isset($eventRegIds) || count($eventRegIds) < 1 ) && ENABLE_RATING) {
+    print "</p><p style='background-color:yellow'>OBS! Det finns inget tävlings-ID för denna tävling.  ".
+        "knutet i EventReg-systemet (ölregisteringsystemet). Detta måste sättas upp i dess dataas för att Rating ska fungera!.</p>";
+}
+else {
+    if  (ENABLE_RATING) {
+    $eventRegIdsString = implode(', ', $competition['eventReg_ids']);
+    print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString;
+    }
+}
+?>
+<hr>
 <p>Det finns <?=$competition['voteCodeCount']?> <a
 href="listVoteCodes.php?competitionId=<?=$competitionId?>">röstkoder</a> för denna tävling.
              
@@ -104,10 +119,23 @@ if ($privilegeLevel == 2) {
 }
 ?>
 
+
+<hr>
+<?php if (ENABLE_RATING) { ?>
+<h3>Visa <a href="showRateResult.php?competitionId=<?=$competitionId?>">tävlingsresultatet, rating</h3>
+<?php } else{ ?>
+<h5>Visa <a href="showVotes.php?competitionId=<?=$competitionId?>">röstningsresultatet</h5>.
+<?php } ?>
 <hr>
 
 <?php
 $categories = $dbAccess->getCategories($competitionId);
+if (ENABLE_RATING) { 
+?>  
+<p style="background-color:yellow">OBS att "Deltagande nummer" inte används av rate-systemet, och enbart behöver fyllas i för det äldre vote-systemet (om/när det används)</p>
+<?php
+}
+
 
 foreach ($categories as $category) {
 ?>
@@ -124,11 +152,6 @@ foreach ($categories as $category) {
 <?php
 }
 ?>
-
-
-<hr>
-
-<p>Se <a href="showVotes.php?competitionId=<?=$competitionId?>">röstningsresultatet</a>.
 
 </body>
 </html>

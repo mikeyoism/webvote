@@ -101,6 +101,9 @@ class DbAccess
         } else {
             $testingOpenUntilTime = new DateTime($row['testingOpenUntilTime']);
         }
+        //get evetreg event_id corresponding to our $compentionId
+        $evenreg_event_ids = $this->getEventReg_EventId($id);
+
 
         return array(
             'id' => $id,
@@ -108,7 +111,8 @@ class DbAccess
             'openTime' => $openTime,
             'closeTime' => $closeTime,
             'testingOpenUntilTime' => $testingOpenUntilTime,
-            'voteCodeCount' => $voteCodeCount
+            'voteCodeCount' => $voteCodeCount,
+            'eventReg_ids' => $evenreg_event_ids
         );
     }
 
@@ -178,7 +182,7 @@ class DbAccess
 
 
 
-    
+
     //get eventreg event_id corresponding to our $compentionId
     public function getEventReg_EventId($competitionId)
     {
@@ -186,15 +190,89 @@ class DbAccess
         $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getEventId: Query failed: $sql");
         if ($result->num_rows < 1)
             die("Invalid eventreg competition id." . $competitionId . " num_rows: " . $result->num_rows);
-        
+
         //return list of event_ids (typiskt FV + etikett tävling)
         $events = array();
         while ($row = $result->fetch_assoc()) {
-            array_push($events,$row['event_id']); 
+            array_push($events, $row['event_id']);
         }
         return $events;
     }
 
+    
+    //get beer info from eventreg database, for a single beerEntryId
+    public function getBeer($competitionId,$beerEntryId)
+    {
+        $evenreg_event_ids = $this->getEventReg_EventId($competitionId);
+        if (count($evenreg_event_ids) < 1)
+            die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
+        $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
+
+        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, ' .
+            'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
+            'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
+            'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
+            'WHERE Beers_in_event.fv_competition_no =' . $beerEntryId . ' AND Beers_in_event.event_id IN (' . implode(',', $evenreg_event_ids) .   ') '  .
+            'AND Beers_in_event.deleted = 0 ' .
+            'AND Beer_data.deleted = 0 AND Beers.deleted = 0 ' .
+            'AND Users.deleted = 0 AND User_data.deleted = 0 ' .
+            'ORDER BY Beer_data.main_class, Beer_data.sub_class ASC';;
+
+        $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getBeer: Query failed: $sql");
+
+        if ($result->num_rows != 1)
+            die("Invalid getBeer result id=" . $beerEntryId  . " num_rows: " . $result->num_rows . " sql: " . $sql);
+
+        $row = $result->fetch_assoc();
+        $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+        $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
+        $classIndex = $classOffset + $fv_class_id_nr;
+        $nextEntryId = 1;
+        $classes = $this->getCategories($competitionId, true);
+        $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
+            return ($var['id'] == $classIndex);
+        }));
+        if (!array_key_exists(0, $class))
+            die("Invalid class id." . $classIndex);
+        //find the class name in $classes by array key Id
+
+        $className = $class[0]['description']; //$classes[$fv_class_id_nr-1]['description'];
+        $entryId = $nextEntryId++;
+        $sql2 =
+        'SELECT Brewers_of_beer.brewer_id, Brewers.brewer_name FROM Brewers_of_beer ' .
+        'INNER JOIN Brewers USING (brewer_id) ' .
+        'WHERE Brewers_of_beer.beer_id =' . $row['beer_id'] . ' ' .
+        'AND Brewers_of_beer.deleted = 0';
+        $result2 = $this->getConnectionDb2_Eventreg()->query($sql2) or die("getBeers: Query failed: $sql2");
+        $i = 0;
+        $brewer_names = "";
+        while ($row2 = mysqli_fetch_array($result2)) {
+            if ($i > 0) {
+                $brewer_names = $brewer_names . ", " . $row2['brewer_name'];
+            } else {
+                $brewer_names = $row2['brewer_name'];
+            }
+            $i++;
+        }
+
+        $beer = array(
+            'class' =>  $class[0]['id'], //must always match id in categories/competitions
+            'entry_id' => $entryId,
+            'entry_code' => $row['fv_competition_no'],
+            'styleId' => $row['main_class'] . $row['sub_class'],
+            'styleName' => $className,
+            'name' => $row['beer_name'],
+            'brewer' => $brewer_names,
+            'alk' => $row['alc'],
+            'OG' => $row['og'],
+            'FG' => $row['fg'],
+            'IBU' => $row['bu']
+        );
+
+        return $beer;
+    }
+
+    
     //get beer info from eventreg database
     public function getBeers($competitionId, $grouped = false)
     {
@@ -229,19 +307,19 @@ class DbAccess
         $classes = $this->getCategories($competitionId, true);
         $beers = array();
         $nextEntryId = 1;
-        $classOffset = CONST_SETTING_CATEGORY_OFFSET -1;
+        $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
         $classIndex = 0;
         while ($row = $result->fetch_assoc()) {
             //store beer info in arrays grouped by FvMainClass
-            if ($row['fv_competition_no'] >= 900){ //etikett tävling (övriga fält lika som för ditto öl)
+            if ($row['fv_competition_no'] >= 900) { //etikett tävling (övriga fält lika som för ditto öl)
                 $fv_class_id_nr = 8;
                 $classIndex = $classOffset + $fv_class_id_nr + 1;
-            }else{
+            } else {
                 $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
                 $classIndex = $classOffset + $fv_class_id_nr;
             }
- 
-            
+
+
             //find classes.id in $classes
             $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
                 return ($var['id'] == $classIndex);
@@ -255,23 +333,22 @@ class DbAccess
             $className = $class[0]['description']; //$classes[$fv_class_id_nr-1]['description'];
             $entryId = $nextEntryId++;
 
-            $sql2 = 
-            'SELECT Brewers_of_beer.brewer_id, Brewers.brewer_name FROM Brewers_of_beer ' .
-            'INNER JOIN Brewers USING (brewer_id) ' .
-            'WHERE Brewers_of_beer.beer_id =' . $row['beer_id'] . ' ' .
-            'AND Brewers_of_beer.deleted = 0';
+            $sql2 =
+                'SELECT Brewers_of_beer.brewer_id, Brewers.brewer_name FROM Brewers_of_beer ' .
+                'INNER JOIN Brewers USING (brewer_id) ' .
+                'WHERE Brewers_of_beer.beer_id =' . $row['beer_id'] . ' ' .
+                'AND Brewers_of_beer.deleted = 0';
             $result2 = $this->getConnectionDb2_Eventreg()->query($sql2) or die("getBeers: Query failed: $sql2");
             $i = 0;
             $brewer_names = "";
             while ($row2 = mysqli_fetch_array($result2)) {
                 if ($i > 0) {
-                  $brewer_names = $brewer_names . ", " . $row2['brewer_name'];
+                    $brewer_names = $brewer_names . ", " . $row2['brewer_name'];
                 } else {
-                  $brewer_names = $row2['brewer_name'];
-            
+                    $brewer_names = $row2['brewer_name'];
                 }
                 $i++;
-              }
+            }
 
             $beer = array(
                 'class' =>  $class[0]['id'], //must always match id in categories/competitions
@@ -309,14 +386,14 @@ class DbAccess
         $result = $this->getConnection()->query($sql) or die("getCategories: Query failed: $sql");
 
         $categories = array();
-        $useOffset = false;//CONST_SETTING_CONNECT_EVENTREG_DB > 1 ? true : false;
+        $useOffset = false; //CONST_SETTING_CONNECT_EVENTREG_DB > 1 ? true : false;
         $idStartPos = 0;
 
         while ($row = $result->fetch_assoc()) {
             $id = $row['id'];
             $name = $row['name'];
             $description = $row['description'];
-            
+
             //when we don't want to get entries, we can skip the entries query
             //(ie rating-mode where entries are fetched separately fram the eventreg database)
             if ($NoEntries) {
@@ -620,6 +697,183 @@ class DbAccess
         }
     }
 
+    //get weigthed rating results sorted by calculated total points for each beerEntryId
+    public function getRatingResultTot($categoryId, $voteCountStartTime)
+    {
+        $competitionId = getCompetitionId();
+        $weightedScores = $this->getWeightedRatingResult($categoryId, $voteCountStartTime);
+        $ratingResults = array();
+        foreach ($weightedScores as $voteCodeId => $scores) {
+            foreach ($scores as $beerEntryId => $score) {
+                if ($beerEntryId == 'VoteCodeStat') {
+                    continue;
+                }
+                if (!array_key_exists($beerEntryId, $ratingResults)) {
+                    $ratingResults[$beerEntryId] = array('beerEntryId' => $beerEntryId, 'ratingScore' => 0, 'weightedScore' => 0, 'votersCount' => 0, 'WeightedMeanValue' => 0);
+                }
+                $ratingResults[$beerEntryId]['ratingScore'] += $score['ratingScore'];
+                $ratingResults[$beerEntryId]['weightedScore'] += $score['weightedScore'];
+                $ratingResults[$beerEntryId]['votersCount']++;
+                //Grab beername, brewer and style from eventreg database
+
+                $beer = $this->getBeer($competitionId , $beerEntryId);
+                $ratingResults[$beerEntryId]['beerName'] = $beer['name'];
+                $ratingResults[$beerEntryId]['brewer'] = $beer['brewer'];
+                $ratingResults[$beerEntryId]['styleName'] = $beer['styleName'];
+                $ratingResults[$beerEntryId]['styleId'] = $beer['styleId'];
+
+            }
+        }
+        //Medelbetyg för alla som röstat på denna öl
+        //obs enbart statistik, används ej i rankingen, då ett fåtal höga betyg kan ge en hög medelpoäng
+        foreach ($ratingResults as &$ratingResult) {
+            $ratingResult['weightedMeanValue'] = round($ratingResult['weightedScore'] / $ratingResult['votersCount'],3 );
+        }
+
+
+        //sort the array by weightedScore (instead of beerEntryId)
+        usort($ratingResults, function ($a, $b) {
+            $sort = $b['weightedScore'] - $a['weightedScore'];
+            //utjämningsregler vid lika poäng
+            if ($sort == 0)
+                $sort = $b['votersCount'] - $a['votersCount'];
+            if ($sort == 0)
+                $sort = $b['ratingScore'] - $a['ratingScore'];
+            return $sort;
+        });
+        return $ratingResults;
+    }
+
+
+    //get number of unique beerEntryId:s for this rating  $categoryId
+    public function getBeerEntryCount($categoryId, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select count(distinct beerEntryId) as c from ratings where categoryId=' . $this->escape($categoryId) . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getBeerEntryCount: Query failed: $sql");
+        $beerCount = $result->fetch_assoc()['c'];
+        return $beerCount;
+    }
+    //
+
+    //get weigted results
+    public function getWeightedRatingResult($categoryId, $voteCountStartTime)
+    {
+        //reglerna i denna funktion är till för att ta udden av eventuellt taktikröstande, 
+        //och ge en rättvis tävling där alla besökare propotionerligt kan påverka resultatet ungefär likvärdigt
+        //tanken är att en vanlig besökare ska uppmuntaras att betygsätta många öl utifrån smak och tycke, liknande untappd.
+        //besökaren ska inte få upplevelsen att hen sitter i en jury som ska utse vinnare 
+        //och därmed föröker hitta ett fåtal favoriter att betygsätta, eller tvärt om drar sig för att betygsätta alls eftersom denne druckit för få öl i klassen för kunna "rösta rättvist"
+
+
+
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+
+        //get number of unique beerEntryId:s for this $categoryId
+        $beerCount = $this->getBeerEntryCount($categoryId, $voteCountStartTime);
+
+        //each voteCodeId is a unique voter (participating user)
+        //get a list of all unique voteCodeId:s for this $categoryId
+        $sql = 'select distinct voteCodeId from ratings where categoryId=' . $this->escape($categoryId) . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getRatingResults: Query failed: $sql");
+        $voteCodeIds = array();
+        while ($row = $result->fetch_assoc()) {
+            array_push($voteCodeIds, $row['voteCodeId']);
+        }
+        $voteCodeCount = count($voteCodeIds);
+        //for each voteCodeId, get all ratingScores and beerEntryId sorted by ratingScore
+        $weightedScores = array();
+        foreach ($voteCodeIds as $voteCodeId) {
+            $sql = 'select ratingScore, drankCheck, beerEntryId ' .
+                '  from ratings where categoryId=' . $this->escape($categoryId) . ' and voteCodeId=' . $voteCodeId . $extraCond . ' order by ratingScore desc';
+            $result = $this->getConnection()->query($sql) or die("getRatingResults: Query failed: $sql");
+            //Create a list of weighted ratingScores for this voteCodeId
+            //ratingScore is a number between 1 and 5 for each beerEntryId
+            //a weigthed score of 5 is given to the highest rated beer(s), 4 to the second highest etc.
+            //the weigthedScore is the ratingScore adjusted as follows :
+            //by the total percentage of ratings this voteCodeId has put, out of total number of unique beerEntryId:s in this category
+            //a weighedScore of 5 is given to the highest rated beer(s) if the voteCodeId has rated atleast 75% of the beers in this category
+            //a weighedScore of 4 is given to the second highest rated beer(s) if the voteCodeId has rated atleast 50% of the beers in this category
+            //a weighedScore of 3 is given to the third highest rated beer(s) if the voteCodeId has rated atleast 35% of the beers in this category
+            //a weighedScore of 2 is given to the fourth highest rated beer(s) if the voteCodeId has rated atleast 15% of the beers in this category
+            //a weighedScore of 1 is given to the fifth highest rated beer(s) if the voteCodeId has rated atleast 1 of the beers in this category
+            $ratingCount = 0;
+            $weightedMaxScore = 5;
+            $weightedScoreCount = 0;
+            //get rowcount in $result
+            $ratingCount = mysqli_num_rows($result);
+            if ($ratingCount > $beerCount * 0.75) {
+                $weightedMaxScore = 5;
+            } else if ($ratingCount > $beerCount * 0.5) {
+                $weightedMaxScore = 4;
+            } else if ($ratingCount > $beerCount * 0.35) {
+                $weightedMaxScore = 3;
+            } else if ($ratingCount > $beerCount * 0.15) {
+                $weightedMaxScore = 2;
+            } else if ($ratingCount > 0) {
+                $weightedMaxScore = 1;
+            }
+            $weightedSubstract = 5 - $weightedMaxScore;
+
+
+            $weightedScores[$voteCodeId] = array();
+            while ($row = $result->fetch_assoc()) {
+                //insert or update weigthedScore for this beerEntryId into sql table ratings_weighted_result
+                $weightedScoreCount++;
+                if (isset($row['ratingScore'])) { //null are common (drankcheck's) and should not be counted/listed at all
+                    if ($row['ratingScore'] == 0) {
+                        $weightedScore = 0;
+                    } else {
+                        $weightedScore = max(1, $row['ratingScore'] - $weightedSubstract); //adjust ratingScore up to weightedMaxScore
+                    }
+
+                    $weightedScores[$voteCodeId][$row['beerEntryId']] = array('beerEntryId' => $row['beerEntryId'], 'ratingScore' => $row['ratingScore'],  'weightedScore' => $weightedScore);
+                }
+            }
+
+        }
+        //loop $weightedScores, calculate mean values for ratingScore and weightedScore for each voteCodeId
+        //add these to the array $weightedScores        
+        foreach ($weightedScores as $voteCodeId => $scores) {
+        
+            $ratingScoreSum = 0;
+            $weightedScoreSum = 0;
+            $ratingScoreCount = 0;
+            $weightedScoreCount = 0;
+            foreach ($scores as $beerEntryId => $score) {
+                if ($score['ratingScore'] > 0) {
+                    $ratingScoreSum += $score['ratingScore'];
+                    $ratingScoreCount++;
+                }
+                if ($score['weightedScore'] > 0) {
+                    $weightedScoreSum += $score['weightedScore'];
+                    $weightedScoreCount++;
+                }
+            }
+            //set mean values for this voteCodeId (just for evaluation, not stored fro results)
+            $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'] = $ratingScoreCount > 0 ? $ratingScoreSum / $ratingScoreCount : 0;
+            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedScoreMean'] = $weightedScoreCount > 0 ? $weightedScoreSum / $weightedScoreCount : 0;
+
+        }
+
+
+
+
+
+
+
+        return $weightedScores;
+    }
+
+
     private function escape($s)
     {
         return $this->getConnection()->real_escape_string($s);
@@ -782,7 +1036,7 @@ function FvClass($low_alc, $main_class, $sub_class)
     } elseif (($main_class == 12)) {
         $fv_class = !$as_numeric ? 'Cider och mjöd' : '7';
     } else {
-        $fv_class = !$as_numeric ? 'Okänd': '0';
+        $fv_class = !$as_numeric ? 'Okänd' : '0';
     }
 
     return $fv_class;
