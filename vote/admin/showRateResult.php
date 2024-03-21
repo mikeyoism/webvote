@@ -16,6 +16,19 @@ $openTimes = dbAccess::calcCompetitionTimes($competition);
 <meta charset="utf-8"/> 
 <title>Tävlingsresultat (rating) för <?=$competition['name']?></title>
 <link rel="stylesheet" href="css/themes/shbf.css" />
+<style>
+table, th, td {
+  border: 1px solid black;
+   border-collapse: collapse;
+}
+tr:nth-child(even) {
+  background-color: #D6EEEE;
+}
+td,th {
+  padding: 7px;
+  
+}
+</style>
 </head>
 <body>
 <h1>Tävlingsresultat (av betyg/rating) för <?=$competition['name']?></h1>
@@ -38,8 +51,8 @@ $categories = $dbAccess->getCategories($competition['id']);
 foreach ($categories as $category) {
 ?>
 <h2>Kategori <?=$category['name']?>
-<table>
-<tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th><th>Antal röstare</th><th>(Oviktad råpoäng)</th><th>(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th>
+<table >
+<tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th><th>Antal röstare</th><th>(Oviktad råpoäng)</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th>
 <?php
     $voteResult = $dbAccess->getRatingResultTot($category['id'], $voteCountStartTime);
     foreach ($voteResult as $row) {
