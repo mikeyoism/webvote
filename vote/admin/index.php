@@ -95,7 +95,7 @@ if (!$openTimes['open'] && !$openTimes['timeBeforeOpen']->invert) {
 $eventRegIds = $competition['eventReg_ids'];
 if ((!isset($eventRegIds) || count($eventRegIds) < 1 ) && ENABLE_RATING) {
     print "</p><p style='background-color:yellow'>OBS! Det finns inget tävlings-ID för denna tävling.  ".
-        "knutet i EventReg-systemet (ölregisteringsystemet). Detta måste sättas upp i dess dataas för att Rating ska fungera!.</p>";
+        "knutet i EventReg-systemet (ölregisteringsystemet). Detta måste sättas upp i dess databas, för att Rating ska fungera! Tabell.Kolumn Events.votesys_competition_id.</p>";
 }
 else {
     if  (ENABLE_RATING) {

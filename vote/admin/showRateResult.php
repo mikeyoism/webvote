@@ -15,7 +15,7 @@ $openTimes = dbAccess::calcCompetitionTimes($competition);
 <head>
 <meta charset="utf-8"/> 
 <title>Tävlingsresultat (rating) för <?=$competition['name']?></title>
-<link rel="stylesheet" href="css/themes/shbf.css" />
+<link rel="stylesheet" href="../css/themes/shbf.css" />
 <style>
 table, th, td {
   border: 1px solid black;
