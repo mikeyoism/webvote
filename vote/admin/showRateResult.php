@@ -31,7 +31,7 @@ td,th {
 </style>
 </head>
 <body>
-<h1>Tävlingsresultat (av betyg/rating) för <?=$competition['name']?></h1>
+<h1>Tävlingsresultat RATING för <?=$competition['name']?></h1>
 
 <p>Senast uppdaterad <?=(new DateTime())->format('Y-m-d H:i')?>.
 
@@ -50,7 +50,11 @@ $categories = $dbAccess->getCategories($competition['id']);
 
 foreach ($categories as $category) {
 ?>
-<h2>Kategori <?=$category['name']?>
+<h2>Kategori <?=$category['name']?> - <?=$category['description']?></h2>
+<p><strong><?=$dbAccess->getVoteCodeCount($category['id'], $voteCountStartTime)?>st </strong> besökare 
+ har druckit av <strong><?=$dbAccess->getDrankCheckCount($category['id'], $voteCountStartTime)?></strong> olika öl,
+ varav <strong><?=$dbAccess->getRatingCount($category['id'], $voteCountStartTime)?></strong> har fått ett betyg.
+</p>
 <table >
 <tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th><th>Antal röstare</th><th>(Oviktad råpoäng)</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th>
 <?php

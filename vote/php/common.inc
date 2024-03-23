@@ -745,21 +745,6 @@ class DbAccess
     }
 
 
-    //get number of unique beerEntryId:s for this rating  $categoryId
-    public function getBeerEntryCount($categoryId, $voteCountStartTime)
-    {
-        if ($voteCountStartTime === null) {
-            $extraCond = '';
-        } else {
-            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
-        }
-        $sql = 'select count(distinct beerEntryId) as c from ratings where categoryId=' . $this->escape($categoryId) . $extraCond;
-        $result = $this->getConnection()->query($sql) or die("getBeerEntryCount: Query failed: $sql");
-        $beerCount = $result->fetch_assoc()['c'];
-        return $beerCount;
-    }
-    //
-
     //get weigted results
     public function getWeightedRatingResult($categoryId, $voteCountStartTime)
     {
@@ -872,6 +857,62 @@ class DbAccess
 
         return $weightedScores;
     }
+
+    //get number of unique beerEntryId:s for this rating  $categoryId
+    public function getBeerEntryCount($categoryId, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select count(distinct beerEntryId) as c from ratings where categoryId=' . $this->escape($categoryId) . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getBeerEntryCount: Query failed: $sql");
+        $beerCount = $result->fetch_assoc()['c'];
+        return $beerCount;
+    }
+    //get number of unique voteCodeId:s for this rating  $categoryId
+    public function getVoteCodeCount($categoryId, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select count(distinct voteCodeId) as c from ratings where categoryId=' . $this->escape($categoryId) . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getVoteCodeCount: Query failed: $sql");
+        $voteCodeCount = $result->fetch_assoc()['c'];
+        return $voteCodeCount;
+    }
+    //get number of ratings with a score > 0 for a $categoryId
+    public function getRatingCount($categoryId, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select count(ratingScore) as c from ratings where categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getRatingCount: Query failed: $sql");
+        $ratingCount = $result->fetch_assoc()['c'];
+        return $ratingCount;
+    }
+    //get number of drankCheck's for a $categoryId
+    public function getDrankCheckCount($categoryId, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        //note: in a correct db, drankcheck is always 1 if ratingScore>0, but we check both here for safety
+        $sql = 'select count(drankCheck) as c from ratings where categoryId=' . $this->escape($categoryId) . ' and drankCheck=1 or ratingScore>0' . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getDrankCheckCount: Query failed: $sql");
+        $drankCheckCount = $result->fetch_assoc()['c'];
+        return $drankCheckCount;
+    }
+
+
 
 
     private function escape($s)
