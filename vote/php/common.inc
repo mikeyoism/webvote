@@ -199,16 +199,16 @@ class DbAccess
         return $events;
     }
 
-    
+
     //get beer info from eventreg database, for a single beerEntryId
-    public function getBeer($competitionId,$beerEntryId)
+    public function getBeer($competitionId, $beerEntryId)
     {
         $evenreg_event_ids = $this->getEventReg_EventId($competitionId);
         if (count($evenreg_event_ids) < 1)
             die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
         $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
 
-        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, ' .
+        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
             'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
             'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
@@ -236,13 +236,18 @@ class DbAccess
             die("Invalid class id." . $classIndex);
         //find the class name in $classes by array key Id
 
-        $className = $class[0]['description']; //$classes[$fv_class_id_nr-1]['description'];
+
+        //extract style name from type_name (format main_class.sub_class style_name)
+        $styleName =  str_replace($row['main_class'] . ':' . $row['sub_class'] . ' ', '', $row['type_name']);
+
+
+
         $entryId = $nextEntryId++;
         $sql2 =
-        'SELECT Brewers_of_beer.brewer_id, Brewers.brewer_name FROM Brewers_of_beer ' .
-        'INNER JOIN Brewers USING (brewer_id) ' .
-        'WHERE Brewers_of_beer.beer_id =' . $row['beer_id'] . ' ' .
-        'AND Brewers_of_beer.deleted = 0';
+            'SELECT Brewers_of_beer.brewer_id, Brewers.brewer_name FROM Brewers_of_beer ' .
+            'INNER JOIN Brewers USING (brewer_id) ' .
+            'WHERE Brewers_of_beer.beer_id =' . $row['beer_id'] . ' ' .
+            'AND Brewers_of_beer.deleted = 0';
         $result2 = $this->getConnectionDb2_Eventreg()->query($sql2) or die("getBeers: Query failed: $sql2");
         $i = 0;
         $brewer_names = "";
@@ -260,7 +265,7 @@ class DbAccess
             'entry_id' => $entryId,
             'entry_code' => $row['fv_competition_no'],
             'styleId' => $row['main_class'] . $row['sub_class'],
-            'styleName' => $className,
+            'styleName' => $styleName,
             'name' => $row['beer_name'],
             'brewer' => $brewer_names,
             'alk' => $row['alc'],
@@ -272,7 +277,7 @@ class DbAccess
         return $beer;
     }
 
-    
+
     //get beer info from eventreg database
     public function getBeers($competitionId, $grouped = false)
     {
@@ -283,7 +288,7 @@ class DbAccess
         //set big selects - one.com requires this, not oderlan (we should probably improve the sql query instead of using this setting, atm the query is as in the eventreg code)
         $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
         //get all beers in the competition
-        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, ' .
+        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
             'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
             'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
@@ -330,7 +335,9 @@ class DbAccess
             //find the class name in $classes by array key Id
 
 
-            $className = $class[0]['description']; //$classes[$fv_class_id_nr-1]['description'];
+            //extract style name from type_name (format main_class.sub_class style_name)
+            $styleName =  str_replace($row['main_class'] . ':' . $row['sub_class'] . ' ', '', $row['type_name']);
+
             $entryId = $nextEntryId++;
 
             $sql2 =
@@ -355,7 +362,7 @@ class DbAccess
                 'entry_id' => $entryId,
                 'entry_code' => $row['fv_competition_no'],
                 'styleId' => $row['main_class'] . $row['sub_class'],
-                'styleName' => $className,
+                'styleName' => $styleName,
                 'name' => $row['beer_name'],
                 'brewer' => $brewer_names,
                 'alk' => $row['alc'],
@@ -716,18 +723,17 @@ class DbAccess
                 $ratingResults[$beerEntryId]['votersCount']++;
                 //Grab beername, brewer and style from eventreg database
 
-                $beer = $this->getBeer($competitionId , $beerEntryId);
+                $beer = $this->getBeer($competitionId, $beerEntryId);
                 $ratingResults[$beerEntryId]['beerName'] = $beer['name'];
                 $ratingResults[$beerEntryId]['brewer'] = $beer['brewer'];
                 $ratingResults[$beerEntryId]['styleName'] = $beer['styleName'];
                 $ratingResults[$beerEntryId]['styleId'] = $beer['styleId'];
-
             }
         }
         //Medelbetyg för alla som röstat på denna öl
         //obs enbart statistik, används ej i rankingen, då ett fåtal höga betyg kan ge en hög medelpoäng
         foreach ($ratingResults as &$ratingResult) {
-            $ratingResult['weightedMeanValue'] = round($ratingResult['weightedScore'] / $ratingResult['votersCount'],3 );
+            $ratingResult['weightedMeanValue'] = round($ratingResult['weightedScore'] / $ratingResult['votersCount'], 3);
         }
 
 
@@ -823,12 +829,11 @@ class DbAccess
                     $weightedScores[$voteCodeId][$row['beerEntryId']] = array('beerEntryId' => $row['beerEntryId'], 'ratingScore' => $row['ratingScore'],  'weightedScore' => $weightedScore);
                 }
             }
-
         }
         //loop $weightedScores, calculate mean values for ratingScore and weightedScore for each voteCodeId
         //add these to the array $weightedScores        
         foreach ($weightedScores as $voteCodeId => $scores) {
-        
+
             $ratingScoreSum = 0;
             $weightedScoreSum = 0;
             $ratingScoreCount = 0;
@@ -846,7 +851,6 @@ class DbAccess
             //set mean values for this voteCodeId (just for evaluation, not stored fro results)
             $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'] = $ratingScoreCount > 0 ? $ratingScoreSum / $ratingScoreCount : 0;
             $weightedScores[$voteCodeId]['VoteCodeStat']['weightedScoreMean'] = $weightedScoreCount > 0 ? $weightedScoreSum / $weightedScoreCount : 0;
-
         }
 
 
@@ -1007,8 +1011,8 @@ function redirectToSelf()
 
 
 // Returns FV class as string or numeric based on the main and sub class of the beer
-// this is a copy of the function in the eventreg code, *but with returned numerics adusted to order in the competition table*
-//TODO store in database instead of hardcoding
+// this is a copy of the function in the eventreg code, *but with returned numerics adjusted to order in the competition table*
+//TODO store in database instead 
 
 function FvClass($low_alc, $main_class, $sub_class)
 {
