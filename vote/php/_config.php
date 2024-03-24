@@ -29,16 +29,30 @@ date_default_timezone_set("Europe/Stockholm");
 define("COMPETITION_ID", 42);
 
 define("ENABLE_RATING", true);
-
-define("CONST_SETTING_SHOW_HELP_POPUP", true);
-//visar hjälppopup med mer info för användaren
-define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true);
-
-//Antal siffror i serierna för NUMBERSPAN ovan (måste vara samma antal siffror från min - max i alla kategoerier (ex 100-999 = 3 siffror)
-define("CONST_SETTING_BEERID_NUMBERSPAN_LENGTH",3);
-
 //Längd på röstkoder - överskrid inte satt maxlängd i db.
 define("CONST_SETTING_VOTE_CODE_LENGTH",6);
+
+/*Nedan är Prestandainställningar, ändras INTE om inte problem föreligger
+ Kan ändras under pågående tävling*/
+
+//läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
+define("CONST_SETTING_CONNECT_EVENTREG_DB",false);
+///1=No Offset in Category-table, TODO; fix this
+define("CONST_SETTING_CATEGORY_OFFSET",92); 
+//intervall klienter ska fråga efter systatus, i millisekunder
+//(sysstatus = fönsterat som visar hur länge tävlig är öppen/stängd mm i klienten)
+define("SETTING_SYSSTATUS_INTERVAL",10000);
+
+//----END OF COMPETITION SETTINGS-----
+
+//LEGACY VOTE SETTINGS - NOT USED FOR RATING
+
+define("ENABLE_VOTING",!ENABLE_RATING); //same as ENABLE_RATING
+//visar hjälppopup med mer info för användaren
+define("CONST_SETTING_SHOW_HELP_POPUP", true);
+define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true);
+//Antal siffror i serierna för NUMBERSPAN ovan (måste vara samma antal siffror från min - max i alla kategoerier (ex 100-999 = 3 siffror)
+define("CONST_SETTING_BEERID_NUMBERSPAN_LENGTH",3);
 //Antal röster per kategori
 //Om fler än 7st måste DB-tabeller utökas, se readme.md
 define("CONST_SETTING_VOTES_PER_CATEGORY",3);
@@ -47,26 +61,18 @@ define("CONST_SETTING_VOTES_PER_CATEGORY",3);
 define("CONST_SETTING_VOTES_PER_CATEGORY_SAME",2);
 //Kräv att alla tre röster utnyttjas, om man röstat på samma öl +1 gång
 define("CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL",true);
+//----END OF LEGACY VOTE SETTINGS -----
 
-/*Nedan är Prestandainställningar, ändras INTE om inte problem föreligger
- Kan ändras under pågående tävling*/
-
-//intervall klienter ska fråga efter systatus, i millisekunder
-//(sysstatus = fönsterat som visar hur länge tävlig är öppen/stängd mm i klienten)
-define("SETTING_SYSSTATUS_INTERVAL",10000);
-
-//läs ölinfo från eventreg-database (annars från csv-filer)
-define("CONST_SETTING_CONNECT_EVENTREG_DB",true);
-define("CONST_SETTING_CATEGORY_OFFSET",92); ///1=No Offset in Category-table, TODO; fix this
-
-
-//----END OF COMPETITION SETTINGS-----
+//----SYSTEM SETTINGS -----
 
 //output js & php script debug i klient? Viktigt att sätta false i produktion
 //ger extra fel och info rutor för testning 
 define("CONST_SYS_JS_DEBUG", true); 
 //php extension som inte alltid finns installerad (one.com)
 define("APC_CACHE_ENABLED", false);
+
+
+
 
 //php debugging to JS console, enabled if CONST_SYS_JS_DEBUG
 //(you need a firefox/chrome firephp-addon to see these messages in your console)

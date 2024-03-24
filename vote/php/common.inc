@@ -208,7 +208,7 @@ class DbAccess
             die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
         $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
 
-        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name ' .
+        $sql =  'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
             'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
             'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
@@ -916,8 +916,76 @@ class DbAccess
         return $drankCheckCount;
     }
 
+    //cache-lagrar öldata från eventReg, i filer för att undvika att läsa från db varje gång
+    //för att garantera prestanada vid större tävlingar..troligtvis overkill men ändå...
+    //relevant endast CONST_SETTING_CONNECT_EVENTREG_DB = FALSE, in _config.php
+    function writeEventBeerDataToCacheFiles($competitionId)
+    {
+        $beers = $this->getBeers($competitionId, false);
+        $categories = $this->getCategories($competitionId, true);
 
+        //get count of categories and beers
+        if (count($categories) == 0 || count($beers) == 0) {
+            die('No categories or beers found in EventReg database. Check that the competitionId is correct and that the EventReg database is up and running.');
+        }
+        //delete old files named list_fv*.txt
+        $files = glob('../../rate/data/list_fv*.txt');
+        foreach ($files as $file) {
+            unlink($file);
+        }
+        $idx = 1;
+        foreach ($categories as $class) {
+            $filename = '../../rate/data/list_fv' . $idx++ . '.txt';
+            $str = '';
+            //write class id, name and description  as header to first line of file
+            $str =  $class['id'] . "\t " . $class['name'] . "\t" . $class['description'] . "\n";
+            //write beers one by one to file
+            foreach ($beers as $beer) {
+                if ($beer['class'] == $class['id']) {
+                    $str .= $beer['entry_code'] . "\t" . $beer['styleId'] . ' - ' . $beer['styleName'] . "\t" . $beer['name'] . "\t" . $beer['brewer'] . "\t" . $beer['alk'] . "\t" . $beer['OG'] . "\t" . $beer['FG'] . "\t" . $beer['IBU'] . "\n";
+                }
+            }
+            file_put_contents($filename, $str);
+        }
+    }
+    function readEventBeerDataFromCacheFiles($competitionId)
+    {
+        //get all files in data folder that matches list_fv*.txt
+        $files = glob('../../rate/data/list_fv*.txt');
+        $categories = array();
+        $beers = array();
+        $nextEntryId = 1;
+        foreach ($files as $file) {
+            $str = file_get_contents($file);
+            $lines = explode("\n", trim($str, "\n"));
+            $class = explode("\t", $lines[0]);
+            //header line contains class id, name and description
+            array_push($categories, array('id' => trim($class[0]), 'name' => trim($class[1]), 'description' => trim($class[2])));
 
+            foreach (array_slice($lines, 1) as $line) {
+                $cols = explode("\t", $line);
+
+                $styleParts = explode(" - ", $cols[1]);
+
+                $entryId = $nextEntryId++;
+                $beer = array(
+                    'class' => $class[0],
+                    'entry_id' => $entryId,
+                    'entry_code' => $cols[0],
+                    'styleId' => $styleParts[0],
+                    'styleName' => $styleParts[1],
+                    'name' => $cols[2],
+                    'brewer' => $cols[3],
+                    'alk' => $cols[4],
+                    'OG' => $cols[5],
+                    'FG' => $cols[6],
+                    'IBU' => $cols[7]
+                );
+                $beers[$entryId] = $beer;
+            }
+        }
+        return array($categories, $beers);
+    }
 
     private function escape($s)
     {
@@ -1008,6 +1076,8 @@ function redirectToSelf()
     header("Location: http://$host$uri$query");
     exit;
 }
+
+
 
 
 // Returns FV class as string or numeric based on the main and sub class of the beer

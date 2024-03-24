@@ -44,7 +44,7 @@ if(isset($_POST['operation']))
         
 
         //legacy vote settings - not used for rating
-        $jsonReply["ENABLE_VOTING"] =ENABLE_RATING; //same as ENABLE_RATING
+        $jsonReply["ENABLE_VOTING"] =ENABLE_VOTING; //same as ENABLE_RATING
         $jsonReply["CONST_SETTING_SHOW_HELP_POPUP"] =CONST_SETTING_SHOW_HELP_POPUP;
         $jsonReply["CONST_SETTING_BEERID_NUMBERSPAN_LENGTH"] = CONST_SETTING_BEERID_NUMBERSPAN_LENGTH;
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY"] = CONST_SETTING_VOTES_PER_CATEGORY;

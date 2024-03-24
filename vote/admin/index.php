@@ -42,6 +42,14 @@ if (isset($_POST['generateVoteCodes'])) {
     $dbAccess->setCompetitionOpenForTestUntil($competitionId, $closeTime);
     redirectToSelf();
 }
+else if (isset($_POST['cacheEventRegData'])) {
+    if ($privilegeLevel < 2) {
+        die('Not authorized.');
+    }
+
+    $dbAccess->writeEventBeerDataToCacheFiles($competitionId);
+    redirectToSelf();
+}
 
 
 ?>
@@ -99,10 +107,22 @@ if ((!isset($eventRegIds) || count($eventRegIds) < 1 ) && ENABLE_RATING) {
 }
 else {
     if  (ENABLE_RATING) {
-    $eventRegIdsString = implode(', ', $competition['eventReg_ids']);
-    print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString;
+        $eventRegIdsString = implode(', ', $competition['eventReg_ids']);
+        print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString;
+        if (CONST_SETTING_CONNECT_EVENTREG_DB == false){?>
+            <form method='post'>
+            När EventReg-databasen är redo eller ner det sker uppdateringar i den, ska du hämta senaste ölinfo:<br>
+        <button type="submit" name='cacheEventRegData'>Cache senaste ölinfo från från Event-Reg databasen </button>
+        </form>    
+        <?php
+        }
+        else
+        {
+            print "<p>Ölinfo hämtas under tävling direkt från EventReg-databasen av klienterna (inställning CONST_SETTING_CONNECT_EVENTREG_DB i _config.db)</p>";
+        }
     }
 }
+
 ?>
 <hr>
 <p>Det finns <?=$competition['voteCodeCount']?> <a

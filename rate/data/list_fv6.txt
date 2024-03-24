@@ -1,42 +1,23 @@
-103	11A - Frukt, bär och grönsaksöl	Yuzu Rocket Beer	Patrik Svensk, Carl Sundstedt, Pontus Lakso, Marcus Löthman	6,2	61	14	143
-106	11B - Kryddöl	Enbärski	Patrik Svensk, Carl Sundstedt, Pontus Lakso, Marcus Löthman	5,8	55	11	25
-108	11D - Modifierade öl	Chupacabra Chili Porter	Anders Jacobsson	7,3	74	19	57
-118	11A - Frukt, bär och grönsaksöl	Hallon öl	Andreas Arvidsson, Martin Fahlström	3,7	32	4	11
-121	11G - Rökbock	Mossens Köksbryggeri Rathaus Rauchbockbier	Bo Ström, Per Thoren	7,1	74	20	32
-136	11D - Modifierade öl	Hasses humleskola Ginger Rogers, Ginger beer	Erik Johansson, Sven Byström medlemsnr:5328 Hans Ericson medlemsnummer:7015	3,8	45	16	60
-142	11D - Modifierade öl	Session IPA	Erik Wood	3,8	39	10	70
-145	11D - Modifierade öl	Hoppy Imperial Saison	Erik Wood	10,6	86	6	117
-151	11H - Övrig rököl	Smoky Boxed Beard 2015	Fredrik Gustavsson, Therese Mortensen	7,3	77	22	43
-159	11H - Övrig rököl	Snörök	Göran Bolmgren, Jörgen Pettersson	5,5	64	22	29
-163	11A - Frukt, bär och grönsaksöl	Black Currant Berliner	Jacob Svensson	2,9	28	6	4
-164	11H - Övrig rököl	Bölkling Smoked Ale	Jacob Svensson, Marcus Bäck	5,5	58	16	27
-170	11D - Modifierade öl	ADK Imperial berliner schnauze	Kalle Andersson, Nina Schultes	6,2	59	12	17
-178	11A - Frukt, bär och grönsaksöl	Frukost	Johan Holmdahl	5,3	52	12	20
-179	11L - Övriga, övriga klassiska öltyper	Bombs Away 	Johan Holmdahl, Christian Reinmar, Thomas Lantz, Mikael Terner	9,4	89	18	70
-182	11D - Modifierade öl	Rotweizen	Jakob Carlström, Jan Nyström	4,6	50	15	15
-183	11D - Modifierade öl	Trippel Mandel	Jakob Carlström, Jan Nyström	8,4	78	14	41
-184	11D - Modifierade öl	Important Mrs Brown	Jakob Carlström, Niklas Stenlås, Lars Callert	16,1	147	25	92
-194	11A - Frukt, bär och grönsaksöl	Oakbay's Piña Colada Ananas och kokos	Rickard Berglund	5,8	56	12	36
-204	11I - Trä- och fatlagrade öl	Grotte (Bourbon Oak Aged)	Viktor Nyman, Jens Peterson, Viktor Larsson	11,5	107	20	90
-208	11D - Modifierade öl	Out of Coconut Season	Mikael Josefsson	6,6	51	1	33
-218	11A - Frukt, bär och grönsaksöl	Sirocco Black	John Bengtsson, Sven Bengtsson	8,6	69	4	25
-238	11D - Modifierade öl	HBG2 - Brainiac	Martin Björck, Victoria Shulga, Fredrik Wallerfrost, Niklas Lindqvist, Patrik Jargenius, Kristoffer Björk, Stefan Alexi	3,3	32	7	49
-243	11B - Kryddöl	Chili Choklad Porter	Dan Nilsson, Henrik, Joakim, Mattias, Mats, Inger, Selomon, Fredrik, Henrik, Johan	4,0	48	18	28
-245	11D - Modifierade öl	Mammut öl	Jan Tejbrant, Massor	8,4	82	18	45
-247	11D - Modifierade öl	Dr Malt & Mr Hop	Dominic Rivas	4,2	47	15	51
-261	11I - Trä- och fatlagrade öl	Svartra Pisten (Mackmyra Reserve Whiskey Barrel Aged)	Mattias Wallén, Mikael Sörensen	9,1	85	16	70
-266	11D - Modifierade öl	Triple dry hopped havtorn drink and drive bilbana IPA	Patrik Norrlöf	3,4	34	8	46
-270	11D - Modifierade öl	FOLKA	Milos Savic, Timo Widell 	3,4	36	10	92
-273	11L - Övriga, övriga klassiska öltyper	Gambrinius Wärmländsk Starkdricka	Per Karlsson	6,5	64	15	9
-278	11D - Modifierade öl	Gambrinius Honey Beer	Allan Nordström	7,0	66	13	43
-286	11A - Frukt, bär och grönsaksöl	Cloudberrybrew	Joacim Nilsen	3,2	32	8	2
-296	11A - Frukt, bär och grönsaksöl	Infraröde Orm	Richard Sören Strand	4,1	43	12	39
-298	11A - Frukt, bär och grönsaksöl	Huggorm	Richard Sören Strand	5,4	47	6	26
-301	11A - Frukt, bär och grönsaksöl	Organic Naked Barley Appel Ale	Robin Lynch	5,9	50	5	15
-310	11D - Modifierade öl	Valentine Warrior	Mats Nyqvist, Magnus Torstensson och Mathias Ljungsten	5,3	70	30	51
-314	11D - Modifierade öl	Uncork Orange	Stefan Backlund	6,6	54	4	30
-326	11G - Rökbock	Bärsärk Rauchbier	Janne Sandström, Per Andersson	7,0	70	17	31
-334	11B - Kryddöl	Sunds Jul 2015	Tommy Jonsson	7,9	70	10	25
-336	11D - Modifierade öl	En Vit Stout	Robert Siirilä, Carin Eriksson	4,6	50	15	26
-321	11D - Modifierade öl	Lemorado Wheat	Pelle Nyman, Erkki Yli-Tokola, Pernilla Nyman	4,5	47	13	15
-338	11D - Modifierade öl	Limeburner Double India Not Pale Ale	Henrik Kristedal, Pernilla Zackrisson	8,1	74	13	100
+97	 Klass 6	Övriga öl
+218	11A - Frukt, b?r och gr?nsaks?l	Verrouviller groseil de Süsskind	Mats Hellman, Kåre Bondesson, Mattias Hansson, Bo Eriksson	10.8	86	2	1
+212	11A - Frukt, b?r och gr?nsaks?l	Blåbärssuris	Maja Koivunen, Tove Gremlin	8.1	80	18	17
+142	11A - Frukt, bär och grönsaksöl	Drottningen af Breweriet	Tobias Strand, Daniel Markänger, Johan Lövgren, Nisse Mannerby, Jonas Saltin	4.8	48	12	5
+122	11A - Frukt, bär och grönsaksöl	Margareta är sur	Dennis Augustzen	4.7	50	14	10
+123	11A - Frukt, bär och grönsaksöl	mr mangoo	Dennis Augustzen	5.5	50	12	10
+151	11A - Frukt, bär och grönsaksöl	Hallonsuris	George Smidlund	4.2	51	19	0
+102	11A - Frukt, bär och grönsaksöl	Heavy’s Mango Tango	Andreas Blomstrand	6.4	60	12	38
+158	11A - Frukt, bär och grönsaksöl	Trollmors SAFT	Hannes Christensen	6.0	56	14	10
+200	11D - Modifierade öl	Hallonkris	anders jansson, Marcus hotakainen, Jens modin	5.7	55	12	20
+249	11D - Modifierade öl	Vad vill du ha? Överraska mig!	Ted Elmenheim, Henrik Persson	6.5	59	11	50
+216	11D - Modifierade öl	Humle och Dumle	David Gustafsson	8.2	68	8	37
+240	11D - Modifierade öl	Black to the roots	Peter Hogstrom	7.1	66	12	50
+239	11D - Modifierade öl	DEIFIED Mid NEIPA	Peter Blom, Mathias Örnqvist	5.0	48	10	34
+104	11D - Modifierade öl	Granskott	Andreas Dahlqvist	6.0	53	8	24
+103	11D - Modifierade öl	Black Tropical	Andreas Blomstrand	6.0	60	15	50
+213	11F - Rököl, typ Bamberg	Seamus&#39; mistake	Maja Koivunen	5.5	54	12	28
+187	11F - Rököl, typ Bamberg	Prickig Korp	Jonas Lorenthsson	5.1	54	15	24
+179	11I - Trä- och fatlagrade öl	Kokomo 18month rum BA Imp Stout 2020	Johan Wallèn, Christoffer Johansson, Tor Björnsson	12.4	108	29	100
+205	11I - Trä- och fatlagrade öl	I HAVE FAITH IN YOU	Tomas	16.0	36	15	50
+168	11I - Trä- och fatlagrade öl	Gamla Pengar Punsch Oaked Double Mash IS	Martin Björck, Victoria Björck, Kristoffer Björk, Niklas Wilke, Stefan Alexi, Patrik Jargenius, Fredrik Wallerfrost	13.1	131	47	66
+101	11I - Trä- och fatlagrade öl	Allsorts Barrel Stout	Jonas Domeij	8.5	80	20	67
+217	11L - ?vriga, ?vriga klassiska ?ltyper	Cidre Robin	Mats Hellman, Patrik Lewander	7.1	58	4	0

@@ -1,26 +1,15 @@
-123	10E - Berliner weisse	Gubbliner	Claes Eliasson, Pernilla Fredriksson Eliasson	2,6	26	6	3
-124	11C - Brettanomycesöl	Gubbens Lanthus IPA 	Claes Eliasson, Pernilla Fredriksson Eliasson	5,1	47	8	56
-128	10F - Övriga klassiska syrliga öl	Sursippa	Daniel Zetterstrom, Ivan Zetterström Peter Zetterström Olivia kastebring 	4,1	40	9	10
-152	10F - Övriga klassiska syrliga öl	Fermentörernas Florida Weisse MangoPassion	Magnus Vasilis, Martin Jonsson & Jonas Wetterlundh	4,8	42	6	5
-161	11C - Brettanomycesöl	Ich Bin Ein Brettliner	Henrik Andersson	5,0	50	12	2
-167	10B - Gueze	Geuze gooik	Kalle Andersson	5,3	42	2	1000
-168	10D - Oud bruin	Brunt skit	Kalle Andersson	5,5	50	8	18
-169	10D - Oud bruin	ADK Oud Bruin	Kalle Andersson	6,2	55	8	18
-171	10E - Berliner weisse	Varannan Weissen	Jimmy Berglund	3,3	31	6	3
-172	10F - Övriga klassiska syrliga öl	Berliner mit Schwung	Jimmy Berglund	3,3	31	6	3
-173	10F - Övriga klassiska syrliga öl	Lichtenhainer	Jimmy Berglund	5,0	45	7	15
-174	10E - Berliner weisse	Berliner No 4	Tim Funck	3,6	31	4	3
-175	10F - Övriga klassiska syrliga öl	Gose No 2	Tim Funck	5,1	46	7	7
-176	10D - Oud bruin	Kolans större röda	Tim Funck	6,3	56	8	8
-177	10F - Övriga klassiska syrliga öl	Kolans lilla röda	Tim Funck, Hans Berglund	4,5	37	3	2
-186	10E - Berliner weisse	Brandenburger Weisse	Gustav Dominicus, Niklas Stenlås	3,3	29	4	5
-193	10F - Övriga klassiska syrliga öl	Lite surt, tack! (acidophilus/B.Trois/dryhop)	Oskar Frodin, Tom Virtanen	3,8	33	4	18
-198	11C - Brettanomycesöl	Braükaiser Nelson Goes Batshit Crazy	Viktor Johansson, Alexander Vallén, Oskar Mikaelsson	7,9	65	5	50
-199	10D - Oud bruin	Sur Skog	Viktor Johansson, Alexander Vallén, Oskar Mikaelsson	7,9	68	8	12
-201	10F - Övriga klassiska syrliga öl	Röda Faran	Viktor Nyman, Jens Peterson, Viktor Larsson	3,3	31	6	3
-260	10F - Övriga klassiska syrliga öl	Mr. Mangos Passion	Staffan Helmersson	5,7	48	5	15
-287	10F - Övriga klassiska syrliga öl	Whiskey sour	Joacim Nilsen	5,0	46	8	2
-293	11C - Brettanomycesöl	Snurre Sbrett	Peter Högström, Johan Säftsröm	6,7	52	1	26
-295	10E - Berliner weisse	En annan nasse!	Peter Högström, Anette Bengtson	3,4	28	2	6
-313	11C - Brettanomycesöl	Ljuger - Wit och Brett	Mattias Persson, Emil Edbom, Andreas Bastås, Sebastian Grönqvist	7,9	72	12	12
-316	10E - Berliner weisse	Aus Berlin mit Schuss	Stefan Backlund, Monica Backlund	2,9	28	6	3
+96	 Klass 5	Syrligt och Spontanjäst öl
+207	10A - Lambik	Bye bye	Jonas Gönczi	4.7	0	0	5
+156	10B - Gueze	Uppsala Megablend	Gustav Dominicus, Jakob Carlström, Niklas Stenlås, Kjell Eriksson, Helena Eriksson, Maria Sandhill, Håkan Gunneriusson, Saga Wistman Gunneriusson	6.0	48	3	8
+153	10C - Fruktlambik	lafamilja framboise inte bitter bara sur	Gogo Jägestedt, daniel jägestedt, joel jägestedt	6.8	1	2	5
+202	10C - Fruktlambik	The Blood Orange Veil	anders jansson	6.2	50	1	5
+228	10C - Fruktlambik	Snout Spout	Henrik Hildemar	7.0	60	5	0
+203	10E - Berliner weisse	Blueberry king cake	T/T Brewery	6.0	15	4	0
+113	10E - Berliner weisse	Raspberry Mojito!	Niklas Mannberg	5.0	50	10	0
+211	10F - ?vriga klassiska syrliga ?l	Kvicken	Maja Koivunen	5.0	42	4	0
+144	10F - Övriga klassiska syrliga öl	Poseidon	Filip Strand, Per Karlsson, Stefan Eriksson	5.0	53	15	5
+259	10F - Övriga klassiska syrliga öl	Peaches and Cream	William Shepard, Sophia Shepard	4.7	51	15	15
+206	10F - Övriga klassiska syrliga öl	Hydrornas krutsuris	Drolle, Loke	6.0	62	18	11
+148	10F - Övriga klassiska syrliga öl	Just Another Gose	Fredrik Ek	4.6	1	1	9
+174	10F - Övriga klassiska syrliga öl	Banan Melon Kiwi &#38; Citron	Tor Björnsson, Johan Wallén, Frej Björnsson	6.2	56	9	0
+136	10F - Övriga klassiska syrliga öl	Ned Flanders red, Caractere Ernerouge	Erik Ernerudh, Johan Ernerudh	6.5	55	5	11
