@@ -100,7 +100,7 @@ function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings)
             if ($rating->beerEntryId > 0 && $categoryId == $rating->categoryId) { //exta check
                 
                 //ratingScore, garantera att den finns, +  att det är en int eller null
-                if (!$rating->ratingScore)
+                if (!isset($rating->ratingScore))
                     $rating->ratingScore = "";
                 $ratingScore = $rating->ratingScore  == "" ?  null : $rating->ratingScore;
                 if ($ratingScore !== null && ($ratingScore = filter_var($ratingScore, FILTER_VALIDATE_INT)) === false) {
