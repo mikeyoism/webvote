@@ -127,7 +127,7 @@ var beer_db = function () {
 					cid = bid = null;
 
 
-				if (DEBUGMODE) { console.log('@user_ratings for votecode=' + user_data.vote_code); console.log(user_data.ratings); }
+				
 				update_vote_code(user_data.vote_code);
 				initialize_html(startupClass);
 
@@ -202,10 +202,11 @@ var beer_db = function () {
 		else {
 			last_compare_function = compare_beers_by_entry_code; //default
 		}
-		//store emply user_data to localstorage, for next reload etc
+		//store empty user_data to localstorage, for next reload etc
 		if (reset === true) {
 			saveToLocalStorage();
 		}
+		if (DEBUGMODE) { console.log('@user_ratings for votecode=' + user_data.vote_code); console.log(user_data.ratings); }
 	}
 
 
@@ -470,7 +471,7 @@ var beer_db = function () {
 			}
 		});
 
-		$('#class-search-beer').on('keyup', function (e) {
+		$('#menu-search-beer').on('keyup', function (e) {
 			var searchstr = $(this).val();
 			if (searchstr.length >= 3) {
 				//find the beer(s) with the searchstr
@@ -830,7 +831,7 @@ var beer_db = function () {
 				$('.rating-comment').prop('disabled', !vote_code_ok);
 			}
 		}
-		if (DEBUGMODE) { console.log('@update_rating_allowed, vote_code_ok=' + vote_code_ok + ', competition_open=' + competition_open); }		
+		//if (DEBUGMODE) { console.log('@update_rating_allowed, vote_code_ok=' + vote_code_ok + ', competition_open=' + competition_open); }		
 	}
 
 
