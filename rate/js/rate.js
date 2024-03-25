@@ -91,52 +91,6 @@ var beer_db = function () {
 			}
 		});
 	}
-	function init_user_data(reset = false) {
-		//cached data, or new session
-		var user_data_string = null;
-
-		if (reset !== true) {
-			user_data_string = localStorage.getItem("user_data_" + competition_id);
-		}
-		if (user_data_string != null) {
-			user_data = JSON.parse(user_data_string);
-		}
-		else {
-			user_data = { beers: {}, vote_code: '', votes: {}, ratings: {} };
-			$.each(classes, function (i, vote_class) {
-				user_data.votes[vote_class.id] = {};
-			});
-			$.each(classes, function (i, vote_class) {
-				user_data.ratings[vote_class.id] = [];
-			});
-
-		}
-		if (user_data.last_compare_function_name != null) {
-			//name of function is stored, set last_compare_function
-			switch (user_data.last_compare_function_name) {
-				case 'compare_beers_by_entry_code':
-					last_compare_function = compare_beers_by_entry_code;
-					break;
-				case 'compare_beers_by_rating':
-					last_compare_function = compare_beers_by_rating;
-					break;
-				case 'compare_beers_by_style':
-					last_compare_function = compare_beers_by_style;
-					break;
-				default:
-					last_compare_function = compare_beers_by_entry_code;
-			}
-
-		}
-		else {
-			last_compare_function = compare_beers_by_entry_code; //default
-		}
-		//store emply user_data to localstorage, for next reload etc
-		if (reset === true) {
-			saveToLocalStorage();
-		}
-	}
-
 	function init() {
 		getRateSettings().done(function () {
 			get_competition_data().done(function () {
@@ -196,6 +150,60 @@ var beer_db = function () {
 		});
 
 	}
+	function saveToLocalStorage() {
+		//set user_data.last_compare_function_name
+		if (last_compare_function !== null)
+			user_data.last_compare_function_name = last_compare_function.name;
+
+		localStorage.setItem('user_data_' + competition_id, JSON.stringify(user_data));
+
+	}	
+	function init_user_data(reset = false) {
+		//cached data, or new session
+		var user_data_string = null;
+
+		if (reset !== true) {
+			user_data_string = localStorage.getItem("user_data_" + competition_id);
+		}
+		if (user_data_string != null) {
+			user_data = JSON.parse(user_data_string);
+		}
+		else {
+			user_data = { beers: {}, vote_code: '', votes: {}, ratings: {} };
+			$.each(classes, function (i, vote_class) {
+				user_data.votes[vote_class.id] = {};
+			});
+			$.each(classes, function (i, vote_class) {
+				user_data.ratings[vote_class.id] = [];
+			});
+
+		}
+		if (user_data.last_compare_function_name != null) {
+			//name of function is stored, set last_compare_function
+			switch (user_data.last_compare_function_name) {
+				case 'compare_beers_by_entry_code':
+					last_compare_function = compare_beers_by_entry_code;
+					break;
+				case 'compare_beers_by_rating':
+					last_compare_function = compare_beers_by_rating;
+					break;
+				case 'compare_beers_by_style':
+					last_compare_function = compare_beers_by_style;
+					break;
+				default:
+					last_compare_function = compare_beers_by_entry_code;
+			}
+
+		}
+		else {
+			last_compare_function = compare_beers_by_entry_code; //default
+		}
+		//store emply user_data to localstorage, for next reload etc
+		if (reset === true) {
+			saveToLocalStorage();
+		}
+	}
+
 
 
 	function initialize_html(startupClass = 0) {
@@ -282,10 +290,6 @@ var beer_db = function () {
 
 
 
-		
-
-
-
 		//welcome-popup-lesshelp click
 		$('#welcome-popup-infoheader').on('click', function (e) {
 
@@ -300,6 +304,7 @@ var beer_db = function () {
 		if (bid != null) {
 			$('#vote-proceed-no-code-button').hide();
 		}
+		
 		var startupClassIndex = 0;
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
@@ -494,13 +499,6 @@ var beer_db = function () {
 
 	} //end of initialize_html
 
-	function popup_beer_by_id(beer_id) {
-
-		if (beer_id != null) {
-			popup_beer(beer_id, null, true);
-			$('#beer-popup').modal('show');
-		}
-	}
 
 
 	function update_no_vote_code_alert() {
@@ -548,14 +546,7 @@ var beer_db = function () {
 			}
 		}
 	}
-	function saveToLocalStorage() {
-		//set user_data.last_compare_function_name
-		if (last_compare_function !== null)
-			user_data.last_compare_function_name = last_compare_function.name;
 
-		localStorage.setItem('user_data_' + competition_id, JSON.stringify(user_data));
-
-	}
 
 	function compare_beers_by_entry_code(a, b) {
 		var a_code = beers[a].entry_code;
@@ -624,14 +615,7 @@ var beer_db = function () {
 		return compare_beers_by_entry_code(a, b);
 	}
 
-
-	function get_ratings_in_class(class_id) {
-		var ratings = user_data.ratings[class_id];
-		if (ratings == undefined) {
-			ratings = [];
-		}
-		return ratings;
-	}
+   //get rating from user_data.ratings
 	function get_rating(class_id, beer_entry_id) {
 		var rating = {
 			categoryId: class_id,
@@ -749,6 +733,13 @@ var beer_db = function () {
 	}
 
 
+	function popup_beer_by_id(beer_id) {
+
+		if (beer_id != null) {
+			popup_beer(beer_id, null, true);
+			$('#beer-popup').modal('show');
+		}
+	}
 	function popup_beer(item_id, e, isentry_code = false) {
 		if (isentry_code) {
 			var found = false;
@@ -794,9 +785,6 @@ var beer_db = function () {
 
 
 
-
-
-
 		$("#popup-comment").val(comment);
 
 
@@ -818,6 +806,7 @@ var beer_db = function () {
 		window.location.hash = 'modal-beer-popup'; // Used to trap back button
 	}
 
+
 	function update_rating_in_beer_list(entry_id, rating) {
 		var rating_span = $('#rating-display-' + entry_id);
 		rating_span.html(get_rating_string(rating));
@@ -826,8 +815,7 @@ var beer_db = function () {
 	function get_rating_string(rating) {
 		return '<span class="gold">' + '&#9733;'.repeat(rating) + '</span>'
 			+ '<span class="grey">' + '&#9734;'.repeat(5 - rating) + '</span>';
-		// return '<span class="fa fa-star fa-fw gold"></span>'.repeat(rating)
-		//    + '<span class="fa fa-star fa-fw grey"></span>'.repeat(5 - rating);
+
 	}
 	function update_drank_in_beer_list(entry_id, drank) {
 		var drank_span = $('#drank-display-' + entry_id);
@@ -872,7 +860,7 @@ var beer_db = function () {
 		}
 	}
 
-	//read ratings
+	//read ratings from backend and update local storage etc
 	function read_ratings() {
 		$.ajax({
 			type: "POST",
@@ -924,7 +912,7 @@ var beer_db = function () {
 
 		});
 	}
-	//store ratings
+	//store ratings to backend
 	function store_ratings() {
 		return $.ajax({
 			type: "POST",
@@ -958,7 +946,7 @@ var beer_db = function () {
 		});
 	}
 
-
+	//get competition status from backend
 	function get_competition_status(args) {
 		$.ajax({
 			type: "POST",
