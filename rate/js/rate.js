@@ -27,6 +27,9 @@ var beer_db = function () {
 	var VOTE_CODE_LEN = 6;
 	var competition_name = "";
 	var competition_open = false;
+	var competition_closes_hhmm = "";
+	var competition_seconds_to_close = 0;
+	var competition_seconds_to_open = 0;
 	var competition_has_closed = false; //only true if competition has closed after first being open
 
 	//url parameters competition id and beer id
@@ -945,7 +948,41 @@ var beer_db = function () {
 			}
 		});
 	}
+	function update_ui_competition_status() {
+		var style_class = 'd-inline-block pl-3 pr-3 mb-3';
+		if (ENABLE_RATING === false) {
+			style_class += ' bg-danger text-white';
+			var open_closed_text = 'Betygsättningen är avstängd av tävlingsledningen';
+			$('.rating').addClass('d-none'); //hide rating stars
+		} else {
+			$('.rating').removeClass('d-none');
+			if (competition_open) {
+				
+				if (competition_seconds_to_close < 60) {
+					style_class += ' bg-danger text-white'
+				} else if (competition_seconds_to_close < 600) {
+					style_class += ' bg-warning text-white'
+				} else {
+					style_class += ' bg-info text-white'
+				}
+				var open_closed_text = 'Betygsätt fram till kl. ' + competition_closes_hhmm + ', det är  '
+					+ secondsToRemainString(competition_seconds_to_close) + ' kvar.';
+			} else {
+				if (competition_seconds_to_open < 0) {
+					style_class += ' bg-danger text-white';
+					var open_closed_text = 'Betygsättningen har stängt.';
+					competition_has_closed = true;
+				} else {
+					style_class += ' bg-warning';
+					var open_closed_text = 'Betygsättningen öppnar om '
+						+ secondsToString(competition_seconds_to_open) + '.';
+				}
+			}
+		}
+		update_rating_allowed();
 
+		$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);		
+	}
 	//get competition status from backend
 	function get_competition_status(args) {
 		$.ajax({
@@ -983,42 +1020,20 @@ var beer_db = function () {
 					competition_name = response.competition_name;
 					$('#competition-name').html(competition_name);
 				}
-
-
-				var style_class = 'd-inline-block pl-3 pr-3 mb-3';
-				if (ENABLE_RATING === false) {
-					style_class += ' bg-danger text-white';
-					var open_closed_text = 'Betygsättningen är avstängd av tävlingsledningen';
-					$('.rating').addClass('d-none'); //TODO
-				} else {
-					$('.rating').removeClass('d-none');
-					if (response.competition_open) {
-						competition_open = true;
-						if (response.competition_seconds_to_close < 60) {
-							style_class += ' bg-danger text-white'
-						} else if (response.competition_seconds_to_close < 600) {
-							style_class += ' bg-warning text-white'
-						} else {
-							style_class += ' bg-info text-white'
-						}
-						var open_closed_text = 'Betygsätt fram till kl. ' + response.competition_closes_hhmm + ', det är  '
-							+ secondsToRemainString(response.competition_seconds_to_close) + ' kvar.';
-					} else {
-						competition_open = false;
-						if (response.competition_seconds_to_open < 0) {
-							style_class += ' bg-danger text-white';
-							var open_closed_text = 'Betygsättningen har stängt.';
-							competition_has_closed = true;
-						} else {
-							style_class += ' bg-warning';
-							var open_closed_text = 'Betygsättningen öppnar om '
-								+ secondsToString(response.competition_seconds_to_open) + '.';
-						}
-					}
+				if (response.competition_open != null) {
+					competition_open = response.competition_open;
 				}
-				update_rating_allowed();
+				if (response.competition_closes_hhmm != null) {
+					competition_closes_hhmm = response.competition_closes_hhmm;
+				}
+				if (response.competition_seconds_to_close != null) {
+					competition_seconds_to_close = response.competition_seconds_to_close;
+				}
+				if (response.competition_seconds_to_open != null) {
+					competition_seconds_to_open = response.competition_seconds_to_open;
+				}
+				update_ui_competition_status();
 
-				$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);
 
 
 
