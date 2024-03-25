@@ -164,6 +164,7 @@ var beer_db = function () {
 	function init_user_data(reset = false) {
 		//cached data, or new session
 		var user_data_string = null;
+		if (DEBUGMODE) console.log('@init_user_data, reset=' + reset);
 
 		if (reset !== true) {
 			user_data_string = localStorage.getItem("user_data_" + competition_id);
@@ -441,6 +442,7 @@ var beer_db = function () {
 
 		//popup-drank click
 		$("#popup-drank-rot").on("click", function (event) {
+			//workaround variable as $("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true) has no effefct
 			if (!drank_checking_allowed) {
 				event.preventDefault();
 				event.stopPropagation();
@@ -501,54 +503,6 @@ var beer_db = function () {
 		});
 
 	} //end of initialize_html
-
-
-
-	function update_no_vote_code_alert() {
-		if (vote_code_ok) {
-			$('#popup-alert-no-vote-code').hide();
-
-
-		} else {
-			$('#popup-alert-no-vote-code').show();
-		}
-		update_rating_allowed();
-	}
-
-	//workaround variable for click event on the drank icon
-	var drank_checking_allowed = true;
-	//enable/disable fieldsets
-	function update_rating_allowed() {
-
-
-		if (!ENABLE_RATING || !competition_open) {
-			$('.rating').prop('disabled', true);
-		} else {
-			$('.rating').prop('disabled', !vote_code_ok);
-		}
-		//disable all changes if rating is disabled by competition sys-setting
-		if (!ENABLE_RATING) {
-			//popup-drank child checkbox
-			//$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
-			drank_checking_allowed = false;
-
-			$('.rating-comment').prop('disabled', true);
-		}
-		else {
-			//disable drank and comment if competition has not yet opened
-			//it's ok to leave comments and drank-checks, after competition/rating has closed
-			if (!competition_open && !competition_has_closed) {
-				//$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", true);
-				drank_checking_allowed = false;
-				$('.rating-comment').prop('disabled', true);
-			}
-			else {
-				//$("input[type='checkbox'][name='popup-drankcheck']").prop("disabled", !vote_code_ok);
-				drank_checking_allowed = vote_code_ok;
-				$('.rating-comment').prop('disabled', !vote_code_ok);
-			}
-		}
-	}
 
 
 	function compare_beers_by_entry_code(a, b) {
@@ -830,8 +784,59 @@ var beer_db = function () {
 
 
 
+
+	function update_no_vote_code_alert() {
+		if (vote_code_ok) {
+			$('#popup-alert-no-vote-code').hide();
+
+
+		} else {
+			$('#popup-alert-no-vote-code').show();
+		}
+		update_rating_allowed();
+	}
+
+	//workaround variable for click event on the drank icon
+	var drank_checking_allowed = true;
+	//enable/disable fieldsets
+	function update_rating_allowed() {
+
+
+
+		if (!ENABLE_RATING || !competition_open) {
+			$('.rating').prop('disabled', true);
+		} else {
+			$('.rating').prop('disabled', !vote_code_ok);
+		}
+		//disable all changes if rating is disabled by competition sys-setting
+		if (!ENABLE_RATING) {
+			//popup-drank child checkbox
+			
+			drank_checking_allowed = false;
+
+			$('.rating-comment').prop('disabled', true);
+		}
+		else {
+			//disable drank and comment if competition has not yet opened
+			//it's ok to leave comments and drank-checks, after competition/rating has closed
+			if (!competition_open && !competition_has_closed) {
+				
+				drank_checking_allowed = false;
+				$('.rating-comment').prop('disabled', true);
+			}
+			else {
+				
+				drank_checking_allowed = vote_code_ok;
+				$('.rating-comment').prop('disabled', !vote_code_ok);
+			}
+		}
+		if (DEBUGMODE) { console.log('@update_rating_allowed, vote_code_ok=' + vote_code_ok + ', competition_open=' + competition_open); }		
+	}
+
+
 	function update_vote_code(code) {
 
+		if (DEBUGMODE) { console.log('@update_vote_code: ' + code);}
 
 		if (code !== user_data.vote_code) {
 			//init new user_data
@@ -862,7 +867,42 @@ var beer_db = function () {
 			fill_beer_lists(last_compare_function, activeTab); //show all beers, no ratings
 		}
 	}
+	function update_ui_competition_status() {
+		var style_class = 'd-inline-block pl-3 pr-3 mb-3';
+		if (ENABLE_RATING === false) {
+			style_class += ' bg-danger text-white';
+			var open_closed_text = 'Betygsättningen är avstängd av tävlingsledningen';
+			$('.rating').addClass('d-none'); //hide rating stars
+		} else {
+			$('.rating').removeClass('d-none');
+			if (competition_open) {
+				
+				if (competition_seconds_to_close < 60) {
+					style_class += ' bg-danger text-white'
+				} else if (competition_seconds_to_close < 600) {
+					style_class += ' bg-warning text-white'
+				} else {
+					style_class += ' bg-info text-white'
+				}
+				var open_closed_text = 'Betygsätt fram till kl. ' + competition_closes_hhmm + ', det är  '
+					+ secondsToRemainString(competition_seconds_to_close) + ' kvar.';
+			} else {
+				if (competition_seconds_to_open < 0) {
+					style_class += ' bg-danger text-white';
+					var open_closed_text = 'Betygsättningen har stängt.';
+					competition_has_closed = true;
+				} else {
+					style_class += ' bg-warning';
+					var open_closed_text = 'Betygsättningen öppnar om '
+						+ secondsToString(competition_seconds_to_open) + '.';
+				}
+			}
+		}
+		update_rating_allowed();
 
+		$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);		
+		//if (DEBUGMODE) { console.log('@update_ui_competition_status: ' + open_closed_text); }
+	}
 	//read ratings from backend and update local storage etc
 	function read_ratings() {
 		$.ajax({
@@ -930,7 +970,7 @@ var beer_db = function () {
 				ratings: user_data.ratings
 			}),
 			success: function (response) {
-				if (DEBUGMODE) { console.log("@pre_store_ratings"); console.log(user_data.ratings) };
+				//if (DEBUGMODE) { console.log("@pre_store_ratings"); console.log(user_data.ratings) };
 				//if the server accepted the ratings, save them to localstorage
 				if (response.msgtype == 'OK') {
 					saveToLocalStorage();
@@ -940,7 +980,7 @@ var beer_db = function () {
 
 
 
-				if (DEBUGMODE) { console.log("@store_ratings"); console.log(response) };
+				if (DEBUGMODE) { console.log("@store_ratings result"); console.log(response) };
 			},
 			error: function (xhr, textStatus, errorThrown) {
 				if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
@@ -948,41 +988,7 @@ var beer_db = function () {
 			}
 		});
 	}
-	function update_ui_competition_status() {
-		var style_class = 'd-inline-block pl-3 pr-3 mb-3';
-		if (ENABLE_RATING === false) {
-			style_class += ' bg-danger text-white';
-			var open_closed_text = 'Betygsättningen är avstängd av tävlingsledningen';
-			$('.rating').addClass('d-none'); //hide rating stars
-		} else {
-			$('.rating').removeClass('d-none');
-			if (competition_open) {
-				
-				if (competition_seconds_to_close < 60) {
-					style_class += ' bg-danger text-white'
-				} else if (competition_seconds_to_close < 600) {
-					style_class += ' bg-warning text-white'
-				} else {
-					style_class += ' bg-info text-white'
-				}
-				var open_closed_text = 'Betygsätt fram till kl. ' + competition_closes_hhmm + ', det är  '
-					+ secondsToRemainString(competition_seconds_to_close) + ' kvar.';
-			} else {
-				if (competition_seconds_to_open < 0) {
-					style_class += ' bg-danger text-white';
-					var open_closed_text = 'Betygsättningen har stängt.';
-					competition_has_closed = true;
-				} else {
-					style_class += ' bg-warning';
-					var open_closed_text = 'Betygsättningen öppnar om '
-						+ secondsToString(competition_seconds_to_open) + '.';
-				}
-			}
-		}
-		update_rating_allowed();
 
-		$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);		
-	}
 	//get competition status from backend
 	function get_competition_status(args) {
 		$.ajax({
