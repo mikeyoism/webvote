@@ -733,8 +733,8 @@ var beer_db = function () {
 		if (user_rating_class != undefined) {
 			$.each(user_rating_class, function (i, obj) {
 				if (obj.beerEntryId == beer_entry_id) {
-					rating = obj.ratingScore;
-					comment = obj.ratingComment;
+					rating = obj.ratingScore === null ? '' : obj.ratingScore;
+					comment = obj.ratingComment === null ? '' : obj.ratingComment;
 					drank = (obj.drankCheck === "1" || obj.drankCheck === 1 || obj.drankCheck === true) ? true : false;
 					return false;
 				}
