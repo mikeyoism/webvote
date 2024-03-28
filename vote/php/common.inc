@@ -877,6 +877,8 @@ class DbAccess
                     $ratedScoreCount++; //integrity check, should be zero
 
             }
+            
+            $weightedScores[$voteCodeId]['VoteCodeStat']['ratedPercent'] = $ratingCount / $beerCountforCategory * 100;
             $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreSum'] = $ratingScoreSum;
             $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'] = $ratingScoreCount > 0 ? $ratingScoreSum / $ratingScoreCount : 0;
             
@@ -897,34 +899,41 @@ class DbAccess
                 $diff = $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMedian'] -$weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'];
             
             $weightedScores[$voteCodeId]['VoteCodeStat']['MeanMedianDiff'] = $diff;
+            //count high & low ratings
+            $top = $weightedScores[$voteCodeId]['VoteCodeStat']['ScoreCounts'][4] +$weightedScores[$voteCodeId]['VoteCodeStat']['ScoreCounts'][5]; 
+            $low = $weightedScores[$voteCodeId]['VoteCodeStat']['ScoreCounts'][1] +$weightedScores[$voteCodeId]['VoteCodeStat']['ScoreCounts'][2];
+            $weightedScores[$voteCodeId]['VoteCodeStat']['top'] = $top;
+            $weightedScores[$voteCodeId]['VoteCodeStat']['low'] = $low;
+
+            $weightedScores[$voteCodeId]['VoteCodeStat']['topPercent'] = $top / $beerCountforCategory * 100;
+            $weightedScores[$voteCodeId]['VoteCodeStat']['lowPercent'] = $low / $beerCountforCategory * 100;
+            $weightedScores[$voteCodeId]['VoteCodeStat']['lowTopRatio'] = $low / $top;            
 
             //note: 0.5 is the lowest value allowed (no divide by zero if normalizing), 
             //it's also a way to prevent a single voter from skewing the results too much
             //as it (0.5) kicks in and affects the scaling further below, when the diff is high and weightedMaxScore drops to <=2, 
             //thus
             //it kicks in as floor for a single vote on just one beer in the class,
-            //or multiple votes all with the same rating of 5
-            //or multiple votes on a few beers with a high mean
+            //or multiple ratings all with the same rating of 5
+            //or multiple ratings on a few beers with a high mean
             $weightedMaxScore = max(0.5,$weightedMaxScore -$diff); 
             $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScore'] = $weightedMaxScore;
-            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = $weightedMaxScore; //no further  adjustment atm, deprecated
+            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = $weightedMaxScore; 
             
-            //alternative, deprecated:
-            //$weightedMaxScore = max(0,$weightedMaxScore -$diff); 
-            //$weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScore'] = $weightedMaxScore;
 
-            //calculate the average of the weighted maximum score and the rating score mean, as a way to reduce the weightedMaxScore, and promote a more even distribution of points
-            //(this is not suitable without some extreme edge handling)
-            //$weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = ($weightedMaxScore + $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean']) / 2.5;            
-            
-            //extreme edge case, a single vote, or less than 15% of the beers rated, should not be able to skew the results (The Adjusted weightedMaxScore above will be too high in these cases))
-            // if ($ratingCount == 1 && $beerCountforCategory > 5)
-            //    $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1;
-            // else if ($ratingCount < $beerCountforCategory * 0.15) 
-            //     $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1.5;
+            //produce a reduced range - a lower weightedMaxScoreAdj, for the following cases of skewed ratios /voting patterns
 
-            
+            //extreme edge, less than 10% of ratings, like one 5-star rating, and 1 or 2 1-star rating, ratio 1:1 to 1:2, should not be able to skew the results more than when voting on many beers
+            if ($top > 0 && $low > 0  && $ratingCount < $beerCountforCategory * 0.1 && $weightedMaxScore>= 2) 
+                  $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] /= 2.5;
+
+            //detect a high 1:3+ of low ratings vs high ratings, and reduce the weightedMaxScoreAdj proportionally
+            //the extreme edge case is a single voter that rates all beers in the class with a 1-star rating except 1 beer with a 5-star rating, ratio 1:veryhigh
+            else if ($top > 0 && $low > 0 && $weightedScores[$voteCodeId]['VoteCodeStat']['lowTopRatio'] >= 3 && $weightedMaxScore>= 2)
+                $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] /= (1.25 + ($weightedScores[$voteCodeId]['VoteCodeStat']['lowTopRatio'] /12.5)); 
+  
             $weightedMaxScoreAdj = $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'];
+            
             
             // Calculate the weighted score for each beerEntryId
             foreach ($weightedScores[$voteCodeId] as $beerEntryId => $score) {
@@ -939,8 +948,7 @@ class DbAccess
 
                     $weightedScores[$voteCodeId][$beerEntryId]['weightedScore'] = $scaledRatingScore; 
                     $weightedScores[$voteCodeId][$beerEntryId]['weightedScoreNorm'] = $scaledRatingScoreN;
-
-                    
+                    //alternatively we could furhter punish a high lowTopRatio by applying the normalized score here
 
                     
                 }
@@ -949,12 +957,13 @@ class DbAccess
                 
             
         }
+        //debug output - to evaulate the algorithms above, preferbly run this with 1 voteCodeId
         if (CONST_SYS_JS_DEBUG){
             echo '<pre>';
             foreach ($voteCodeIds as $voteCodeId) {
             
             print_r($weightedScores[$voteCodeId]['VoteCodeStat']);
-            //print_r($weightedScores[$voteCodeId]);
+            
             }
             echo '</pre>';
         }        

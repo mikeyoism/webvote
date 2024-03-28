@@ -64,8 +64,8 @@ foreach ($categories as $category) {
 ?>
         <tr>
         <td><?=$row['beerEntryId']?></td>
-        <td><?=$row['weightedScore']?></td>
-        <td><?=$row['weightedScoreNorm']?></td>
+        <td><?=round($row['weightedScore'],5)?></td>
+        <td><?=round($row['weightedScoreNorm'],5)?></td>
         <td><?=$row['votersCount']?></td>
         <td><?=$row['ratingScore']?></td>
         <td><?=$row['weightedMeanValue']?></td>

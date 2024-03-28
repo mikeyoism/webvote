@@ -383,7 +383,12 @@ var beer_db = function () {
 			}
 		});
 
-
+		//close ths popup on enter key
+		$('#beer-popup').on('keypress', function (e) {
+			if (e.which == 13) {
+				$('#beer-popup').modal('hide');
+			}
+		});
 		//popup beer close event
 		$("#beer-popup").on('hidden.bs.modal', function (event) {
 			if (user_data.vote_code.length == VOTE_CODE_LEN) {
@@ -762,6 +767,7 @@ var beer_db = function () {
 
 		current_popup_item_id = item_id;
 		window.location.hash = 'modal-beer-popup'; // Used to trap back button
+
 	}
 
 
