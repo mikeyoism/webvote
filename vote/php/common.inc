@@ -898,33 +898,30 @@ class DbAccess
             
             $weightedScores[$voteCodeId]['VoteCodeStat']['MeanMedianDiff'] = $diff;
 
-            // if ($diff >= 3.0)
-            //     $weightedMaxScore = $weightedMaxScore - 5;
-            // else
-            // if ($diff >= 2.0)
-            //     $weightedMaxScore = $weightedMaxScore - 3;
-            // else if ($diff >= 1.5)
-            //     $weightedMaxScore = $weightedMaxScore - 2;
-            // else if ($diff >= 1.0)
-            //     $weightedMaxScore = $weightedMaxScore - 1.5;
-            // else if ($diff >= 0.75)
-            //     $weightedMaxScore = $weightedMaxScore - 1;
-            // else if ($diff >= 0.5)
-            //     $weightedMaxScore = $weightedMaxScore - 0.5;
-            // else if ($diff >= 0.25)
-            //     $weightedMaxScore = $weightedMaxScore - 0.25;
-
-            $weightedMaxScore = max(0,$weightedMaxScore -$diff);
+            //note: 0.5 is the lowest value allowed (no divide by zero if normalizing), 
+            //it's also a way to prevent a single voter from skewing the results too much
+            //as it (0.5) kicks in and affects the scaling further below, when the diff is high and weightedMaxScore drops to <=2, 
+            //thus
+            //it kicks in as floor for a single vote on just one beer in the class,
+            //or multiple votes all with the same rating of 5
+            //or multiple votes on a few beers with a high mean
+            $weightedMaxScore = max(0.5,$weightedMaxScore -$diff); 
             $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScore'] = $weightedMaxScore;
-            //calculate the average of the weighted maximum score and the rating score mean, as a way to adjust the weightedMaxScore
-            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = ($weightedMaxScore + $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean']) / 2.5;
+            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = $weightedMaxScore; //no further  adjustment atm, deprecated
             
+            //alternative, deprecated:
+            //$weightedMaxScore = max(0,$weightedMaxScore -$diff); 
+            //$weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScore'] = $weightedMaxScore;
+
+            //calculate the average of the weighted maximum score and the rating score mean, as a way to reduce the weightedMaxScore, and promote a more even distribution of points
+            //(this is not suitable without some extreme edge handling)
+            //$weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = ($weightedMaxScore + $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean']) / 2.5;            
             
-            //extreme edge case, a single vote, or less than 15% of the beers rated, should not be able to skew the results (The Adjusted weightedMaxScore above will be 2 in these cases))
-            if ($ratingCount == 1 && $beerCountforCategory > 5)
-                $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1;
-            else if ($ratingCount < $beerCountforCategory * 0.15) 
-                $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1.5;
+            //extreme edge case, a single vote, or less than 15% of the beers rated, should not be able to skew the results (The Adjusted weightedMaxScore above will be too high in these cases))
+            // if ($ratingCount == 1 && $beerCountforCategory > 5)
+            //    $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1;
+            // else if ($ratingCount < $beerCountforCategory * 0.15) 
+            //     $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1.5;
 
             
             $weightedMaxScoreAdj = $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'];
