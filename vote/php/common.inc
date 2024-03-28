@@ -325,7 +325,7 @@ class DbAccess
             } else {
                 $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
                 if ($fv_class_id_nr == 0)
-                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
+                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
                 $classIndex = $classOffset + $fv_class_id_nr;
             }
 
@@ -934,7 +934,7 @@ class DbAccess
   
             $weightedMaxScoreAdj = $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'];
             
-            
+
             // Calculate the weighted score for each beerEntryId
             foreach ($weightedScores[$voteCodeId] as $beerEntryId => $score) {
                 if ($beerEntryId == 'VoteCodeStat') {
