@@ -51,12 +51,13 @@ $categories = $dbAccess->getCategories($competition['id']);
 foreach ($categories as $category) {
 ?>
 <h2>Kategori <?=$category['name']?> - <?=$category['description']?></h2>
+<p>Klassen har <strong><?=$dbAccess->getBeerCountForCategory($category['id'])?>st </strong> registrerade tävlingsbidrag att rösta på.</p>
 <p><strong><?=$dbAccess->getVoteCodeCount($category['id'], $voteCountStartTime)?>st </strong> besökare 
  har druckit av <strong><?=$dbAccess->getDrankCheckCount($category['id'], $voteCountStartTime)?></strong> olika öl,
  varav <strong><?=$dbAccess->getRatingCount($category['id'], $voteCountStartTime)?></strong> har fått ett betyg.
 </p>
 <table >
-<tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th><th>Antal röstare</th><th>(Oviktad råpoäng)</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th>
+<tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th><th><strong>(Normaliserad)</strong></th></th><th>Antal röstare</th><th>(Oviktad råpoäng)</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th>
 <?php
     $voteResult = $dbAccess->getRatingResultTot($category['id'], $voteCountStartTime);
     foreach ($voteResult as $row) {
@@ -64,6 +65,7 @@ foreach ($categories as $category) {
         <tr>
         <td><?=$row['beerEntryId']?></td>
         <td><?=$row['weightedScore']?></td>
+        <td><?=$row['weightedScoreNorm']?></td>
         <td><?=$row['votersCount']?></td>
         <td><?=$row['ratingScore']?></td>
         <td><?=$row['weightedMeanValue']?></td>

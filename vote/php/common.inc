@@ -4,6 +4,7 @@ class DbAccess
 {
     private $dbConn = null;
     private $dbConnDb2_Eventreg = null;
+    protected $NrOfBeersPerCategory = null; //cache for number of beers per category
 
     function __construct()
     {
@@ -225,6 +226,8 @@ class DbAccess
 
         $row = $result->fetch_assoc();
         $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+        if ($fv_class_id_nr == 0)
+            die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
         $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
         $classIndex = $classOffset + $fv_class_id_nr;
         $nextEntryId = 1;
@@ -321,6 +324,8 @@ class DbAccess
                 $classIndex = $classOffset + $fv_class_id_nr + 1;
             } else {
                 $fv_class_id_nr =  FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+                if ($fv_class_id_nr == 0)
+                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
                 $classIndex = $classOffset + $fv_class_id_nr;
             }
 
@@ -704,11 +709,16 @@ class DbAccess
         }
     }
 
+    
     //get weigthed rating results sorted by calculated total points for each beerEntryId
     public function getRatingResultTot($categoryId, $voteCountStartTime)
     {
         $competitionId = getCompetitionId();
-        $weightedScores = $this->getWeightedRatingResult($categoryId, $voteCountStartTime);
+        //get number of unique beerEntryId:s for all categories (once)
+        
+
+        $beerCountforCategory = $this->getBeerCountForCategory($categoryId);
+        $weightedScores = $this->getWeightedRatingResult($categoryId, $voteCountStartTime,$beerCountforCategory);
         $ratingResults = array();
         foreach ($weightedScores as $voteCodeId => $scores) {
             foreach ($scores as $beerEntryId => $score) {
@@ -716,10 +726,11 @@ class DbAccess
                     continue;
                 }
                 if (!array_key_exists($beerEntryId, $ratingResults)) {
-                    $ratingResults[$beerEntryId] = array('beerEntryId' => $beerEntryId, 'ratingScore' => 0, 'weightedScore' => 0, 'votersCount' => 0, 'WeightedMeanValue' => 0);
+                    $ratingResults[$beerEntryId] = array('beerEntryId' => $beerEntryId, 'ratingScore' => 0, 'weightedScore' => 0, 'weightedScoreNorm' => 0, 'votersCount' => 0, 'weightedMeanValue' => 0);
                 }
                 $ratingResults[$beerEntryId]['ratingScore'] += $score['ratingScore'];
                 $ratingResults[$beerEntryId]['weightedScore'] += $score['weightedScore'];
+                $ratingResults[$beerEntryId]['weightedScoreNorm'] += $score['weightedScoreNorm'];
                 $ratingResults[$beerEntryId]['votersCount']++;
                 //Grab beername, brewer and style from eventreg database
 
@@ -752,13 +763,15 @@ class DbAccess
 
 
     //get weigted results
-    public function getWeightedRatingResult($categoryId, $voteCountStartTime)
+    public function getWeightedRatingResult($categoryId, $voteCountStartTime,$beerCountforCategory )
     {
         //reglerna i denna funktion är till för att ta udden av eventuellt taktikröstande, 
-        //och ge en rättvis tävling där alla besökare propotionerligt kan påverka resultatet ungefär likvärdigt
+        //och ge en rättvis tävling där alla besökare propotionerligt kan påverka resultatet ungefär likvärdigt, betyg översätts  med en jämn fördelning av poäng.
         //tanken är att en vanlig besökare ska uppmuntaras att betygsätta många öl utifrån smak och tycke, liknande untappd.
         //besökaren ska inte få upplevelsen att hen sitter i en jury som ska utse vinnare 
         //och därmed föröker hitta ett fåtal favoriter att betygsätta, eller tvärt om drar sig för att betygsätta alls eftersom denne druckit för få öl i klassen för kunna "rösta rättvist"
+        
+        
 
 
 
@@ -768,8 +781,7 @@ class DbAccess
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
 
-        //get number of unique beerEntryId:s for this $categoryId
-        $beerCount = $this->getBeerEntryCount($categoryId, $voteCountStartTime);
+
 
         //each voteCodeId is a unique voter (participating user)
         //get a list of all unique voteCodeId:s for this $categoryId
@@ -784,85 +796,206 @@ class DbAccess
         $weightedScores = array();
         foreach ($voteCodeIds as $voteCodeId) {
             $sql = 'select ratingScore, drankCheck, beerEntryId ' .
-                '  from ratings where categoryId=' . $this->escape($categoryId) . ' and voteCodeId=' . $voteCodeId . $extraCond . ' order by ratingScore desc';
+                '  from ratings where categoryId=' . $this->escape($categoryId) . ' and ratingscore>0 and voteCodeId=' . $voteCodeId . $extraCond . ' order by ratingScore desc';
             $result = $this->getConnection()->query($sql) or die("getRatingResults: Query failed: $sql");
-            //Create a list of weighted ratingScores for this voteCodeId
+            //Create a list of ratingScores  and calculated WeigthedScores for this voteCodeId (voter)
             //ratingScore is a number between 1 and 5 for each beerEntryId
-            //a weigthed score of 5 is given to the highest rated beer(s), 4 to the second highest etc.
-            //the weigthedScore is the ratingScore adjusted as follows :
-            //by the total percentage of ratings this voteCodeId has put, out of total number of unique beerEntryId:s in this category
-            //a weighedScore of 5 is given to the highest rated beer(s) if the voteCodeId has rated atleast 75% of the beers in this category
-            //a weighedScore of 4 is given to the second highest rated beer(s) if the voteCodeId has rated atleast 50% of the beers in this category
-            //a weighedScore of 3 is given to the third highest rated beer(s) if the voteCodeId has rated atleast 35% of the beers in this category
-            //a weighedScore of 2 is given to the fourth highest rated beer(s) if the voteCodeId has rated atleast 15% of the beers in this category
-            //a weighedScore of 1 is given to the fifth highest rated beer(s) if the voteCodeId has rated atleast 1 of the beers in this category
+            //a ratingScore score of 5 is given to the highest rated beer(s), 4 to the second highest etc.
+
             $ratingCount = 0;
-            $weightedMaxScore = 5;
+            
             $weightedScoreCount = 0;
             //get rowcount in $result
             $ratingCount = mysqli_num_rows($result);
-            if ($ratingCount > $beerCount * 0.75) {
-                $weightedMaxScore = 5;
-            } else if ($ratingCount > $beerCount * 0.5) {
-                $weightedMaxScore = 4;
-            } else if ($ratingCount > $beerCount * 0.35) {
-                $weightedMaxScore = 3;
-            } else if ($ratingCount > $beerCount * 0.15) {
-                $weightedMaxScore = 2;
-            } else if ($ratingCount > 0) {
-                $weightedMaxScore = 1;
-            }
-            $weightedSubstract = 5 - $weightedMaxScore;
 
-
+            
             $weightedScores[$voteCodeId] = array();
+            $ratingScoreCount = array();
+            for ($i = 0; $i <= 5; $i++) { //pos zero is for null values (not rated at all)
+                $ratingScoreCount[$i] = 0;
+            }
+            
             while ($row = $result->fetch_assoc()) {
-                //insert or update weigthedScore for this beerEntryId into sql table ratings_weighted_result
+                //insert or update weigthedScore for this beerEntryId 
                 $weightedScoreCount++;
+                //count number of equal ratingScores for each voteCodeId
+                //add these to the array $ratingScoreCount
+                if (!isset($row['ratingScore']))
+                    $ratingScoreCount[0]++;
+                else if (array_key_exists($row['ratingScore'], $ratingScoreCount)) {
+                        $ratingScoreCount[$row['ratingScore']]++;
+                }
+                    
+                //initialize weightedScore to ratingScore
                 if (isset($row['ratingScore'])) { //null are common (drankcheck's) and should not be counted/listed at all
                     if ($row['ratingScore'] == 0) {
                         $weightedScore = 0;
                     } else {
-                        $weightedScore = max(1, $row['ratingScore'] - $weightedSubstract); //adjust ratingScore up to weightedMaxScore
+                        $weightedScore = $row['ratingScore']; //initialize to ratingScore
                     }
 
                     $weightedScores[$voteCodeId][$row['beerEntryId']] = array('beerEntryId' => $row['beerEntryId'], 'ratingScore' => $row['ratingScore'],  'weightedScore' => $weightedScore);
                 }
             }
-        }
-        //loop $weightedScores, calculate mean values for ratingScore and weightedScore for each voteCodeId
-        //add these to the array $weightedScores        
-        foreach ($weightedScores as $voteCodeId => $scores) {
-
+            //add zero values to $ratingScoreCount for ratingScores not present in the $result
+            //to get accuarate median value
+            $ratingScoreCount[0] = $beerCountforCategory - $weightedScoreCount;
+            //store to $weightedScores
+            $weightedScores[$voteCodeId]['VoteCodeStat']['ScoreCounts'] = $ratingScoreCount;
+            
+            //calcualte the median value in $ratingScoreCount, for detecting unusual voting patterns
+            
             $ratingScoreSum = 0;
-            $weightedScoreSum = 0;
+            $ScoreCountsSum = array_sum($ratingScoreCount);
+            $ratingScoreMedian = 0;
+            $ratingScoreMedianPos = $ScoreCountsSum / 2;
+            $ScoreCountsSum = 0;
+            foreach ($ratingScoreCount as $ratingScore => $count) {
+                $ScoreCountsSum += $count;
+                if ($ScoreCountsSum >= $ratingScoreMedianPos) {
+                    $ratingScoreMedian = $ratingScore;
+                    break;
+                }
+            }
+            $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMedian'] = $ratingScoreMedian;
+            $weightedScores[$voteCodeId]['VoteCodeStat']['ScoreCountsSum'] = $ScoreCountsSum;
+
+           
+            //calulate mean value for ratingScores for this voteCodeId, for beers rated.
+            $ratingScoreSum = 0;
             $ratingScoreCount = 0;
-            $weightedScoreCount = 0;
-            foreach ($scores as $beerEntryId => $score) {
+            $ratedScoreCount = 0;
+            foreach ($weightedScores[$voteCodeId] as $beerEntryId => $score) {
+                if ($beerEntryId == 'VoteCodeStat') {
+                    continue;
+                }
                 if ($score['ratingScore'] > 0) {
                     $ratingScoreSum += $score['ratingScore'];
                     $ratingScoreCount++;
                 }
-                if ($score['weightedScore'] > 0) {
-                    $weightedScoreSum += $score['weightedScore'];
-                    $weightedScoreCount++;
+                else
+                    $ratedScoreCount++; //integrity check, should be zero
+
+            }
+            $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreSum'] = $ratingScoreSum;
+            $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'] = $ratingScoreCount > 0 ? $ratingScoreSum / $ratingScoreCount : 0;
+            
+
+            
+            //calculate max allowed weightedScore for this voteCodeId (voter)
+            //lower weightedMaxScore using the diff betweeen ratingscoreMean and median value
+            
+            //note the Median is based on *all* beers in the category, while the mean value is based on the select beers that earned a rating by this voter
+            //thus a low diff between the median indicates that the voter has rated a lot of beers (and adjustmenst to the weightedMaxScore is not really needed)
+            //thus a high diff between the median and the mean value indicates that the voter has a few high ratings
+            //and the weightedMaxScore should be lowered to prevent this voter from skewing the results
+            $weightedMaxScore = 5;
+            
+            if ($weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'] > $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMedian'])
+                $diff = $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'] - $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMedian'];
+            else
+                $diff = $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMedian'] -$weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'];
+            
+            $weightedScores[$voteCodeId]['VoteCodeStat']['MeanMedianDiff'] = $diff;
+
+            // if ($diff >= 3.0)
+            //     $weightedMaxScore = $weightedMaxScore - 5;
+            // else
+            // if ($diff >= 2.0)
+            //     $weightedMaxScore = $weightedMaxScore - 3;
+            // else if ($diff >= 1.5)
+            //     $weightedMaxScore = $weightedMaxScore - 2;
+            // else if ($diff >= 1.0)
+            //     $weightedMaxScore = $weightedMaxScore - 1.5;
+            // else if ($diff >= 0.75)
+            //     $weightedMaxScore = $weightedMaxScore - 1;
+            // else if ($diff >= 0.5)
+            //     $weightedMaxScore = $weightedMaxScore - 0.5;
+            // else if ($diff >= 0.25)
+            //     $weightedMaxScore = $weightedMaxScore - 0.25;
+
+            $weightedMaxScore = max(0,$weightedMaxScore -$diff);
+            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScore'] = $weightedMaxScore;
+            //calculate the average of the weighted maximum score and the rating score mean, as a way to adjust the weightedMaxScore
+            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = ($weightedMaxScore + $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean']) / 2.5;
+            
+            
+            //extreme edge case, a single vote, or less than 15% of the beers rated, should not be able to skew the results (The Adjusted weightedMaxScore above will be 2 in these cases))
+            if ($ratingCount == 1 && $beerCountforCategory > 5)
+                $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1;
+            else if ($ratingCount < $beerCountforCategory * 0.15) 
+                $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'] = 1.5;
+
+            
+            $weightedMaxScoreAdj = $weightedScores[$voteCodeId]['VoteCodeStat']['weightedMaxScoreAdj'];
+            
+            // Calculate the weighted score for each beerEntryId
+            foreach ($weightedScores[$voteCodeId] as $beerEntryId => $score) {
+                if ($beerEntryId == 'VoteCodeStat') {
+                    continue;
+                }
+                if ($score['ratingScore'] > 0) {
+                    // Scale the ratingScore value into a range between 0 and weightedMaxScoreAdj
+                    $scaledRatingScore = $score['ratingScore'] / 5 * $weightedMaxScoreAdj;
+                    //normalize (compress) the weightedScore to a range between 1 and weightedMaxScoreAdj+1, so that no beer can get a score < 1
+                    $scaledRatingScoreN = $scaledRatingScore * ($weightedMaxScoreAdj - 1) / $weightedMaxScoreAdj + 1;                
+
+                    $weightedScores[$voteCodeId][$beerEntryId]['weightedScore'] = $scaledRatingScore; 
+                    $weightedScores[$voteCodeId][$beerEntryId]['weightedScoreNorm'] = $scaledRatingScoreN;
+
+                    
+
+                    
                 }
             }
-            //set mean values for this voteCodeId (just for evaluation, not stored fro results)
-            $weightedScores[$voteCodeId]['VoteCodeStat']['ratingScoreMean'] = $ratingScoreCount > 0 ? $ratingScoreSum / $ratingScoreCount : 0;
-            $weightedScores[$voteCodeId]['VoteCodeStat']['weightedScoreMean'] = $weightedScoreCount > 0 ? $weightedScoreSum / $weightedScoreCount : 0;
+            
+                
+            
         }
-
-
-
-
-
-
-
+        if (CONST_SYS_JS_DEBUG){
+            echo '<pre>';
+            foreach ($voteCodeIds as $voteCodeId) {
+            
+            print_r($weightedScores[$voteCodeId]['VoteCodeStat']);
+            //print_r($weightedScores[$voteCodeId]);
+            }
+            echo '</pre>';
+        }        
         return $weightedScores;
+
     }
 
+    //function that call getBeers, and counts then number of unique beers in each $categoryId
+    //returns an array with the number of unique beers in each $categoryId, or the count for a specific $categoryId if param $categoryId is set
+    //preferably call this function once with $categoryId = null, and use the returned array for further processing, as getBeers is a bit slow
+    protected function getBeerCountsPerCategory($categoryId = null)
+    {
+        $beers = $this->getBeers(getCompetitionId(), false);
+        $categories = $this->getCategories(getCompetitionId(), true);
+        $beerCounts = array();
+        foreach ($categories as $class) {
+            $beerCounts[$class['id']] = 0;
+        }
+        foreach ($beers as $beer) {
+            $beerCounts[$beer['class']]++;
+        }
+        if ($categoryId !== null) {
+            return $beerCounts[$categoryId];
+        }
+        return $beerCounts;
+    }
+    public function getBeerCountForCategory($categoryId)
+    {
+        //chache the result in $this->NrOfBeersPerCategory
+        if ($this->NrOfBeersPerCategory == null)
+            $this->NrOfBeersPerCategory = $this->getBeerCountsPerCategory(null);
+        
+        return $this->NrOfBeersPerCategory[$categoryId];
+    }
+    
+
     //get number of unique beerEntryId:s for this rating  $categoryId
+    //note:count rated beers, not unique beers
     public function getBeerEntryCount($categoryId, $voteCountStartTime)
     {
         if ($voteCountStartTime === null) {
@@ -910,7 +1043,7 @@ class DbAccess
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
         //note: in a correct db, drankcheck is always 1 if ratingScore>0, but we check both here for safety
-        $sql = 'select count(drankCheck) as c from ratings where categoryId=' . $this->escape($categoryId) . ' and drankCheck=1 or ratingScore>0' . $extraCond;
+        $sql = 'select count(drankCheck) as c from ratings where categoryId=' . $this->escape($categoryId) . ' and (drankCheck=1)' . $extraCond;
         $result = $this->getConnection()->query($sql) or die("getDrankCheckCount: Query failed: $sql");
         $drankCheckCount = $result->fetch_assoc()['c'];
         return $drankCheckCount;
@@ -1130,7 +1263,8 @@ function FvClass($low_alc, $main_class, $sub_class)
         (($main_class == 9) && ($sub_class == 'H')) ||
         (($main_class == 9) && ($sub_class == 'I')) ||
         (($main_class == 9) && ($sub_class == 'J')) ||
-        (($main_class == 9) && ($sub_class == 'K'))
+        (($main_class == 9) && ($sub_class == 'K')) ||
+        (($main_class == 9) && ($sub_class == 'L'))
     ) {
         $fv_class = !$as_numeric ? 'Jästdominerad öl' : '4';
     } elseif (($main_class == 10) ||
