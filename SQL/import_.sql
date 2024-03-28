@@ -20,8 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `webvote3`
 --
-DROP DATABASE IF EXISTS `webvote3`;
-CREATE DATABASE IF NOT EXISTS `webvote3` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+DROP DATABASE IF EXISTS `webvote`;
+CREATE DATABASE IF NOT EXISTS `webvote` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `webvote3`;
 
 -- --------------------------------------------------------
