@@ -95,7 +95,7 @@ if (!$openTimes['open'] && !$openTimes['timeBeforeOpen']->invert) {
         "Öppna 1 timme för test</button></form>";
 }
 ?>
-    
+       
 <hr>
 <p>Aktuellt tävlings-ID är: <?=$competitionId?>
 <?php
@@ -108,10 +108,12 @@ if ((!isset($eventRegIds) || count($eventRegIds) < 1 ) && ENABLE_RATING) {
 else {
     if  (ENABLE_RATING) {
         $eventRegIdsString = implode(', ', $competition['eventReg_ids']);
-        print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString;
+        $eventRegNames = implode(', ', $competition['eventReg_Names']);
+        $eventRegCompTypes = implode(', ', $competition['eventReg_CompType']);
+        print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString . "/" . $eventRegNames . "/" .  $eventRegCompTypes;
         if (CONST_SETTING_CONNECT_EVENTREG_DB == false){?>
             <form method='post'>
-            När EventReg-databasen är redo eller ner det sker uppdateringar i den, ska du hämta senaste ölinfo:<br>
+            <p>När EventReg-databasen är REDO (FV-Nr har tilldelats) eller när det sker uppdateringar i den, ska du hämta senaste ölinfo:</p><br>
         <button type="submit" name='cacheEventRegData'>Cache senaste ölinfo från från Event-Reg databasen </button>
         </form>    
         <?php
