@@ -1011,11 +1011,14 @@ var beer_db = function () {
 				//if (DEBUGMODE) console.log(response);
 				//todo: break out the competition status to a separate function for instant calls (see refs in the code below)
 				if (response.competition_id != competition_id) {
-					showErrorAndSpinner("Tävlings-id stämmer inte", false);
+					setErrorAndSpinner("Tävlings-id stämmer inte", false);
 					competition_open = false;
 					if (DEBUGMODE) console.log('competition id mismatch');
 					return;
 				}
+				else
+					setErrorAndSpinner(""); //clear any previous error message and hide loading spinner
+				
 				if (response.ENABLE_RATING != null && response.ENABLE_RATING !== ENABLE_RATING) {
 					ENABLE_RATING = response.ENABLE_RATING;
 
