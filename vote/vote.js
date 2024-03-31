@@ -181,6 +181,9 @@ votejs = function () {
             }
         });
     };
+    var ENABLE_VOTING = true;
+    var ENABLE_VOTING_AS_RATING = false;
+    var ENABLE_RATING = false;
 
     function sysstatus(args) {
         $.ajax({
@@ -194,6 +197,17 @@ votejs = function () {
             }),
             success: function (response) {
                 if (DEBUGMODE) console.log(response);
+                //legacy mode - intended for terminal voting
+                if (response.ENABLE_VOTING_AS_RATING == true) {
+                    ENABLE_VOTING_AS_RATING = true;
+                }
+                if (response.ENABLE_RATING == true) {
+                    ENABLE_RATING = true;
+                }
+                if (response.ENABLE_VOTING == false) {
+                    ENABLE_VOTING = false;
+ 
+                }
                 $("#competition_header").text(response.competition_name);
                 //fix interval -> update_interval
                 if (response.update_interval != status_interval) {
@@ -202,7 +216,7 @@ votejs = function () {
                     status_timer = window.setInterval(sysstatus, status_interval)
                 }
 
-                if (response.competition_seconds_to_close < 60) {
+                if (response.competition_seconds_to_close < 60 /*|| response.ENABLE_RATING == true*/) {
                     var alert_level = 'WARNING'
                 } else if (response.competition_seconds_to_close < 600) {
                     var alert_level = 'ERROR'

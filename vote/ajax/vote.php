@@ -21,22 +21,20 @@ if (APC_CACHE_ENABLED) {
     $competition = apc_fetch('competition-' . $competitionId);
     if ($competition === false) {
         $competition = $dbAccess->getCompetition($competitionId);
-    apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
+        apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
     }
-}else {
+} else {
     $competition = $dbAccess->getCompetition($competitionId);
 
 }
 if (APC_CACHE_ENABLED) {
-    
+
     $categories = apc_fetch('categories-' . $competitionId);
     if ($categories === false) {
-    $categories = $dbAccess->getCategories($competitionId);
-    apc_store('categories-' . $competitionId, $categories, 120); // Cache for 120 seconds.
+        $categories = $dbAccess->getCategories($competitionId);
+        apc_store('categories-' . $competitionId, $categories, 120); // Cache for 120 seconds.
     }
-}
-else
-{
+} else {
     $categories = $dbAccess->getCategories($competitionId);
 }
 
@@ -64,7 +62,12 @@ if ($voteCodeId == 0) {
             list($status, $msg) = array('WARNING', 'Röstningen är STÄNGD!');
         } else {
 
-            list($status, $msg) = postVotes($dbAccess, $competition, $voteCodeId, $voteArgs->votes, $resetVoteCode, $categories);
+            if (ENABLE_VOTING_AS_RATING) {
+                list($status, $msg) = storeVotesAsRatings($dbAccess, $competition, $voteCodeId, $voteArgs->votes, $resetVoteCode, $categories);
+            } else {
+                list($status, $msg) = postVotes($dbAccess, $competition, $voteCodeId, $voteArgs->votes, $resetVoteCode, $categories);
+            }
+
         }
         $jsonReply['msgtype'] = $status;
         $jsonReply['usrmsg'] = $msg;
@@ -86,23 +89,30 @@ function postVotes($dbAccess, $competition, $voteCodeId, $votes, $resetVoteCode,
 
     $countSame = 0;
     foreach ($votes as $categoryId => $categoryVotes) {
-        $category = $categories[$categoryId];
+        //find category
+        $category = null;
+        foreach ($categories as $cat) {
+            if ($cat['id'] == $categoryId) {
+                $category = $cat;
+                break;
+            }
+        }
+        //$category = $categories[$categoryId];
 
         $ivotes = [];
 
         for ($i = 1; $i <= 3; $i++) {
             if (property_exists($categoryVotes, $i)) {
-                // $vote = filter_var($categoryVotes->{$i}, FILTER_SANITIZE_STRING); //deprecated
                 $vote = htmlspecialchars($categoryVotes->{$i}, ENT_QUOTES);
-
-                list($ivote, $errorString) = parseVote($category['entries'], $vote);
+                list($ivote, $errorString) = parseVote($category != null ? $category['entries'] : null, $vote,CONNECT_EVENTREG_DB_VOTING);
                 if ($ivote == -1) {
                     return array('WARNING', "Röst rad #$i: $errorString");
                 } else if ($ivote != 0) {
 
                     //räkna antal lika röster, exludera null-röster
                     $counts = count(array_filter($ivotes, function ($v) use ($ivote) {
-                        return $v == $ivote; }));
+                        return $v == $ivote;
+                    }));
 
                     //lagra antal lika röster
                     if ($counts + 1 > $countSame)
@@ -131,17 +141,111 @@ function postVotes($dbAccess, $competition, $voteCodeId, $votes, $resetVoteCode,
             }
         }
 
-        $dbAccess->insertVote($voteCodeId, $categoryId, $ivotes);
+        list($ivote, $errorString) = $dbAccess->insertVote($voteCodeId, $categoryId, $ivotes,true /*validate*/);
+        if ($ivote == -1) {
+            return array('WARNING', "Röst rad #$i: $errorString");
+        }
     }
 
     return array('OK', "Rösterna har registrerats");
 }
+//legacy mode - store votes as ratings to ratings-table
+//intended for voting stations
+function storeVotesAsRatings($dbAccess, $competition, $voteCodeId, $votes, $resetVoteCode, $categories)
+{
+    $successes = 0;
+    $removals = 0;
+    $failures = 0;
+    foreach ($votes as $categoryId => $categoryVotes) {
+
+        $ivotes = array();
+        $countSame = 0;
+        for ($i = 1; $i <= 3; $i++) {
+            if (property_exists($categoryVotes, $i)) {
+                $vote = htmlspecialchars($categoryVotes->{$i}, ENT_QUOTES);
+                if ($vote == '') {
+                    continue;
+                }
+                list($ivote, $errorString) = parseVote(null, $vote, true);
+
+                if ($ivote == -1) {
+                    return array('WARNING', "Röst rad #$i: $errorString");
+                } else if ($ivote != 0) {
+
+                    //räkna antal lika röster, exludera null-röster
+                    $counts = count(array_filter($ivotes, function ($v) use ($ivote) {
+                        return $v == $ivote;
+                    }));
+
+                    //lagra antal lika röster
+                    if ($counts + 1 > $countSame)
+                        $countSame = $counts + 1;
+
+                }
+                $ivotes[$i] = $ivote;
+            }
+        }
+        //allow only one vote per beer, or unfair advantage vs rating system
+        if ($countSame > 1) {
+                return array('WARNING', 'Högst en röst per öl.');
+        }
+        //get all existing ratings for this voteCodeID
+        $alreadyRated = $dbAccess->getRatings($competition['id'], $voteCodeId);
+        //in this category, 
+        $alreadyRated = $alreadyRated[$categoryId];
+
+        $vcount = count($ivotes);
+        //(man ska inte kunna använda denna sida för högre påverkan på betyg,
+        //sidan är i detta läge tänkt enbart för voting stationer )
+        //denna score motsvarar ungefär enstaka ratings i nya systemet, 
+        //för större klass, få röster
+        $voteScore = 1;
+        //for each ivote (beerEntryID), store as rating with 1 voteScore
+        foreach ($ivotes as $ivote) {
+            //check if this beer has already been rated, and if so, remove from $alreadyRated
+            if ($ivote == 0) {
+                continue;
+            }
+            foreach ($alreadyRated as $key => $rating) {
+                if ($rating['beerEntryId'] == $ivote) {
+                    unset($alreadyRated[$key]);
+                }
+            }
+            list($ivoteR, $errorString) = $dbAccess->storeRating($voteCodeId, $categoryId, $ivote, $voteScore, null, 1,true /*validate*/);
+            if ($ivoteR == -1) {
+                return array('WARNING', "Röst rad #$i: $errorString");
+            } else {
+                $successes++;
+            }
+        }
+        //for each alreadyRated, store as rating with 0 points
+        //this is to ensure no user uses both the vote system and the rating system
+        foreach ($alreadyRated as $rating) {
+            list($ivoteR, $errorString) = $dbAccess->storeRating($voteCodeId, $categoryId, $rating['beerEntryId'], 0, null, null);
+            if ($ivoteR == -1) {
+                return array('WARNING', $errorString);
+            } else {
+                $removals = 1;
+            }
+
+        }
+
+    }
+    if ($failures > 0) {
+        return array('WARNING', "Något gick fel, " . $failures . " av " . ($failures + $successes) . " betyg har inte registrerats");
+    } else {
+        return array('OK', $successes . "st röster registrerades" . ($removals > 0 ? ", och alla tidigare betyg togs bort" : ""));
+    }
+}
+
+
 
 /*
  * Returns two values (vote, errorDescription):
  * vote is an integer: positive means a vote, null a missing vote, and -1 that an error occurred.
+ * categoryEntries is deprecated if CONNECT_EVENTREG_DB_VOTING is true.
  */
-function parseVote($categoryEntries, $vote)
+function parseVote($categoryEntries, $vote, $noEntryCheck = false)
 {
     if ($vote == '') {
         return array(null, '');
@@ -153,10 +257,14 @@ function parseVote($categoryEntries, $vote)
 
     $ivote = (int) $vote;
 
+    if (!$noEntryCheck && $categoryEntries !== null) {
 
-    if (array_search($ivote, $categoryEntries) === false) {
-        return array(-1, "ogiltig röst ($vote), otillåtet tävlings-id");
+        if (array_search($ivote, $categoryEntries) === false) {
+            return array(-1, "ogiltig röst ($vote), otillåtet tävlings-id");
+        }
     }
 
     return array($ivote, '');
 }
+
+

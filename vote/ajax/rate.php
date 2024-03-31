@@ -122,9 +122,9 @@ function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings)
                     $ratingComment = htmlspecialchars($ratingComment,ENT_QUOTES); //sanitera
                 }
 
-                $ret = $dbAccess->storeRating($voteCodeId, $rating->categoryId, $rating->beerEntryId, $ratingScore, $ratingComment, $drankCheck);
+                list($ivoteR, $errorString) = $dbAccess->storeRating($voteCodeId, $rating->categoryId, $rating->beerEntryId, $ratingScore, $ratingComment, $drankCheck);
                 
-                if ($ret !== true) {
+                if ($ivoteR == -1) {
                     $failures++;
                 }
                 else {

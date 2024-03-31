@@ -420,7 +420,7 @@ class DbAccess
         $result = $this->getConnection()->query($sql) or die("getCategories: Query failed: $sql");
 
         $categories = array();
-        $useOffset = false; //CONST_SETTING_CONNECT_EVENTREG_DB > 1 ? true : false;
+        $useOffset = false; //CONNECT_EVENTREG_DB > 1 ? true : false;
         $idStartPos = 0;
 
         while ($row = $result->fetch_assoc()) {
@@ -456,7 +456,7 @@ class DbAccess
     public function addCategoryEntries($categoryId, $codes)
     {
         $catId = $this->escape($categoryId);
-        $sql = 'INSERT INTO entries '
+        $sql = 'INSERT IGNORE INTO entries '
             . 'VALUES '
             . implode(
                 ',',
@@ -550,11 +550,54 @@ class DbAccess
         return $id;
     }
 
-    public function insertVote($voteCodeId, $categoryId, $votes)
+    public function insertVote($voteCodeId, $categoryId, $votes,$validateBeerEntryId = false)
     {
         $vote1 = !array_key_exists('1', $votes) || $votes['1'] === null ? 'null' : $votes['1'];
         $vote2 = !array_key_exists('2', $votes) || $votes['2'] === null ? 'null' : $votes['2'];
         $vote3 = !array_key_exists('3', $votes) || $votes['3'] === null ? 'null' : $votes['3'];
+
+        //validate beerEntryId against eventreg database
+        //(not neccessary for rating, as the app will/should only send valid beerEntryId's)
+        if ($validateBeerEntryId) {
+            $entries = array();
+            $beer = null;
+            if ($vote1 != "null"){ 
+                $beer = $this->getBeer(getCompetitionId(),$vote1);
+            if ($beer === null) 
+                return array(-1, "ogiltig röst, " . $vote1 . " är inte ett giltigt tävlingsnummer");
+            }
+            $beer2 = null;
+            if ($vote2 != "null"){ 
+                $beer2= $this->getBeer(getCompetitionId(),$vote2);
+            if ($beer2 === null) 
+                return array(-1, "ogiltig röst, " . $vote2 . " är inte ett giltigt tävlingsnummer");
+            }
+            $beer3 = null;
+            if ($vote3 != "null"){
+                $beer3=  $this->getBeer(getCompetitionId(),$vote3);
+            if ($beer3 === null) 
+                return array(-1, "ogiltig röst, " . $vote3 . " är inte ett giltigt tävlingsnummer");
+            }
+            //validate that the beer is in the correct category
+            if ($beer != null && $beer['class'] != $categoryId) 
+                return array(-1, "ogiltig röst, " . $vote1 . " är inte ett giltigt tävlingsnummer i denna kategori");
+            else  if ($vote1 != "null")
+                array_push($entries,$vote1);
+            if ($beer2 != null &&  $beer2['class'] != $categoryId)
+                return array(-1, "ogiltig röst, " . $vote2 . " är inte ett giltigt tävlingsnummer i denna kategori");
+            else  if ($vote2 != "null")
+                array_push($entries,$vote2);
+            if ($beer3 != null &&  $beer3['class'] != $categoryId)
+                return array(-1, "ogiltig röst, " . $vote3 . " är inte ett giltigt tävlingsnummer i denna kategori");
+            else if ($vote3 != "null")
+                array_push($entries,$vote3);
+            
+            //for backwards compatibility, we add the entries to the entries table, to maintain referential integrity
+            //insert or update entryCodes in entries table - on the fly
+            $this->addCategoryEntries($categoryId, $entries);
+        }
+        
+        
 
         $sql = 'insert into votes ' .
             '(id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) ' .
@@ -566,9 +609,21 @@ class DbAccess
     }
 
     //store rating (insert or update), returns false on failure (true on success, or if rating is unchanged)
-    public function storeRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck)
+    public function storeRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck,$validateBeerEntryId = false)
     {
+        //validate beerEntryId against eventreg database
+        //(not neccessary for rating, as the app will/should only send valid beerEntryId's)
+        if ($validateBeerEntryId) {
 
+            $beer = $this->getBeer(getCompetitionId(),$beerEntryId);
+            if ($beer === null) {
+                return array(-1, "ogiltig röst, " . $beerEntryId . " är inte ett giltigt tävlingsnummer");
+            }
+            //validate that the beer is in the correct category
+            if ($beer['class'] != $categoryId) {
+                return array(-1, "ogiltig röst, " . $beerEntryId . " är inte ett giltigt tävlingsnummer i denna kategori");
+            }
+        }
 
         $sql = 'select id,ratingScore,ratingComment,drankCheck from ratings where voteCodeId=' . $voteCodeId . ' and categoryId=' . $categoryId . ' and beerEntryId=' . $beerEntryId;
         $result = $this->getConnection()->query($sql) or die("storeRating: Query failed: $sql");
@@ -576,7 +631,7 @@ class DbAccess
         if ($result->num_rows == 0) {
 
             if ($this->insertRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck) === true)
-                return true;
+                return array(1, "OK!");
         } else {
             $row = $result->fetch_assoc();
             //update rating if it has changed
@@ -591,7 +646,7 @@ class DbAccess
                 $stmt->execute() or die("storeRating: Execute failed: $sql");
             }
         }
-        return true;
+        return array(1, "OK!");
     }
     //insert new rating
     protected function insertRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck)
@@ -639,7 +694,7 @@ class DbAccess
         return $votes;
     }
     //get ratings
-    public function getRatings($competitionId, $voteCodeId, $voteCountStartTime)
+    public function getRatings($competitionId, $voteCodeId, $voteCountStartTime = null)
     {
         if ($voteCountStartTime === null) {
             $extraCond = '';
@@ -1086,7 +1141,7 @@ class DbAccess
 
     //cache-lagrar öldata från eventReg, i filer för att undvika att läsa från db varje gång
     //för att garantera prestanada vid större tävlingar..troligtvis overkill men ändå...
-    //relevant endast CONST_SETTING_CONNECT_EVENTREG_DB = FALSE, in _config.php
+    //relevant endast CONNECT_EVENTREG_DB = FALSE, in _config.php
     function writeEventBeerDataToCacheFiles($competitionId)
     {
         $beers = $this->getBeers($competitionId, false);

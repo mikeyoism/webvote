@@ -1005,7 +1005,8 @@ var beer_db = function () {
 			dataType: 'json',
 			cache: false,
 			data: JSON.stringify({
-				competition_id: competition_id
+				competition_id: competition_id,
+				isRateSystem: true
 			}),
 			success: function (response) {
 				//if (DEBUGMODE) console.log(response);

@@ -36,7 +36,7 @@ define("CONST_SETTING_VOTE_CODE_LENGTH",6);
  Kan ändras under pågående tävling*/
 
 //läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
-define("CONST_SETTING_CONNECT_EVENTREG_DB",false);
+define("CONNECT_EVENTREG_DB",false);
 ///1=No Offset in Category-table, TODO; fix this
 define("CONST_SETTING_CATEGORY_OFFSET",92); 
 //intervall klienter ska fråga efter systatus, i millisekunder
@@ -47,7 +47,19 @@ define("SETTING_SYSSTATUS_INTERVAL",10000);
 
 //LEGACY VOTE SETTINGS - NOT USED FOR RATING
 
-define("ENABLE_VOTING",!ENABLE_RATING); //same as ENABLE_RATING
+//för legacy VOTE, läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
+//detta gör entries-tabellen irrelevant
+define("CONNECT_EVENTREG_DB_VOTING",true);
+
+//tillåt ALDRIG röstning (till vote-tabell) samtidigt som betygssättning (till ratings-tabell)
+define("ENABLE_VOTING",!ENABLE_RATING); // alltså normalt = !ENABLE_RATING
+
+//vote lagras till ratings-table, not vote-table 
+//överskrider ENABLE_VOTING
+define("ENABLE_VOTING_AS_RATING",true); 
+//enbart terminaler kan rösta AS_RATING
+define("ENABLE_VOTING_AS_RATING_TERMINAL_ONLY",true);  
+
 //visar hjälppopup med mer info för användaren
 define("CONST_SETTING_SHOW_HELP_POPUP", true);
 define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true);
@@ -55,6 +67,7 @@ define("SETTING_OPEN_DEBUG_ALWAYS_OPEN",true);
 define("CONST_SETTING_BEERID_NUMBERSPAN_LENGTH",3);
 //Antal röster per kategori
 //Om fler än 7st måste DB-tabeller utökas, se readme.md
+//inget annat än 3 är supportat i db just nu
 define("CONST_SETTING_VOTES_PER_CATEGORY",3);
 
 //Max antal röster på samma öl - i samma kategori, sätt -1 för att inaktivera begränsing.
@@ -68,7 +81,7 @@ define("CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL",true);
 //output js & php script debug i klient? Viktigt att sätta false i produktion
 //ger extra fel och info rutor för testning 
 define("CONST_SYS_JS_DEBUG", true); 
-//php extension som inte alltid finns installerad (one.com)
+//php extension som inte alltid finns installerad, och är depricerad (one.com)
 define("APC_CACHE_ENABLED", false);
 
 

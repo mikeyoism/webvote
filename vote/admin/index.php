@@ -111,7 +111,7 @@ else {
         $eventRegNames = implode(', ', $competition['eventReg_Names']);
         $eventRegCompTypes = implode(', ', $competition['eventReg_CompType']);
         print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString . "/" . $eventRegNames . "/" .  $eventRegCompTypes;
-        if (CONST_SETTING_CONNECT_EVENTREG_DB == false){?>
+        if (CONNECT_EVENTREG_DB == false){?>
             <form method='post'>
             <p>När EventReg-databasen är REDO (FV-Nr har tilldelats) eller när det sker uppdateringar i den, ska du hämta senaste ölinfo:</p><br>
         <button type="submit" name='cacheEventRegData'>Cache senaste ölinfo från från Event-Reg databasen </button>
@@ -120,7 +120,7 @@ else {
         }
         else
         {
-            print "<p>Ölinfo hämtas under tävling direkt från EventReg-databasen av klienterna (inställning CONST_SETTING_CONNECT_EVENTREG_DB i _config.db)</p>";
+            print "<p>Ölinfo hämtas under tävling direkt från EventReg-databasen av klienterna (inställning CONNECT_EVENTREG_DB i _config.db)</p>";
         }
     }
 }
@@ -152,13 +152,15 @@ if ($privilegeLevel == 2) {
 
 <?php
 $categories = $dbAccess->getCategories($competitionId);
-if (ENABLE_RATING) { 
+if (ENABLE_VOTING && !CONNECT_EVENTREG_DB_VOTING) { 
 ?>  
-<p style="background-color:yellow">OBS att "Deltagande nummer" inte används av rate-systemet, och enbart behöver fyllas i för det äldre vote-systemet (om/när det används)</p>
+<p style="background-color:yellow">OBS att "Deltagande nummer" inte används av rate-systemet, och enbart behöver fyllas i för det äldre vote-systemet (om/när det används)
+Även votesytemet kan istället för dessa deltagande-nummer veriefiera öl mot Event-reg databasen se inställning CONNECT_EVENTREG_DB_VOTING i _config.php</p>
+
 <?php
 }
 
-
+if (ENABLE_VOTING && !CONNECT_EVENTREG_DB_VOTING) { 
 foreach ($categories as $category) {
 ?>
 <p><b>Deltagande nummer i kategori <?=$category['name']?> (<?=$category['description']?>)</b>:
@@ -172,6 +174,7 @@ foreach ($categories as $category) {
     </form>
 
 <?php
+}
 }
 ?>
 

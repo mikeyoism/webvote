@@ -142,7 +142,7 @@ function htmlVoteRow($cat, $voteNr, $voteLabel)
 {
     $ret= "";
     $label = "Röst " . $voteNr; //default, röst 1, röst 2 etc
-    if ($voteLabel != "")
+    if ($voteLabel != "" && !ENABLE_VOTING_AS_RATING)
         $label = $voteLabel; //user defined, guld, silver etc...
     
     $ret = '		    <label for="' . $cat . '_vote' . $voteNr . '" id="' . $cat . '_vote' . $voteNr . '_label">' . $label . ':</label>' .
