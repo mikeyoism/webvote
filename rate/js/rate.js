@@ -889,7 +889,7 @@ var beer_db = function () {
 				} else if (competition_seconds_to_close < 600) {
 					style_class += ' bg-warning text-white'
 				} else {
-					style_class += ' bg-info text-white'
+					style_class += ' rateinfo'
 				}
 				var open_closed_text = 'Betygsätt fram till kl. ' + competition_closes_hhmm + ', det är  '
 					+ secondsToRemainString(competition_seconds_to_close) + ' kvar.';

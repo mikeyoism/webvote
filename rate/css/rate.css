@@ -1,4 +1,23 @@
+.navbar {
+    background-color: #D2C199;
+}
+.dropdown-menu{
+    /* background-color: var(--light); */
+    /* background-color: #E2D7BE; */
+    background-color: #ECE5D4;
+    a {
+        color: black;
+    }
+    
+}
+.competition-status.rateinfo{
+    background-color: #D2C199; 
+    color: black;
+    
+
+}
 .beer-number {
+
 }
 
 .beer-name {
