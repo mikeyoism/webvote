@@ -910,7 +910,7 @@ var beer_db = function () {
 		$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);		
 		//if (DEBUGMODE) { console.log('@update_ui_competition_status: ' + open_closed_text); }
 	}
-	//read ratings from backend and update local storage etc
+	//read ratings from backend  and update local storage etc
 	function read_ratings() {
 		$.ajax({
 			type: "POST",
@@ -1049,7 +1049,18 @@ var beer_db = function () {
 				if (response.competition_seconds_to_open != null) {
 					competition_seconds_to_open = response.competition_seconds_to_open;
 				}
-				update_ui_competition_status();
+
+				if (response.refresh_page != null && response.refresh_page === true) {
+					if (DEBUGMODE) console.log('refresh_page backend request');
+					get_competition_data().done(function () {
+						update_vote_code(user_data.vote_code); // to refresh everything
+						update_ui_competition_status();
+					});
+
+				}
+				else {
+					update_ui_competition_status();
+				}
 
 
 

@@ -6,7 +6,7 @@ require_once '../../vote/php/common.inc';
 
 
 if (!CONNECT_EVENTREG_DB) {
-    //Read from cached files (updted/created in admin-page)
+    //Read from cached files (updated/created in admin-page)
     $dbAccess = new DbAccess();
     $catsAndBeers =  $dbAccess->readEventBeerDataFromCacheFiles($competitionId);
     $categories = $catsAndBeers[0];

@@ -35,7 +35,7 @@ define("CONST_SETTING_VOTE_CODE_LENGTH",6);
 /*Nedan är Prestandainställningar, ändras INTE om inte problem föreligger
  Kan ändras under pågående tävling*/
 
-//läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
+//LIVE-läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
 define("CONNECT_EVENTREG_DB",false);
 ///1=No Offset in Category-table, TODO; fix this
 define("CONST_SETTING_CATEGORY_OFFSET",92); 
@@ -47,7 +47,7 @@ define("SETTING_SYSSTATUS_INTERVAL",10000);
 
 //LEGACY VOTE SETTINGS - NOT USED FOR RATING
 
-//för legacy VOTE, läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
+//för legacy VOTE, läs ölinfo från eventreg-database (cache-filer används inte för detta)
 //detta gör entries-tabellen irrelevant
 define("CONNECT_EVENTREG_DB_VOTING",true);
 

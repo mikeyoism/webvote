@@ -108,19 +108,30 @@ if ((!isset($eventRegIds) || count($eventRegIds) < 1 ) && ENABLE_RATING) {
 else {
     if  (ENABLE_RATING) {
         $eventRegIdsString = implode(', ', $competition['eventReg_ids']);
-        $eventRegNames = implode(', ', $competition['eventReg_Names']);
-        $eventRegCompTypes = implode(', ', $competition['eventReg_CompType']);
-        print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString . "/" . $eventRegNames . "/" .  $eventRegCompTypes;
+
+        print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString;
+                //strings with eventinfo
+                foreach ($competition['eventReg_Info'] as $ekey => $eventRegInfo) {
+                    print "<p>EventReg-ID: " . $ekey. " = " . $eventRegInfo['competition'] . " (" .$eventRegInfo['event_name'] . ")" . "</p>";
+                    
+                }
+
         if (CONNECT_EVENTREG_DB == false){?>
             <form method='post'>
-            <p>När EventReg-databasen är REDO (FV-Nr har tilldelats) eller när det sker uppdateringar i den, ska du hämta senaste ölinfo:</p><br>
-        <button type="submit" name='cacheEventRegData'>Cache senaste ölinfo från från Event-Reg databasen </button>
+            <p>När EventReg-databasen är Redo (Anmälan är stängd och FV-Nr har genererats för alla öl & etiketter) eller när det sker uppdateringar i den, ska du hämta senaste ölinfo:</p><br>
+        <button type="submit" name='cacheEventRegData'>Spara ner senaste ölinfo från från Event-Reg databasen</button>
         </form>    
+            <p>Informationen som visas i betygsättningssystemet för besökarna mellanlagras (i klenterna) för bästa prestanda, och uppdateras när du trycker på knappen.</p>
+            <p>Om prestandan är god (mindre tävlingar) går det bra att istället aktivera live-uppdateringar från Event-reg till klienterna med inställning CONNECT_EVENTREG_DB i _config.php</p>
+            <p>Notera att andra funktioner, som presentationen tävlingsresultatet alltid live-läser från Event-reg, och inte påverkas av detta.</p>
+                <br>
         <?php
+            
         }
         else
         {
-            print "<p>Ölinfo hämtas under tävling direkt från EventReg-databasen av klienterna (inställning CONNECT_EVENTREG_DB i _config.db)</p>";
+            print "<p>Ölinfo hämtas under tävling direkt från EventReg-databasen av klienterna (inställning CONNECT_EVENTREG_DB i _config.php)
+            Säkerställ innan tävling att EventReg databasen är Redo (FV-Nr har genererats för alla öl & etiketter)</p>";
         }
     }
 }

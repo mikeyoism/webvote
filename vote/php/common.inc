@@ -86,7 +86,7 @@ class DbAccess
 
         $voteCodeCount = $result->fetch_assoc()['c'];
 
-        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime '
+        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime,lastEventRegCache  '
             . 'FROM competitions '
             . 'WHERE competitions.id=' . $this->escape($id);
         $result = $this->getConnection()->query($sql) or die("getCompetition: Query failed: $sql");
@@ -97,21 +97,26 @@ class DbAccess
 
         $openTime = new DateTime($row['openTime']);
         $closeTime = new DateTime($row['closeTime']);
+        
         if (is_null($row['testingOpenUntilTime'])) {
             $testingOpenUntilTime = null;
         } else {
             $testingOpenUntilTime = new DateTime($row['testingOpenUntilTime']);
         }
+        if (is_null($row['lastEventRegCache'])) {
+            $lastEventRegCache = null;
+        } else {
+            $lastEventRegCache = new DateTime($row['lastEventRegCache']);
+        }
         //get evetreg event_id corresponding to our $compentionId
         $evenreg_event_ids = $this->getEventReg_EventId($id);
         $ids = array();
-        $evNames= array();
-        $cpNames = array();
+        $eventInfo = array();
         foreach($evenreg_event_ids as $event)
         {
             array_push($ids,$event['event_id']);
-            array_push($evNames,$event['event_name']);
-            array_push($cpNames,$event['competition']);
+            //store event info in array, by id
+            $eventInfo[$event['event_id']] = array('event_name' => $event['event_name'], 'competition' => $event['competition']);
         }
         
         return array(
@@ -120,10 +125,11 @@ class DbAccess
             'openTime' => $openTime,
             'closeTime' => $closeTime,
             'testingOpenUntilTime' => $testingOpenUntilTime,
+            'lastEventRegCache' => $lastEventRegCache,
             'voteCodeCount' => $voteCodeCount,
             'eventReg_ids' => $ids,
-            'eventReg_Names' => $evNames,
-            'eventReg_CompType' => $cpNames
+            'eventReg_Info' => $eventInfo,
+            
         );
     }
 
@@ -194,7 +200,7 @@ class DbAccess
 
 
 
-    //get eventreg event_id corresponding to our $compentionId
+    //get eventreg event_id and info corresponding to our $compentionId
     public function getEventReg_EventId($competitionId)
     {
         $sql = 'SELECT event_id, event_name,comp FROM Events WHERE deleted= 0 AND votesys_competition_id=' . $this->escape($competitionId);
@@ -1170,6 +1176,12 @@ class DbAccess
             }
             file_put_contents($filename, $str);
         }
+        //update lastEventRegCache in database
+        $sql = 'update competitions set lastEventRegCache=now() where id=' . $competitionId;
+        $stmt = $this->getConnection()->prepare($sql) or die("update lastEventRegCache: prepare failed: $sql");
+        $stmt->execute() or die("update lastEventRegCache: Execute failed: $sql");
+        
+
     }
     function readEventBeerDataFromCacheFiles($competitionId)
     {
