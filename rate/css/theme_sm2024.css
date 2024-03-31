@@ -1,8 +1,19 @@
-.navbar {
-    background-image: url('tunn_stripe_50op.svg') ;
-    /* background-image: url('tunn_stripe.svg') ; */
-    background-repeat: no-repeat;
-    background-size: cover;
+@media only screen and (max-width: 767px) {
+    .navbar {
+        background-image: url('tunn_stripe_50op.svg');
+        /* background-image: url('tunn_stripe.svg') ; */
+        background-repeat: no-repeat;
+        background-size: cover;
+
+    }
 }
 
+@media only screen and (min-width: 715px) {
+    .navbar {
+        background-image: url('tunn_stripe_50op.svg');
+        /* background-image: url('tunn_stripe.svg') ; */
+        background-repeat: repeat;
+        background-size: auto;
 
+    }
+}
