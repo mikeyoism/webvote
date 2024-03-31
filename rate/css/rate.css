@@ -10,12 +10,18 @@
     }
     
 }
+.navbar input[type="search"] {
+
+    background-color : #F2EEE4; 
+  
+}
 .competition-status.rateinfo{
     background-color: #D2C199; 
     color: black;
     
 
 }
+
 .beer-number {
 
 }
