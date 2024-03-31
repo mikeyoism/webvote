@@ -11,13 +11,17 @@
 		crossorigin="anonymous" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>		
 	<link rel="stylesheet" href="css/rate.css" />
+	<link rel="stylesheet" href="css/theme_sm2024.css">
 	<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 </head>
 
 <body>
+	
 	<nav class="navbar sticky-top  navbar-expand navbar-light" >
+		
 		<a class="navbar-brand" href="#" style="padding: 0px;">
-			<img alt="SHBF" src="logo2.png" width="40" style="background-color: transparent;">
+			<img alt="SHBF" src="logo2.png" width="40" style="background-color: transparent;"
+			data-toggle="modal" href="#welcome-popup">
 		</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
 			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,8 +47,11 @@
 					</ul>
 				</li>
 				<li class="nav-item rate-start">
-
-					<a class="nav-link ml-3" id="menu-rate-start" data-toggle="modal" href="#welcome-popup">Hjälp</a>
+					<!--Hjälp / Start-->
+					<a class="nav-link " id="menu-rate-start" data-toggle="modal" href="#welcome-popup">
+						<i class="fas fa-running mt-1 mr-3" style="font-size: 22px;" ></i>
+					</a>
+					
 				</li>
 			</ul>
 
@@ -57,6 +64,8 @@
 
 		</div>
 	</nav>
+
+
 
 
 

@@ -1,5 +1,6 @@
 .navbar {
     background-color: #D2C199;
+    font-weight: bolder;
 }
 .dropdown-menu{
     /* background-color: var(--light); */
@@ -12,7 +13,7 @@
 }
 .navbar input[type="search"] {
 
-    background-color : #F2EEE4; 
+    background-color : #ECE5D4; 
   
 }
 .competition-status.rateinfo{
@@ -21,7 +22,41 @@
     
 
 }
-
+.btn-secondary {
+    background-color: #d1ac55;
+    border-color: #d1ac55;
+    color: black;
+    font-weight: bold;
+}
+.btn-secondary:hover {
+    -webkit-transform: scale(1.1);
+    background-color: #d1ac55;
+}
+.btn-primary {
+    background-color: #d1ac55;
+    border-color: #d1ac55;
+    color: black;
+    font-weight: bold;
+}
+.btn-primary:hover {
+    -webkit-transform: scale(1.1);
+    background-color: #d49910;
+}
+.navbar input[type="search"] {
+    Border: solid rgba(209, 172, 85,0.50) !important;
+    font-weight: bold;
+} 
+#welcome-popup-lesshelp{
+    color: #D2C199;
+    font-weight: bold;
+}
+/*inputs, textareas, select, etc. */
+.form-control:focus {
+    border-color: rgba(209, 172, 85,0.8);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(209, 172, 85,0.6);
+    outline: 0 none;
+  }
+  
 .beer-number {
 
 }
@@ -157,7 +192,7 @@
     width: 63px;
     height: 63px;
     margin: 0 auto;
-    border: 4px solid rgb(0, 0, 0);
+    border: 4px solid rgb(210, 193, 153);
     border-radius: 50%;
     border-left-color: transparent;
     border-right-color: transparent;
