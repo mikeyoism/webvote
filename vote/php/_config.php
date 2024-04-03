@@ -27,8 +27,18 @@ date_default_timezone_set("Europe/Stockholm");
 
 //for testing/used if not set by param
 define("COMPETITION_ID", 42);
-
 define("ENABLE_RATING", true);
+
+//överskrid vissa inställningar i denna fil med värden från db
+//för närvarande överskrids följande: CSS_COMPETITION_THEME
+define("EXTEND_FROM_DB",true);
+
+//cssTheme - css-fil i rate/css/ för tävlingsspecifik design (event poster etc)
+//like theme_sm2024.css
+//lämnas tom för enbart grunddesign
+define("CSS_COMPETITION_THEME", "theme_sm2024.css"); 
+
+
 //Längd på röstkoder - överskrid inte satt maxlängd i db.
 define("CONST_SETTING_VOTE_CODE_LENGTH",6);
 

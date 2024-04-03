@@ -38,6 +38,8 @@ var beer_db = function () {
 	var activeTab = null; //current active tab of the class dropdown
 	var last_compare_function = null; //stored to localStorage
 
+	var skipCarouselFront = false; //skip the front-pic carousel once, when the user has seen it before
+	var cssCompetitionTheme = 'theme_default.css'; //empty file default template
 	function getRateSettings() {
 
 		return $.ajax({
@@ -58,6 +60,18 @@ var beer_db = function () {
 					VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
 					ENABLE_RATING = response.ENABLE_RATING;
 
+					//set cssCompetitionTheme (optional)
+					if (response.CSS_COMPETITION_THEME != null &&  response.CSS_COMPETITION_THEME != "" &&
+						response.CSS_COMPETITION_THEME !== cssCompetitionTheme) {
+						cssCompetitionTheme = response.CSS_COMPETITION_THEME;
+						var cssth = cssCompetitionTheme.toLowerCase();
+						if (cssth.slice(-4) != '.css') {
+							cssth += '.css';
+						}
+						$('#css-theme').attr('href', 'css/' + cssth ); 
+						
+					}
+	
 					if (DEBUGMODE) console.log(response);
 				}
 				else {
@@ -127,7 +141,7 @@ var beer_db = function () {
 					cid = bid = null;
 
 
-				
+
 				update_vote_code(user_data.vote_code);
 				initialize_html(startupClass);
 
@@ -135,7 +149,6 @@ var beer_db = function () {
 				//start competition status timer
 				vote_status_timer = window.setInterval(get_competition_status, VOTE_STATUS_INTERVAL);
 				get_competition_status();
-
 
 
 				//open welcome-popup if no vote code is set
@@ -160,7 +173,7 @@ var beer_db = function () {
 
 		localStorage.setItem('user_data_' + competition_id, JSON.stringify(user_data));
 
-	}	
+	}
 	function init_user_data(reset = false) {
 		//cached data, or new session
 		var user_data_string = null;
@@ -235,18 +248,77 @@ var beer_db = function () {
 			update_vote_code('', true); //reset vote code
 			return false;
 		});
+
+
 		//welcome-popup open event
 		$("#welcome-popup").on('shown.bs.modal', function (event) {
 			//set focus on the vote-code input field
 			$('#vote-code').focus();
 			//trigger validation of the vote-code input field
 			$('#vote-code').trigger('keyup');
+
+			//get image src from the first slide, and set it as background-image for the modal
+			var img_src = $('#eventposter-slide img').css('content');
+
+			//ignore first slide with event poster, if not defined in theme css
+			if (img_src == "normal" || img_src == "none") {
+				
+				$('#carousel-welcome').carousel(1);
+				$('#carousel-welcome').carousel('pause');
+				//show modal header with competition name instead of the event poster
+				$('#welcome-popup').find('.modal-header').removeClass('d-none');
+			}
+
+			else {
+				$('#eventposter-slide').removeClass('d-none');
+				if (!skipCarouselFront) {
+					skipCarouselFront = false;
+		
+					$('#carousel-welcome').carousel(0);
+					$('#carousel-welcome').carousel('cycle')
+				
+					//hide the footer
+					//if no vote code is set, hide the footer for first slide  (shown on the last slide initially)
+					if (user_data.vote_code.length != VOTE_CODE_LEN)
+						$('#modal-footer-welcome').hide();
+				}
+			}
 		});
 
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
 
 			introDriverObj.drive();
+
+		});
+		//fortsätt med kod (needed with carousel, as the button is outside the form)
+		$('#vote-proceed-button').on('click', function (e) {
+			$('#welcome-popup').modal('hide');
+			return false;
+		});
+		// $('#carousel-welcome').on('slide.bs.carousel', function (e) {
+		// 	$('#modal-footer-welcome').hide();
+		// });
+		$('#carousel-welcome').on('slid.bs.carousel', function (e) {
+			if (e.to == 1) { //last slide
+				$('#modal-footer-welcome').show();
+				//remove welcomecarousel_img from child (optional)
+				$('#welcome-popup').find('.modal-content').removeClass('modal-content-welcomecarousel_img');
+				$('#welcome-popup').find('.modal-body').removeClass('modal-body-welcomecarousel_img');
+				$('.carousel-control-next').hide();
+				$('#carousel-welcome').carousel('pause');
+			}
+			else //eventposter slide (rpgoramblad)
+			{
+				//start the carousel, if it's paused
+				$('#welcome-popup').find('.modal-content').addClass('modal-content-welcomecarousel_img');
+				$('#welcome-popup').find('.modal-body').addClass('modal-body-welcomecarousel_img');
+				//hide next/prev buttons
+				$('.carousel-control-next').show();
+
+				$('#carousel-welcome').carousel('cycle');
+
+			}
 
 		});
 		$('#welcome-popup-showmore').hide();
@@ -280,7 +352,7 @@ var beer_db = function () {
 
 				{ element: '#menu-rate-start', popover: { title: 'Aktivera röstkod', description: 'Tryck här för att aktivera eller byta röstkod samt få mer information om tävlingen.' } },
 				{ element: '#menu-search-beer', popover: { title: 'Snabbsökning', description: 'Sök på tävlingsnummer för direktvisning av ölet. Exempel: "123" <p>Alternativt går det även att använda mobilens kamera (utanför appen) för att scanna ölets QR-kod.</p>' } }
-		
+
 
 			]
 			,
@@ -309,7 +381,7 @@ var beer_db = function () {
 		if (bid != null) {
 			$('#vote-proceed-no-code-button').hide();
 		}
-		
+
 		var startupClassIndex = 0;
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
@@ -465,6 +537,7 @@ var beer_db = function () {
 		});
 		//click on no-vote-code alert
 		$('#popup-alert-no-vote-code').on('click', function (e) {
+			skipCarouselFront = true;
 			$('#welcome-popup').modal('show');
 			$('#beer-popup').modal('hide');
 		});
@@ -578,7 +651,7 @@ var beer_db = function () {
 		return compare_beers_by_entry_code(a, b);
 	}
 
-   //get rating from user_data.ratings
+	//get rating from user_data.ratings
 	function get_rating(class_id, beer_entry_id) {
 		var rating = {
 			categoryId: class_id,
@@ -818,7 +891,7 @@ var beer_db = function () {
 		//disable all changes if rating is disabled by competition sys-setting
 		if (!ENABLE_RATING) {
 			//popup-drank child checkbox
-			
+
 			drank_checking_allowed = false;
 
 			$('.rating-comment').prop('disabled', true);
@@ -827,12 +900,12 @@ var beer_db = function () {
 			//disable drank and comment if competition has not yet opened
 			//it's ok to leave comments and drank-checks, after competition/rating has closed
 			if (!competition_open && !competition_has_closed) {
-				
+
 				drank_checking_allowed = false;
 				$('.rating-comment').prop('disabled', true);
 			}
 			else {
-				
+
 				drank_checking_allowed = vote_code_ok;
 				$('.rating-comment').prop('disabled', !vote_code_ok);
 			}
@@ -843,7 +916,7 @@ var beer_db = function () {
 
 	function update_vote_code(code) {
 
-		if (DEBUGMODE) { console.log('@update_vote_code: ' + code);}
+		if (DEBUGMODE) { console.log('@update_vote_code: ' + code); }
 
 		if (code !== user_data.vote_code) {
 			//init new user_data
@@ -883,7 +956,7 @@ var beer_db = function () {
 		} else {
 			$('.rating').removeClass('d-none');
 			if (competition_open) {
-				
+
 				if (competition_seconds_to_close < 60) {
 					style_class += ' bg-danger text-white'
 				} else if (competition_seconds_to_close < 600) {
@@ -907,7 +980,7 @@ var beer_db = function () {
 		}
 		update_rating_allowed();
 
-		$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);		
+		$(".competition-status").removeClass(style_class).addClass(style_class).html(open_closed_text);
 		//if (DEBUGMODE) { console.log('@update_ui_competition_status: ' + open_closed_text); }
 	}
 	//read ratings from backend  and update local storage etc
@@ -995,7 +1068,7 @@ var beer_db = function () {
 			}
 		});
 	}
-
+	
 	//get competition status from backend
 	function get_competition_status(args) {
 		$.ajax({
@@ -1010,7 +1083,8 @@ var beer_db = function () {
 			}),
 			success: function (response) {
 				//if (DEBUGMODE) console.log(response);
-				//todo: break out the competition status to a separate function for instant calls (see refs in the code below)
+
+
 				if (response.competition_id != competition_id) {
 					setErrorAndSpinner("Tävlings-id stämmer inte", false);
 					competition_open = false;
@@ -1019,7 +1093,7 @@ var beer_db = function () {
 				}
 				else
 					setErrorAndSpinner(""); //clear any previous error message and hide loading spinner
-				
+
 				if (response.ENABLE_RATING != null && response.ENABLE_RATING !== ENABLE_RATING) {
 					ENABLE_RATING = response.ENABLE_RATING;
 
@@ -1036,6 +1110,7 @@ var beer_db = function () {
 				if (response.competition_name != null && response.competition_name !== competition_name) {
 					competition_name = response.competition_name;
 					$('#competition-name').html(competition_name);
+					$(document).attr("title", competition_name);
 				}
 				if (response.competition_open != null) {
 					competition_open = response.competition_open;

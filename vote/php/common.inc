@@ -78,7 +78,20 @@ class DbAccess
 
         return;
     }
+    //get css theme for competition
+    public function getCssCompetitionTheme($competitionId)
+    {
+        $sql = 'SELECT cssCompetitionTheme FROM competitions WHERE id=' . $this->escape($competitionId);
+        $result = $this->getConnection()->query($sql) or die("getCssTheme: Query failed: $sql");
 
+        if ($result->num_rows == 1){
+            $row = $result->fetch_assoc();
+            return $row['cssCompetitionTheme'];
+        }
+        else
+            return "";
+        
+    }
     public function getCompetition($id)
     {
         $sql = 'SELECT count(*) as c FROM voteCodes WHERE competitionId=' . $this->escape($id);
@@ -86,7 +99,7 @@ class DbAccess
 
         $voteCodeCount = $result->fetch_assoc()['c'];
 
-        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime,lastEventRegCache  '
+        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime,lastEventRegCache '
             . 'FROM competitions '
             . 'WHERE competitions.id=' . $this->escape($id);
         $result = $this->getConnection()->query($sql) or die("getCompetition: Query failed: $sql");
@@ -108,7 +121,7 @@ class DbAccess
         } else {
             $lastEventRegCache = new DateTime($row['lastEventRegCache']);
         }
-        //get evetreg event_id corresponding to our $compentionId
+        //get evetreg event_id's corresponding to our $compentionId
         $evenreg_event_ids = $this->getEventReg_EventId($id);
         $ids = array();
         $eventInfo = array();

@@ -38,6 +38,13 @@
     color: black;
     font-weight: bold;
 }
+
+.btn-primary:disabled {
+    background-color: #c7bda7;
+    border-color: #c7bda7;
+    color: black;
+    font-weight: regular;
+}
 .btn-primary:hover {
     -webkit-transform: scale(1.1);
     background-color: #d49910;

@@ -1,3 +1,5 @@
+/*custom theme extension for sm2024 Linköping*/
+/*background image for navbar*/
 @media only screen and (max-width: 767px) {
     .navbar {
         background-image: url('tunn_stripe_50op.svg');
@@ -16,4 +18,31 @@
         background-size: auto;
 
     }
+}
+/*comment out to hide eventposter-slide*/
+#eventposter-slide img {
+    
+        content:url('front_programblad_sm2024.png');
+    
+}
+
+/*for adjusting the the carousel container for #eventposter-slide*/
+#modal-content-eventposter_img {
+    /* border: none;*/
+}
+#modal-body-eventposter_img {
+    /* padding: 0%; */
+}
+
+
+.carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23d19405' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E");
+    display: none;
+}
+
+.carousel-control-next-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23d19405' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E");
+	width: 30px;
+	height: 48px;
+    margin-top: 10em;
 }

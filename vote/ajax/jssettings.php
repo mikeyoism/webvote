@@ -41,7 +41,7 @@ if(isset($_POST['operation']))
         $jsonReply["ENABLE_RATING"] =ENABLE_RATING;
         $jsonReply["CONST_SETTING_VOTE_CODE_LENGTH"] = CONST_SETTING_VOTE_CODE_LENGTH;        
         
-        
+        $jsonReply["CSS_COMPETITION_THEME"] = CSS_COMPETITION_THEME;
 
         //legacy vote settings - not used for rating
         $jsonReply["ENABLE_VOTING"] =ENABLE_VOTING; //same as ENABLE_RATING
@@ -51,7 +51,18 @@ if(isset($_POST['operation']))
         //används nu i backend only
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY_SAME"] = CONST_SETTING_VOTES_PER_CATEGORY_SAME;
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL"] = CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL;
-         
+        
+        if (EXTEND_FROM_DB){
+            //read some settings from db, and override value from _config.php
+            require_once "../php/common.inc";
+            $dbAccess = new DbAccess();
+            $competitionId = getCompetitionId();
+            $cssTheme = $dbAccess->getCssCompetitionTheme($competitionId);
+            if ($cssTheme != "")
+                $jsonReply["CSS_COMPETITION_THEME"] = $cssTheme;
+            
+        }
+
         echo  json_encode($jsonReply);
         return true;
 

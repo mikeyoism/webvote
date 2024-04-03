@@ -1,8 +1,8 @@
 <?php // -*- coding: utf-8 -*-
 require_once '../../vote/php/_config.php';
-$competitionId = COMPETITION_ID;
-
 require_once '../../vote/php/common.inc';
+
+$competitionId = getCompetitionId();
 
 
 if (!CONNECT_EVENTREG_DB) {

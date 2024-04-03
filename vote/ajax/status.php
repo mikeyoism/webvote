@@ -3,7 +3,7 @@
 session_start();
 include '../php/common.inc';
 
-//define("SETTING_SYSSTATUS_INTERVAL", 10000);
+
 //post
 $voteArgs = json_decode(file_get_contents('php://input'));
 if (!isset($voteArgs->competition_id)) {
