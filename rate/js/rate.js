@@ -2,6 +2,8 @@
 "use strict";
 
 
+
+
 $(function (event) {
 	beer_db.init();
 });
@@ -11,6 +13,7 @@ var beer_db = function () {
 	var competition_id = null;
 	var classes = null;
 	var beers = null;
+	var styles = null; //style guides
 
 	// This is stored in localStorage, and poulated from backend
 	// contins user_data.vote_code, user_data.beers and user_data.ratings etc.
@@ -98,6 +101,7 @@ var beer_db = function () {
 				competition_id = response.competition_id;
 				classes = response.classes;
 				beers = response.beers;
+				styles = response.styles;
 				if (DEBUGMODE) { console.log("@competition_data"); console.log(response); }
 
 			},
@@ -463,6 +467,7 @@ var beer_db = function () {
 		});
 		//popup beer close event
 		$("#beer-popup").on('hidden.bs.modal', function (event) {
+			$("#popup-style").popover('dispose');
 			if (user_data.vote_code.length == VOTE_CODE_LEN) {
 				var comment = $("#popup-comment").val();
 				var ratingVal = $("input[type='radio'][name='popup-rating']:checked").val()
@@ -804,11 +809,47 @@ var beer_db = function () {
 		var beer = beers[item_id];
 		$("#popup-header").html(beer.entry_code + ". " + beer.name);
 		$("#popup-brewer").html(beer.brewer);
-		$("#popup-style").html(beer.styleName + " (" + beer.styleId + ")");
+		$("#popup-style").html(beer.styleName + " (" + beer.styleId + ") <i class=\"far fa-question-circle\"></i>");
 		$("#popup-og").html(beer.OG);
 		$("#popup-fg").html(beer.FG);
 		$("#popup-alcohol").html(beer.alk);
 		$("#popup-ibu").html(beer.IBU);
+		var style_subdesc = "";
+		//partse StyleId as number and letter
+		var style_parts = beer.styleId.match(/([0-9]+)([A-Z]+)/);
+		if (style_parts != null) {
+
+			//find the style info in the styles guide array
+			$.each(styles, function (i, style) {
+				if (style.number == style_parts[1]) {
+					//substyles
+					$.each(style.styles, function (j, substyle) {
+						if (substyle.letter == style_parts[2]) {
+							style_subdesc = substyle.description;
+							return false;
+						}
+					});
+					return false;
+				}
+			});
+
+
+		}
+
+
+
+		//popover for style description when hovering over the style
+		$("#popup-style").popover({
+			trigger: 'hover focus',
+			placement: 'auto',
+			
+			html: true,
+			content: function () {
+				var txt = "<h3>" + beer.styleName + " (" + beer.styleId + ")</h3>";
+				txt += "<p>" + style_subdesc + "</p>";
+				return txt;
+			}
+		});
 
 		var comment = '';
 		var rating = '';
@@ -831,6 +872,7 @@ var beer_db = function () {
 
 
 
+
 		$("#popup-comment").val(comment);
 
 
@@ -847,6 +889,7 @@ var beer_db = function () {
 		}
 
 		update_no_vote_code_alert();
+
 
 		current_popup_item_id = item_id;
 		window.location.hash = 'modal-beer-popup'; // Used to trap back button

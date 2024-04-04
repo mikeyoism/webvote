@@ -112,6 +112,7 @@ class DbAccess
          
             try {
                 $json = file_get_contents($url);
+                $json = mb_convert_encoding($json,"UTF-8");
             } catch (Exception $e) {
                 die('Error no beer styles found from url: ' . $url);
             }
