@@ -754,7 +754,7 @@ var beer_db = function () {
 			pages.push('</div>');
 
 
-			pages.push('<div class="competition-status alert "></div>');
+			pages.push('<div class="competition-status alert competition-status-main"></div>');
 			pages.push('</div>');
 			//add img floating to the right
 
