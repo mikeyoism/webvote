@@ -3,11 +3,11 @@ require_once '../../vote/php/_config.php';
 require_once '../../vote/php/common.inc';
 
 $competitionId = getCompetitionId();
-
+$dbAccess = new DbAccess();
 
 if (!CONNECT_EVENTREG_DB) {
     //Read from cached files (updated/created in admin-page)
-    $dbAccess = new DbAccess();
+    
     $catsAndBeers =  $dbAccess->readEventBeerDataFromCacheFiles($competitionId);
     $categories = $catsAndBeers[0];
     $beers = $catsAndBeers[1];
@@ -17,7 +17,7 @@ else
 {
     //read live from database (eventreg)
     $beers = array();
-    $dbAccess = new DbAccess();
+    
     
     if (APC_CACHE_ENABLED) {
 
@@ -40,11 +40,16 @@ else
 
 }
 
+$styles = $dbAccess->getBeerStyleGuides($competitionId);
+if (!is_array($styles)) {
+    $styles = array();
+}
 
 
 header('Content-Type: application/json', true);
 echo json_encode(array(
     'competition_id' => $competitionId,
     'classes' => $categories,
-    'beers' => $beers
+    'beers' => $beers,
+    'styles' => $styles
 ));

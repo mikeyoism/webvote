@@ -84,14 +84,51 @@ class DbAccess
         $sql = 'SELECT cssCompetitionTheme FROM competitions WHERE id=' . $this->escape($competitionId);
         $result = $this->getConnection()->query($sql) or die("getCssTheme: Query failed: $sql");
 
-        if ($result->num_rows == 1){
+        if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
             return $row['cssCompetitionTheme'];
+        } else
+            return "";
+
+    }
+    //get url for beer style guide
+    public function getBeerStyleGuideUrl($competitionId)
+    {
+        $sql = 'SELECT styleDefinitionsUrl FROM competitions WHERE id=' . $this->escape($competitionId);
+        $result = $this->getConnection()->query($sql) or die("getBeerStyleGuideUrl: Query failed: $sql");
+
+        if ($result->num_rows == 1) {
+            $row = $result->fetch_assoc();
+            return $row['styleDefinitionsUrl'];
+        } else
+            return "";
+
+    }
+    //returns array with beer style definitions frp
+    public function getBeerStyleGuides($compentionId)
+    {
+        $url = $this->getBeerStyleGuideUrl($compentionId);
+        if (!empty($url)) {
+         
+            try {
+                $json = file_get_contents($url);
+            } catch (Exception $e) {
+                die('Error no beer styles found from url: ' . $url);
+            }
+            if (empty($json) || $json === false) {
+                die('Error reading beer styles from url: ' . $url);
+            }
+            $styles = json_decode($json, true);
+            if (empty($styles)) {
+                die('Error decoding beer styles from url: ' . $url);
+            
+            }
+            return $styles;
         }
         else
-            return "";
-        
+            return null;
     }
+
     public function getCompetition($id)
     {
         $sql = 'SELECT count(*) as c FROM voteCodes WHERE competitionId=' . $this->escape($id);
@@ -110,7 +147,7 @@ class DbAccess
 
         $openTime = new DateTime($row['openTime']);
         $closeTime = new DateTime($row['closeTime']);
-        
+
         if (is_null($row['testingOpenUntilTime'])) {
             $testingOpenUntilTime = null;
         } else {
@@ -125,13 +162,12 @@ class DbAccess
         $evenreg_event_ids = $this->getEventReg_EventId($id);
         $ids = array();
         $eventInfo = array();
-        foreach($evenreg_event_ids as $event)
-        {
-            array_push($ids,$event['event_id']);
+        foreach ($evenreg_event_ids as $event) {
+            array_push($ids, $event['event_id']);
             //store event info in array, by id
             $eventInfo[$event['event_id']] = array('event_name' => $event['event_name'], 'competition' => $event['competition']);
         }
-        
+
         return array(
             'id' => $id,
             'name' => $row['name'],
@@ -143,6 +179,7 @@ class DbAccess
             'eventReg_ids' => $ids,
             'eventReg_Info' => $eventInfo,
             
+
         );
     }
 
@@ -224,7 +261,7 @@ class DbAccess
         //return list of event_ids (typiskt FV + etikett tävling)
         $events = array();
         while ($row = $result->fetch_assoc()) {
-            array_push($events, array('event_id' => $row['event_id'], 'event_name' => $row['event_name'], 'competition' => $row['comp'] )); //comp = FV, ET, DT
+            array_push($events, array('event_id' => $row['event_id'], 'event_name' => $row['event_name'], 'competition' => $row['comp'])); //comp = FV, ET, DT
         }
         return $events;
     }
@@ -235,9 +272,8 @@ class DbAccess
     {
         $events = $this->getEventReg_EventId($competitionId);
         $evenreg_event_ids = array();
-        foreach ($events as $event)
-        {
-            array_push($evenreg_event_ids,$event['event_id']);
+        foreach ($events as $event) {
+            array_push($evenreg_event_ids, $event['event_id']);
         }
         if (count($evenreg_event_ids) < 1)
             die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
@@ -322,9 +358,8 @@ class DbAccess
 
         $events = $this->getEventReg_EventId($competitionId);
         $evenreg_event_ids = array();
-        foreach ($events as $event)
-        {
-            array_push($evenreg_event_ids,$event['event_id']);
+        foreach ($events as $event) {
+            array_push($evenreg_event_ids, $event['event_id']);
         }
         if (count($evenreg_event_ids) < 1)
             die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
@@ -569,7 +604,7 @@ class DbAccess
         return $id;
     }
 
-    public function insertVote($voteCodeId, $categoryId, $votes,$validateBeerEntryId = false)
+    public function insertVote($voteCodeId, $categoryId, $votes, $validateBeerEntryId = false)
     {
         $vote1 = !array_key_exists('1', $votes) || $votes['1'] === null ? 'null' : $votes['1'];
         $vote2 = !array_key_exists('2', $votes) || $votes['2'] === null ? 'null' : $votes['2'];
@@ -580,43 +615,43 @@ class DbAccess
         if ($validateBeerEntryId) {
             $entries = array();
             $beer = null;
-            if ($vote1 != "null"){ 
-                $beer = $this->getBeer(getCompetitionId(),$vote1);
-            if ($beer === null) 
-                return array(-1, "ogiltig röst, " . $vote1 . " är inte ett giltigt tävlingsnummer");
+            if ($vote1 != "null") {
+                $beer = $this->getBeer(getCompetitionId(), $vote1);
+                if ($beer === null)
+                    return array(-1, "ogiltig röst, " . $vote1 . " är inte ett giltigt tävlingsnummer");
             }
             $beer2 = null;
-            if ($vote2 != "null"){ 
-                $beer2= $this->getBeer(getCompetitionId(),$vote2);
-            if ($beer2 === null) 
-                return array(-1, "ogiltig röst, " . $vote2 . " är inte ett giltigt tävlingsnummer");
+            if ($vote2 != "null") {
+                $beer2 = $this->getBeer(getCompetitionId(), $vote2);
+                if ($beer2 === null)
+                    return array(-1, "ogiltig röst, " . $vote2 . " är inte ett giltigt tävlingsnummer");
             }
             $beer3 = null;
-            if ($vote3 != "null"){
-                $beer3=  $this->getBeer(getCompetitionId(),$vote3);
-            if ($beer3 === null) 
-                return array(-1, "ogiltig röst, " . $vote3 . " är inte ett giltigt tävlingsnummer");
+            if ($vote3 != "null") {
+                $beer3 = $this->getBeer(getCompetitionId(), $vote3);
+                if ($beer3 === null)
+                    return array(-1, "ogiltig röst, " . $vote3 . " är inte ett giltigt tävlingsnummer");
             }
             //validate that the beer is in the correct category
-            if ($beer != null && $beer['class'] != $categoryId) 
+            if ($beer != null && $beer['class'] != $categoryId)
                 return array(-1, "ogiltig röst, " . $vote1 . " är inte ett giltigt tävlingsnummer i denna kategori");
-            else  if ($vote1 != "null")
-                array_push($entries,$vote1);
-            if ($beer2 != null &&  $beer2['class'] != $categoryId)
+            else if ($vote1 != "null")
+                array_push($entries, $vote1);
+            if ($beer2 != null && $beer2['class'] != $categoryId)
                 return array(-1, "ogiltig röst, " . $vote2 . " är inte ett giltigt tävlingsnummer i denna kategori");
-            else  if ($vote2 != "null")
-                array_push($entries,$vote2);
-            if ($beer3 != null &&  $beer3['class'] != $categoryId)
+            else if ($vote2 != "null")
+                array_push($entries, $vote2);
+            if ($beer3 != null && $beer3['class'] != $categoryId)
                 return array(-1, "ogiltig röst, " . $vote3 . " är inte ett giltigt tävlingsnummer i denna kategori");
             else if ($vote3 != "null")
-                array_push($entries,$vote3);
-            
+                array_push($entries, $vote3);
+
             //for backwards compatibility, we add the entries to the entries table, to maintain referential integrity
             //insert or update entryCodes in entries table - on the fly
             $this->addCategoryEntries($categoryId, $entries);
         }
-        
-        
+
+
 
         $sql = 'insert into votes ' .
             '(id, votecodeId, categoryId, vote1, vote2, vote3, votingMethod, creationTime) ' .
@@ -628,13 +663,13 @@ class DbAccess
     }
 
     //store rating (insert or update), returns false on failure (true on success, or if rating is unchanged)
-    public function storeRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck,$validateBeerEntryId = false)
+    public function storeRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck, $validateBeerEntryId = false)
     {
         //validate beerEntryId against eventreg database
         //(not neccessary for rating, as the app will/should only send valid beerEntryId's)
         if ($validateBeerEntryId) {
 
-            $beer = $this->getBeer(getCompetitionId(),$beerEntryId);
+            $beer = $this->getBeer(getCompetitionId(), $beerEntryId);
             if ($beer === null) {
                 return array(-1, "ogiltig röst, " . $beerEntryId . " är inte ett giltigt tävlingsnummer");
             }
@@ -817,7 +852,7 @@ class DbAccess
         $ratingResults = array();
         if ($beerCountforCategory > 0) {
             $weightedScores = $this->getWeightedRatingResult($categoryId, $voteCountStartTime, $beerCountforCategory);
-            
+
             foreach ($weightedScores as $voteCodeId => $scores) {
                 foreach ($scores as $beerEntryId => $score) {
                     if ($beerEntryId == 'VoteCodeStat') {
@@ -839,7 +874,7 @@ class DbAccess
                     $ratingResults[$beerEntryId]['styleId'] = $beer['styleId'];
                 }
             }
-   
+
             //Medelbetyg för alla som röstat på denna öl
             //obs enbart statistik, används ej i rankingen, då ett fåtal höga betyg kan ge en hög medelpoäng
             foreach ($ratingResults as &$ratingResult) {
@@ -1193,7 +1228,7 @@ class DbAccess
         $sql = 'update competitions set lastEventRegCache=now() where id=' . $competitionId;
         $stmt = $this->getConnection()->prepare($sql) or die("update lastEventRegCache: prepare failed: $sql");
         $stmt->execute() or die("update lastEventRegCache: Execute failed: $sql");
-        
+
 
     }
     function readEventBeerDataFromCacheFiles($competitionId)
@@ -1234,6 +1269,9 @@ class DbAccess
         }
         return array($categories, $beers);
     }
+
+
+
 
     private function escape($s)
     {
@@ -1324,6 +1362,7 @@ function redirectToSelf()
     header("Location: http://$host$uri$query");
     exit;
 }
+
 
 
 
