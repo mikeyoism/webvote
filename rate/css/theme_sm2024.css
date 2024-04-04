@@ -19,20 +19,67 @@
 
     }
 }
+
 /*comment out to hide eventposter-slide*/
 #eventposter-slide img {
-    
-        content:url('front_programblad_sm2024.png');
-    
+
+    content: url('front_programblad_sm2024.png');
+
 }
 
 /*for adjusting the the carousel container for #eventposter-slide*/
 #modal-content-eventposter_img {
     /* border: none;*/
 }
+
 #modal-body-eventposter_img {
     /* padding: 0%; */
 }
+
+
+#ornament1 {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+
+}
+
+@media only screen and (max-width: 490px) {
+    #ornament1 img {
+        content: url('ornament2.svg');
+
+        max-width: 70px;
+        
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        padding: 0%;
+        opacity: 0.85;
+        z-index: 0;
+
+    }
+}
+@media only screen and (min-width: 491px) {
+    #ornament1 img {
+        content: url('ornament2.svg');
+
+        max-width: 145px;
+        
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        padding: 0%;
+        opacity: 0.85;
+        z-index: 0;
+
+    }
+}
+.competition-status {
+    opacity: 0.85;
+    max-width: 375px;
+}
+
 
 
 .carousel-control-prev-icon {
@@ -42,7 +89,7 @@
 
 .carousel-control-next-icon {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23d19405' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E");
-	width: 30px;
-	height: 48px;
+    width: 30px;
+    height: 48px;
     margin-top: 10em;
 }

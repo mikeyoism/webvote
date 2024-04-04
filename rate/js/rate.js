@@ -61,17 +61,17 @@ var beer_db = function () {
 					ENABLE_RATING = response.ENABLE_RATING;
 
 					//set cssCompetitionTheme (optional)
-					if (response.CSS_COMPETITION_THEME != null &&  response.CSS_COMPETITION_THEME != "" &&
+					if (response.CSS_COMPETITION_THEME != null && response.CSS_COMPETITION_THEME != "" &&
 						response.CSS_COMPETITION_THEME !== cssCompetitionTheme) {
 						cssCompetitionTheme = response.CSS_COMPETITION_THEME;
 						var cssth = cssCompetitionTheme.toLowerCase();
 						if (cssth.slice(-4) != '.css') {
 							cssth += '.css';
 						}
-						$('#css-theme').attr('href', 'css/' + cssth ); 
-						
+						$('#css-theme').attr('href', 'css/' + cssth);
+
 					}
-	
+
 					if (DEBUGMODE) console.log(response);
 				}
 				else {
@@ -262,7 +262,7 @@ var beer_db = function () {
 
 			//ignore first slide with event poster, if not defined in theme css
 			if (img_src == "normal" || img_src == "none") {
-				
+
 				$('#carousel-welcome').carousel(1);
 				$('#carousel-welcome').carousel('pause');
 				//show modal header with competition name instead of the event poster
@@ -273,10 +273,10 @@ var beer_db = function () {
 				$('#eventposter-slide').removeClass('d-none');
 				if (!skipCarouselFront) {
 					skipCarouselFront = false;
-		
+
 					$('#carousel-welcome').carousel(0);
 					$('#carousel-welcome').carousel('cycle')
-				
+
 					//hide the footer
 					//if no vote code is set, hide the footer for first slide  (shown on the last slide initially)
 					if (user_data.vote_code.length != VOTE_CODE_LEN)
@@ -739,16 +739,26 @@ var beer_db = function () {
 				+ ('#page-' + vote_class.id == active_tab_hash ? ' active' : '') + '">');
 
 			pages.push('<div class="container-fluid">');
+			pages.push('<div class="row">');
+			pages.push('<div class="col-8">');
 			pages.push('<h1 class="display-4 ml-1 "><span class="beer-class-header" id="beer-class-header">' + vote_class.name + '</span></h1>');
+			pages.push('</div>');
+			pages.push('<div class="col">');
+			pages.push('<div id="ornament1"><img src="" alt=""></div>');
+			pages.push('</div>');
+			pages.push('</div>');
 
 
 			pages.push('<div class="competition-status alert "></div>');
 			pages.push('</div>');
+			//add img floating to the right
+
 
 			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group ">');
 			pages.push(items[vote_class.id].join(''));
 			pages.push('</div>');
 			pages.push('</div>');
+
 		});
 
 		var html = pages.join('');
@@ -1068,7 +1078,7 @@ var beer_db = function () {
 			}
 		});
 	}
-	
+
 	//get competition status from backend
 	function get_competition_status(args) {
 		$.ajax({
