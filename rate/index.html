@@ -1,6 +1,6 @@
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 	<meta http-equiv="content-language" content="sv">
 	<title>SHBF Ölträff</title>
 
@@ -305,24 +305,35 @@
 	</div>
 
 	<!--Beer Style Guide Modal-->
-	<div id="style-guide-popup" class="modal" role="dialog">
+	<div id="style-guide-popup" class="modal mt-5" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h3 class="modal-title float-left">
-						Ölstilsguide
-					</h3>
+					<div class="modal-title float-left">
+
+						<h4><span id="style-guide-popup-header">Typdefinition</span></br>
+						<span id="style-guide-popup-mainstyle" class="beer-style">Ölklass</span></h4>
+						<h6><span id="style-guide-popup-substyle" class="modal-title beer-substyle float-left">Underklass</span></h6>
+					</div>
+					
 					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button>
+					
 				</div>
 				<div class="modal-body">
-					<p>Ölstilsguiden är en sammanställning av de olika ölstilar som används i tävlingen. Guiden är
-						ett hjälpmedel för att förstå vad som kännetecknar de olika ölstilarna.</p>
-					<p>Ölstilarna är indelade i olika kategorier och underkategorierna är sorterade efter
-						alfabetisk ordning.</p>
-					<p>Om du vill läsa mer om en specifik ölstil, klicka på ölstilen i listan nedan.</p>
-					<div class="accordion" id="style-guide-accordion">
-						<!-- Javascript will insert one accordion item per beer style here. -->
-					</div>
+					<span id="style-guide-popup-og-range" class="badge badge-pill badge-secondary">ogrange</span>
+					<span id="style-guide-popup-fg-range" class="badge badge-pill badge-secondary">fgrange</span>
+					<span id="style-guide-popup-abv-range" class="badge badge-pill badge-secondary">abvrange</span>
+					<span id="style-guide-popup-ibu-range" class="badge badge-pill badge-secondary">iburange</span>
+					<span id="style-guide-popup-ebc-range" class="badge badge-pill badge-secondary">ebcrange</span>
+
+					<p><span id="style-guide-popup-summary">sammanfattning</span></p>
+					<p><span id="style-guide-popup-aroma">arom</span></p>	
+					<p><span id="style-guide-popup-appearance">utseende</span></p>
+					<p><span id="style-guide-popup-flavor">smak</span></p>
+					<p><span id="style-guide-popup-texture">munkänsla</span></p>
+
+					
+					
 				</div>
 			</div>
 		</div>

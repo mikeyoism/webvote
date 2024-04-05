@@ -783,6 +783,23 @@ var beer_db = function () {
 
 	}
 
+	//popup style guide
+	function popup_style_guide(main_style,style_substyle) {
+		//assign the styles array to the modal
+		$('#style-guide-popup').find('#style-guide-popup-mainstyle').html(main_style.name + " (" + main_style.number + ")");
+		$('#style-guide-popup').find('#style-guide-popup-substyle').html(style_substyle.name + " (" + style_substyle.letter + ")");
+		$('#style-guide-popup').find('#style-guide-popup-og-range').html("OG " + style_substyle.ogMin + " - " + style_substyle.ogMax +" °Öchsle");
+		$('#style-guide-popup').find('#style-guide-popup-fg-range').html("FG" + style_substyle.fgMin + " - " + style_substyle.fgMax);
+		$('#style-guide-popup').find('#style-guide-popup-ibu-range').html("Beska " + style_substyle.ibuMin + " - " + style_substyle.ibuMax + " IBU");
+		$('#style-guide-popup').find('#style-guide-popup-abv-range').html("ABV " + style_substyle.abvMin + " - " + style_substyle.abvMax + " %");
+		$('#style-guide-popup').find('#style-guide-popup-ebc-range').html("Färg " + style_substyle.ebcMin + " - " + style_substyle.ebcMax + " EBC");
+		$('#style-guide-popup').find('#style-guide-popup-summary').html(style_substyle.summary);
+		$('#style-guide-popup').find('#style-guide-popup-aroma').html(style_substyle.aroma);
+		$('#style-guide-popup').find('#style-guide-popup-appearance').html(style_substyle.appearance);
+		$('#style-guide-popup').find('#style-guide-popup-flavor').html(style_substyle.flavor);
+		$('#style-guide-popup').find('#style-guide-popup-texture').html(style_substyle.texture);
+		$('#style-guide-popup').modal('show');
+	}
 
 	function popup_beer_by_id(beer_id) {
 
@@ -814,6 +831,8 @@ var beer_db = function () {
 		$("#popup-fg").html(beer.FG);
 		$("#popup-alcohol").html(beer.alk);
 		$("#popup-ibu").html(beer.IBU);
+		var style_main = null;
+		var style_substyle = null;
 		var style_subdesc = "";
 		//partse StyleId as number and letter
 		var style_parts = beer.styleId.match(/([0-9]+)([A-Z]+)/);
@@ -822,10 +841,12 @@ var beer_db = function () {
 			//find the style info in the styles guide array
 			$.each(styles, function (i, style) {
 				if (style.number == style_parts[1]) {
+					style_main = style;
 					//substyles
 					$.each(style.styles, function (j, substyle) {
 						if (substyle.letter == style_parts[2]) {
 							style_subdesc = substyle.description;
+							style_substyle = substyle;
 							return false;
 						}
 					});
@@ -836,19 +857,31 @@ var beer_db = function () {
 
 		}
 
-
-
 		//popover for style description when hovering over the style
+		//note: must be disposed before creating a new one, during close event
 		$("#popup-style").popover({
-			trigger: 'hover focus',
+			trigger: 'click hover focus',
 			placement: 'auto',
-			
+			container: 'body',
+			boundary: 'viewport', //important for small screens
 			html: true,
+			title: '<i class=\"far fa-question-circle\"></i> Ölstilsbeskrivning',
 			content: function () {
-				var txt = "<h3>" + beer.styleName + " (" + beer.styleId + ")</h3>";
+				var txt = "<h6>" + beer.styleName + " (" + beer.styleId + ") </h6>";
+				//popup-link to  style-guide-popup
+				txt += "<a href=\"#\" id=\"popup-style-guide-link\" class=\"btn btn-link btn-sm float-right\">Typdef</a>";
+				
 				txt += "<p>" + style_subdesc + "</p>";
 				return txt;
 			}
+		});
+
+		//style guide link click
+		$(document).on('click', '#popup-style-guide-link', function (e) {
+			$(this).parents(".popover").popover('hide');
+			popup_style_guide(style_main,style_substyle);
+			//$('#style-guide-popup').modal('show');
+			e.preventDefault();
 		});
 
 		var comment = '';

@@ -64,6 +64,19 @@
     outline: 0 none;
   }
   
+.popover {
+    max-width: 550px ;
+    width: 85% ;
+}
+/*scrollable popover body on small screens (iphone SE/Galaxy S8)*/
+@media only screen and (max-height: 741px){
+.popover-body  { 
+    height: 420px;
+    overflow: auto;
+    white-space:pre-wrap;
+}
+}
+
 .beer-number {
 
 }
