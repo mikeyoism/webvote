@@ -41,9 +41,13 @@ var beer_db = function () {
 	var activeTab = null; //current active tab of the class dropdown
 	var last_compare_function = null; //stored to localStorage
 
+	//driver.js offers richer funtionality than bootstrap popovers
+	const driver = window.driver.js.driver;
 	var skipCarouselFront = false; //skip the front-pic carousel once, when the user has seen it before
+	var wentTotheWelcomePopup = false; //if the user went to the welcome-popup
 	var cssCompetitionTheme = 'theme_default.css'; //empty file default template
 	var isTouchScreen = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0));
+
 
 	function getRateSettings() {
 
@@ -295,6 +299,7 @@ var beer_db = function () {
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
 
 			introDriverObj.drive();
+			wentTotheWelcomePopup = true;
 
 		});
 		//fortsätt med kod (needed with carousel, as the button is outside the form)
@@ -334,8 +339,7 @@ var beer_db = function () {
 
 
 		});
-		//driver.js offers richer funtionality than bootstrap popovers
-		const driver = window.driver.js.driver;
+
 		const introDriverObj = driver({
 			animate: true,
 			showProgress: true,
@@ -370,8 +374,6 @@ var beer_db = function () {
 				}
 			}
 		});
-
-
 
 		//welcome-popup-lesshelp click
 		$('#welcome-popup-infoheader').on('click', function (e) {
@@ -786,20 +788,21 @@ var beer_db = function () {
 	}
 
 	//popup full style guide
-	function popup_style_guide(main_style,style_substyle) {
+	function popup_style_guide(main_style, style_substyle) {
 		//assign the styles array to the modal
 		$('#style-guide-popup').find('#style-guide-popup-mainstyle').html(main_style.name + " (" + main_style.number + ")");
 		$('#style-guide-popup').find('#style-guide-popup-substyle').html(style_substyle.name + " (" + style_substyle.letter + ")");
-		$('#style-guide-popup').find('#style-guide-popup-og-range').html('OG ' + style_substyle.ogMin + ' - ' + style_substyle.ogMax + '' );
-		$('#style-guide-popup').find('#style-guide-popup-fg-range').html("FG " + style_substyle.fgMin + " - " + style_substyle.fgMax);
-		$('#style-guide-popup').find('#style-guide-popup-ibu-range').html("Beska " + style_substyle.ibuMin + " - " + style_substyle.ibuMax + " IBU");
-		$('#style-guide-popup').find('#style-guide-popup-abv-range').html("ABV " + style_substyle.abvMin + " - " + style_substyle.abvMax + " %");
-		$('#style-guide-popup').find('#style-guide-popup-ebc-range').html("Färg " + style_substyle.ebcMin + " - " + style_substyle.ebcMax + " EBC");
-		$('#style-guide-popup').find('#style-guide-popup-summary').html(style_substyle.summary);
-		$('#style-guide-popup').find('#style-guide-popup-aroma').html('<strong>Bouquet/arom: </strong>' +style_substyle.aroma);
-		$('#style-guide-popup').find('#style-guide-popup-appearance').html('<strong>Utseende: </strong>' +style_substyle.appearance);
-		$('#style-guide-popup').find('#style-guide-popup-flavor').html('<strong>Smak: </strong>' + style_substyle.flavor);
-		$('#style-guide-popup').find('#style-guide-popup-texture').html('<strong>Munkänsla: </strong>' + style_substyle.texture);
+		$('#style-guide-popup').find('#style-guide-popup-og-range').html('OG ' + (style_substyle.ogMin || ' ' ) + ' - ' + (style_substyle.ogMax  || ' ') );
+		$('#style-guide-popup').find('#style-guide-popup-fg-range').html("FG " + (style_substyle.fgMin || ' ') + " - " + (style_substyle.fgMax  || ' '));
+		$('#style-guide-popup').find('#style-guide-popup-ibu-range').html("Beska " + (style_substyle.ibuMin || ' ' ) + " - " + (style_substyle.ibuMax || ' ' + " IBU"));
+		$('#style-guide-popup').find('#style-guide-popup-abv-range').html("ABV " + (style_substyle.abvMin || ' ' ) + " - " + (style_substyle.abvMax  || ' ' ) + " %" );
+		$('#style-guide-popup').find('#style-guide-popup-ebc-range').html("Färg " + (style_substyle.ebcMin || ' ' ) + " - " + (style_substyle.ebcMax || ' ' ) + " EBC");
+		$('#style-guide-popup').find('#style-guide-popup-summary').html(style_substyle.summary || " ");
+		
+		$('#style-guide-popup').find('#style-guide-popup-aroma').html('<strong>Bouquet/arom: </strong>' + (style_substyle.aroma || " ") );
+		$('#style-guide-popup').find('#style-guide-popup-appearance').html('<strong>Utseende: </strong>' + (style_substyle.appearance || " ") );
+		$('#style-guide-popup').find('#style-guide-popup-flavor').html('<strong>Smak: </strong>' + (style_substyle.flavor || " ") );
+		$('#style-guide-popup').find('#style-guide-popup-texture').html('<strong>Munkänsla: </strong>' + (style_substyle.texture || " " ));
 		$('#style-guide-popup').modal('show');
 	}
 
@@ -874,12 +877,12 @@ var beer_db = function () {
 		update_no_vote_code_alert();
 		current_popup_item_id = item_id;
 
-		
+
 		//find the style info in the styles guide array
 		var style_main = null;
 		var style_substyle = null;
 		var style_subdesc = "";
-		//partse StyleId as number and letter
+		//parse StyleId as number and letter
 		var style_parts = beer.styleId.match(/([0-9]+)([A-Z]+)/);
 		if (style_parts != null) {
 
@@ -908,7 +911,7 @@ var beer_db = function () {
 		//popover for style description when hovering over the style
 		//note: must be disposed before creating a new one, during close event
 		$("#popup-style").popover({
-			trigger: trigger, 
+			trigger: trigger,
 			placement: 'auto',
 			container: 'body',
 			boundary: 'viewport', //important for small screens
@@ -927,11 +930,34 @@ var beer_db = function () {
 		//style guide link click inside popover
 		$(document).on('click', '#popup-style-guide-link', function (e) {
 			$(this).parents(".popover").popover('hide');
-			popup_style_guide(style_main,style_substyle);
+			popup_style_guide(style_main, style_substyle);
 			e.preventDefault();
 		});
 
+		if (wentTotheWelcomePopup) {
+			//Driver for beer-popup
+			const beerPopupDriverObj = driver({
+				animate: true,
+				showProgress: true,
+				progressText: 'Intro {{current}} av {{total}}',
+				showButtons: true,
+				closeBtnText: 'Stäng',
+				nextBtnText: 'Nästa',
+				prevBtnText: 'Föregående',
+				doneBtnText: 'Stäng!',
+				steps: [
+					{ element: 'rating', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till 5 sjtärnor.' } },
+					{ element: '#popup-drankcheck', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
+					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
+					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck för att visa stilguide / öltypsdefinition' } },
 
+				]
+			});
+
+
+			beerPopupDriverObj.drive();
+			wentTotheWelcomePopup = false;
+		}
 
 		window.location.hash = 'modal-beer-popup'; // Used to trap back button
 
