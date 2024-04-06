@@ -3,8 +3,7 @@
     font-weight: bolder;
 }
 .dropdown-menu{
-    /* background-color: var(--light); */
-    /* background-color: #E2D7BE; */
+
     background-color: #ECE5D4;
     a {
         color: black;
@@ -22,6 +21,9 @@
     
 
 }
+.secondary-color {
+    color: #d1ac55;
+}
 .btn-secondary {
     background-color: #d1ac55;
     border-color: #d1ac55;
@@ -30,6 +32,7 @@
 }
 .btn-secondary:hover {
     -webkit-transform: scale(1.1);
+    transform: scale(1.1);
     background-color: #d1ac55;
 }
 .btn-primary {
@@ -47,7 +50,19 @@
 }
 .btn-primary:hover {
     -webkit-transform: scale(1.1);
+    transform: scale(1.1);
     background-color: #d49910;
+}
+.btn-outline-secondary {
+    border-color: #d1ac55;
+    font-weight: bold;
+    color: black;
+}
+.btn-outline-secondary:hover {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+    background-color: #d1ac55;
+    color: black;
 }
 .navbar input[type="search"] {
     Border: solid rgba(209, 172, 85,0.50) !important;
@@ -63,20 +78,30 @@
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(209, 172, 85,0.6);
     outline: 0 none;
   }
-  
+ 
+  /*to align with parent modal*/ 
 .popover {
     max-width: 550px ;
     width: 85% ;
 }
-/*scrollable popover body on small screens (iphone SE/Galaxy S8)*/
+/*scrollable popover body on small screens (iphone SE/Galaxy S8), or popup will not show*/
 @media only screen and (max-height: 741px){
-.popover-body  { 
-    height: 420px;
-    overflow: auto;
-    white-space:pre-wrap;
-}
+
+    .popover-body  { 
+        /* height: 420px; */
+        min-height: auto;
+        max-height: 60vh;
+        overflow: auto;
+        white-space:pre-wrap;
+    }
 }
 
+
+/* #style-guide-popup{
+    /* max-width: 0.8em; */
+    background-color: var(--bg-light);
+    /* font-weight: bold; */
+} */
 .beer-number {
 
 }
