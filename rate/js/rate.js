@@ -43,6 +43,7 @@ var beer_db = function () {
 
 	//driver.js offers richer funtionality than bootstrap popovers
 	const driver = window.driver.js.driver;
+	//var beerPopupDriverObj = null;
 	var skipCarouselFront = false; //skip the front-pic carousel once, when the user has seen it before
 	var wentTotheWelcomePopup = false; //if the user went to the welcome-popup
 	var cssCompetitionTheme = 'theme_default.css'; //empty file default template
@@ -297,7 +298,42 @@ var beer_db = function () {
 
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
-
+			
+			const introDriverObj = driver({
+				animate: true,
+				showProgress: true,
+				progressText: 'Intro {{current}} av {{total}}',
+				showButtons: true,
+				closeBtnText: 'Stäng',
+				nextBtnText: 'Nästa',
+				prevBtnText: 'Föregående',
+				doneBtnText: 'Stäng!',
+				steps: [
+					{ element: '#beer-class-dropdown-button', popover: { title: 'Välj tävlingsklass', description: 'Välj tävlingsklass i menyn.' } },
+					{
+						element: 'tab-content', popover: {
+							title: 'Aktuell tävlingsklass', description: 'Alla tävlande öl i den valda klassen visas här. Tryck på ett öl för att rösta!',
+							side: "right",
+							align: 'start'
+						}
+					},
+					{ element: '#sort-dropdown-button', popover: { title: 'Sortera', description: 'Sortera ölen efter tävlingsnummer, stil eller betyg.' } },
+	
+					{ element: '#menu-rate-start', popover: { title: 'Aktivera röstkod', description: 'Tryck här för att aktivera eller byta röstkod samt få mer information om tävlingen.' } },
+					{ element: '#menu-search-beer', popover: { title: 'Snabbsökning', description: 'Sök på tävlingsnummer för direktvisning av ölet. Exempel: "123" <p>Alternativt går det även att använda mobilens kamera (utanför appen) för att scanna ölets QR-kod.</p>' } }
+	
+	
+				]
+				,
+				onDestroyed: function () {
+					//if bid is set (qr-code url), open the beer-popup
+					if (bid != null) {
+						popup_beer_by_id(bid);
+						bid = null; //once opened, clear the bid
+					}
+				}
+			});
+	
 			introDriverObj.drive();
 			wentTotheWelcomePopup = true;
 
@@ -340,40 +376,37 @@ var beer_db = function () {
 
 		});
 
-		const introDriverObj = driver({
-			animate: true,
-			showProgress: true,
-			progressText: 'Intro {{current}} av {{total}}',
-			showButtons: true,
-			closeBtnText: 'Stäng',
-			nextBtnText: 'Nästa',
-			prevBtnText: 'Föregående',
-			doneBtnText: 'Stäng!',
-			steps: [
-				{ element: '#beer-class-dropdown-button', popover: { title: 'Välj tävlingsklass', description: 'Välj tävlingsklass i menyn.' } },
-				{
-					element: 'tab-content', popover: {
-						title: 'Aktuell tävlingsklass', description: 'Alla tävlande öl i den valda klassen visas här. Tryck på ett öl för att rösta!',
-						side: "right",
-						align: 'start'
-					}
-				},
-				{ element: '#sort-dropdown-button', popover: { title: 'Sortera', description: 'Sortera ölen efter tävlingsnummer, stil eller betyg.' } },
-
-				{ element: '#menu-rate-start', popover: { title: 'Aktivera röstkod', description: 'Tryck här för att aktivera eller byta röstkod samt få mer information om tävlingen.' } },
-				{ element: '#menu-search-beer', popover: { title: 'Snabbsökning', description: 'Sök på tävlingsnummer för direktvisning av ölet. Exempel: "123" <p>Alternativt går det även att använda mobilens kamera (utanför appen) för att scanna ölets QR-kod.</p>' } }
 
 
-			]
-			,
-			onDestroyed: function () {
-				//if bid is set (qr-code url), open the beer-popup
-				if (bid != null) {
-					popup_beer_by_id(bid);
-					bid = null; //once opened, clear the bid
-				}
-			}
+		
+		
+		//on beer-popup guide click
+		$('#beer-popup-guide').on('click', function (e) {
+			//Driver for beer-popup
+			const beerPopupDriverObj = driver({
+				animate: true,
+				showProgress: true,
+				progressText: 'Intro {{current}} av {{total}}',
+				showButtons: true,
+				closeBtnText: 'Stäng',
+				nextBtnText: 'Nästa',
+				prevBtnText: 'Föregående',
+				doneBtnText: 'Stäng!',
+				steps: [
+					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet. OG (Original Gravity, sv. densitet) är uppmätt sockermängd/vörtstyrka innan jäsning. Densiteten efter jäsning anges som FG (Final Gravity)' , side: "bottom", align: 'center'  } },
+					{ element: '#popup-brewer-data', popover: { title: 'Öldata del 2', description: 'Alkoholhalten mäts eller beräknas utifrån OG/FG och anges i volymprocent (ABV). Ölets beska kommer oftast från alfasyran i humlen och anges i måttenheten IBU (International Bitterness Units) ' , side: "bottom", align: 'center'  } },
+					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck på texten för att visa stilguide / öltypsdefinition' } },
+					{ element: '#popup-drank legend', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
+					{ element: '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till 5 sjtärnor. Betyget bidrar med poäng i Folkets val.' } },
+					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
+					
+
+				]
+			});			
+			beerPopupDriverObj.drive();
+			
 		});
+
 
 		//welcome-popup-lesshelp click
 		$('#welcome-popup-infoheader').on('click', function (e) {
@@ -935,29 +968,7 @@ var beer_db = function () {
 		});
 
 		if (wentTotheWelcomePopup) {
-			//Driver for beer-popup
-			const beerPopupDriverObj = driver({
-				animate: true,
-				showProgress: true,
-				progressText: 'Intro {{current}} av {{total}}',
-				showButtons: true,
-				closeBtnText: 'Stäng',
-				nextBtnText: 'Nästa',
-				prevBtnText: 'Föregående',
-				doneBtnText: 'Stäng!',
-				steps: [
-					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet' , side: "bottom", align: 'center'  } },
-					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck för att visa stilguide / öltypsdefinition' } },
-					{ element: '#popup-drank legend', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
-					{ element: '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till 5 sjtärnor. Betyget bidrar med poäng i Folkets val.' } },
-					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
-					
 
-				]
-			});
-
-
-			beerPopupDriverObj.drive();
 			wentTotheWelcomePopup = false;
 		}
 

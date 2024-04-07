@@ -58,11 +58,9 @@
     font-weight: bold;
     color: black;
 }
-.btn-outline-secondary:hover {
-    -webkit-transform: scale(1.1);
-    transform: scale(1.1);
-    background-color: #d1ac55;
-    color: black;
+.btn-sm {
+    line-height: 1;
+    
 }
 .navbar input[type="search"] {
     Border: solid rgba(209, 172, 85,0.50) !important;
