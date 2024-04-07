@@ -783,7 +783,8 @@ var beer_db = function () {
 			pages.push('<div class="container-fluid">');
 			pages.push('<div class="row">');
 			pages.push('<div class="col-8">');
-			pages.push('<h1 class="display-4 ml-1 "><span class="beer-class-header" id="beer-class-header">' + vote_class.name + '</span></h1>');
+			pages.push('<h1 class="ml-1 mb-0"><span class="beer-class-header" id="beer-class-header">' + vote_class.name + '</span></h1>');
+			pages.push('<h6 class="beer-class-description ml-2 mt-0">' + vote_class.description + '</h6>');
 			pages.push('</div>');
 			pages.push('<div class="col">');
 			pages.push('<div id="ornament1"><img src="" alt=""></div>');

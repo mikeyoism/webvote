@@ -101,7 +101,11 @@
     font-weight: bold;
     margin-bottom: 0.4rem;
 }
+.beer-class-header{
+    font-size: 2.5rem;
+    font-weight: 300;
 
+}
 .beer-number {
 
 }
