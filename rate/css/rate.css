@@ -96,12 +96,14 @@
     }
 }
 
+.badge-secondary {
+    background-color: #d1ac55;
+    /* color: black; */
+    font-size: medium;
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+}
 
-/* #style-guide-popup{
-    /* max-width: 0.8em; */
-    background-color: var(--bg-light);
-    /* font-weight: bold; */
-} */
 .beer-number {
 
 }

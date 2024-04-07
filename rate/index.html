@@ -227,11 +227,12 @@
 					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button>
 				</div>
 				<div class="modal-body">
-					<p>Bryggare: <span id="popup-brewer">Bryggare</span></p>
-					<p>OG:&nbsp;<span id="popup-og">1,000</span>,
-						FG:&nbsp;<span id="popup-fg">1,000</span>,
-						Alkohol:&nbsp;<span id="popup-alcohol">0.0</span>&nbsp;%,
-						IBU:&nbsp;<span id="popup-ibu">0</span></p>
+					<p><strong>Bryggare: </strong><span id="popup-brewer" >Bryggare</span></p>
+					<p id="popup-brewer-data">
+						<span class="badge  badge-secondary">OG:&nbsp;<span id="popup-og" >1,000</span></span>
+						<span class="badge  badge-secondary">FG:&nbsp;<span id="popup-fg">1,000</span></span>
+						<span class="badge  badge-secondary">Alkohol:&nbsp;<span id="popup-alcohol">0.0</span>&nbsp;%</span>
+						<span class="badge  badge-secondary">Beska:&nbsp;<span id="popup-ibu">0</span>&nbsp;IBU</span></p>
 					<form>
 
 						<div class="card border-warning mb-3 bg-light">
@@ -253,7 +254,7 @@
 									</div>
 									<div class="col-auto">
 										<fieldset class="rating" disabled>
-											<legend style="font-size: 1rem;">Betyg:</legend>
+											<legend id="rating-legend" style="font-size: 1rem;">Betyg:</legend>
 											<input type="radio" id="popup-rating-star-0" name="popup-rating" value="" />
 											<label for="popup-rating-star-0" class="rating-clear-button mr-2">ta
 												bort</label>

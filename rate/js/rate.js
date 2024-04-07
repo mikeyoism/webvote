@@ -832,8 +832,8 @@ var beer_db = function () {
 		$("#popup-header").html(beer.entry_code + ". " + beer.name);
 		$("#popup-brewer").html(beer.brewer);
 		$("#popup-style").html(beer.styleName + " (" + beer.styleId + ") <i class=\"far fa-question-circle secondary-color\" style=\"vertical-align: middle;\"></i>");
-		$("#popup-og").html(beer.OG);
-		$("#popup-fg").html(beer.FG);
+		$("#popup-og").html(parseInt(beer.OG)/1000 +1);
+		$("#popup-fg").html(parseInt(beer.FG)/1000 + 1);
 		$("#popup-alcohol").html(beer.alk);
 		$("#popup-ibu").html(beer.IBU);
 
@@ -946,10 +946,12 @@ var beer_db = function () {
 				prevBtnText: 'Föregående',
 				doneBtnText: 'Stäng!',
 				steps: [
-					{ element: 'rating', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till 5 sjtärnor.' } },
-					{ element: '#popup-drankcheck', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
-					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
+					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet' , side: "bottom", align: 'center'  } },
 					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck för att visa stilguide / öltypsdefinition' } },
+					{ element: '#popup-drank legend', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
+					{ element: '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till 5 sjtärnor. Betyget bidrar med poäng i Folkets val.' } },
+					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
+					
 
 				]
 			});
