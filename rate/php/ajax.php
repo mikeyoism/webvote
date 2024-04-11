@@ -45,11 +45,35 @@ if (!is_array($styles)) {
     $styles = array();
 }
 
+$hidingBeers = false;
+
+//do note publicly expose beers and brewer info close to competition start (4 hours)
+if (HIDE_BEERS_BEFORE_START) {
+    if (APC_CACHE_ENABLED) {
+        $competition = apc_fetch('competition-' . $competitionId);
+        if ($competition === false) {
+            $competition = $dbAccess->getCompetition($competitionId);
+            apc_store('competition-' . $competitionId, $competition, 30); // Cache for 30 seconds.
+        }
+    } else {
+        $competition = $dbAccess->getCompetition($competitionId);
+    }  
+    
+    $openTimes = $dbAccess->calcCompetitionTimes($competition);
+    
+    if ($openTimes['hideBeers'] == true) {
+        $beers = array();
+        $hidingBeers = true;
+    }
+    
+}
+
 
 header('Content-Type: application/json', true);
 echo json_encode(array(
     'competition_id' => $competitionId,
     'classes' => $categories,
     'beers' => $beers,
-    'styles' => $styles
+    'styles' => $styles,
+    'beersHidden' => $hidingBeers
 ));

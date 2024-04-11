@@ -33,6 +33,10 @@ define("ENABLE_RATING", true);
 //för närvarande överskrids följande: CSS_COMPETITION_THEME
 define("EXTEND_FROM_DB",true);
 
+//dölj öl fram till 4h innan tävlingen startar
+//för att inte avslöja vilka öl & deltagare som är med i tävlingen innan den startar
+define("HIDE_BEERS_BEFORE_START",true);
+
 //cssTheme - css-fil i rate/css/ för tävlingsspecifik design (event poster etc)
 //like theme_sm2024.css
 //lämnas tom för enbart grunddesign

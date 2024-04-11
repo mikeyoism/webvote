@@ -68,6 +68,11 @@ if (isset($competition['lastEventRegCache']) && !CONNECT_EVENTREG_DB) {
     }
 
 }
+//has $opentimes[hideBeers] changed compared to last status read?
+if (HIDE_BEERS_BEFORE_START && $openTimes['hideBeers'] != $_SESSION['hideBeers']) {
+    $refreshPage = true;
+    $_SESSION['hideBeers'] = $openTimes['hideBeers'];
+}
 
 
 $jsonReply = array();
@@ -84,6 +89,7 @@ $jsonReply['competition_closes_hhmm'] = $competition['closeTime']->format('H:i')
 $jsonReply['ENABLE_RATING'] = ENABLE_RATING;
 $jsonReply['ENABLE_VOTING'] = ENABLE_VOTING;
 $jsonReply['ENABLE_VOTING_AS_RATING'] = $VotingAsRating;
+
 
 header('Content-Type: application/json', true);
 echo json_encode($jsonReply);

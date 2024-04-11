@@ -42,6 +42,7 @@ if(isset($_POST['operation']))
         $jsonReply["CONST_SETTING_VOTE_CODE_LENGTH"] = CONST_SETTING_VOTE_CODE_LENGTH;        
         
         $jsonReply["CSS_COMPETITION_THEME"] = CSS_COMPETITION_THEME;
+        $jsonReply['HIDE_BEERS_BEFORE_START'] = HIDE_BEERS_BEFORE_START;
 
         //legacy vote settings - not used for rating
         $jsonReply["ENABLE_VOTING"] =ENABLE_VOTING; //same as ENABLE_RATING

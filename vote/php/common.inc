@@ -226,15 +226,28 @@ class DbAccess
                 self::formatDateInterval($timeBeforeOpen) . '.';
             $voteCountStartTime = null;
         }
+        $hideBeers = false;
+        //calc seconds to open
+         $timeBeforeOpenSeconds = $timeBeforeOpen->invert ? 0 : $timeBeforeOpen->days * 24 * 60 * 60 + $timeBeforeOpen->h * 60 * 60 + $timeBeforeOpen->i * 60 + $timeBeforeOpen->s;
+             //until 3 hours before competition[timeBeforeOpenSeconds], hide beers
+        if (HIDE_BEERS_BEFORE_START && $open == false && $timeBeforeOpenSeconds > 14400) {
+            $hideBeers = true;
+        }
+    
+
 
         return array(
             'openTime' => $openTime,
             'closeTime' => $closeTime,
             'open' => $open,
+            'openForTest' => $testingOpenUntilTime != null,
+            'hideBeers' => $hideBeers,
             'openCloseText' => $openCloseText,
             'timeBeforeOpen' => $timeBeforeOpen,
             'timeBeforeClose' => $timeBeforeClose,
+            'timeBeforeOpenSeconds' => $timeBeforeOpenSeconds,
             'voteCountStartTime' => $voteCountStartTime
+            
         );
     }
 

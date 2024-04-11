@@ -14,6 +14,7 @@ var beer_db = function () {
 	var classes = null;
 	var beers = null;
 	var styles = null; //style guides
+	var beersHidden = null; //before competition start
 
 	// This is stored in localStorage, and poulated from backend
 	// contins user_data.vote_code, user_data.beers and user_data.ratings etc.
@@ -28,6 +29,7 @@ var beer_db = function () {
 	var DEBUGMODE = false;
 	var VOTE_STATUS_INTERVAL = 10000;
 	var VOTE_CODE_LEN = 6;
+	var HIDE_BEERS_BEFORE_START = true;
 	var competition_name = "";
 	var competition_open = false;
 	var competition_closes_hhmm = "";
@@ -69,6 +71,7 @@ var beer_db = function () {
 					VOTE_STATUS_INTERVAL = response.SETTING_SYSSTATUS_INTERVAL;
 					VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
 					ENABLE_RATING = response.ENABLE_RATING;
+					HIDE_BEERS_BEFORE_START = response.HIDE_BEERS_BEFORE_START;
 
 					//set cssCompetitionTheme (optional)
 					if (response.CSS_COMPETITION_THEME != null && response.CSS_COMPETITION_THEME != "" &&
@@ -109,6 +112,7 @@ var beer_db = function () {
 				classes = response.classes;
 				beers = response.beers;
 				styles = response.styles;
+				beersHidden = response.beersHidden;
 				if (DEBUGMODE) { console.log("@competition_data"); console.log(response); }
 
 			},
@@ -298,7 +302,7 @@ var beer_db = function () {
 
 		//welcome-popup close event
 		$("#welcome-popup").on('hidden.bs.modal', function (event) {
-			
+
 			const introDriverObj = driver({
 				animate: true,
 				showProgress: true,
@@ -318,11 +322,11 @@ var beer_db = function () {
 						}
 					},
 					{ element: '#sort-dropdown-button', popover: { title: 'Sortera', description: 'Sortera ölen efter tävlingsnummer, stil eller betyg.' } },
-	
+
 					{ element: '#menu-rate-start', popover: { title: 'Aktivera röstkod', description: 'Tryck här för att aktivera eller byta röstkod samt få mer information om tävlingen.' } },
 					{ element: '#menu-search-beer', popover: { title: 'Snabbsökning', description: 'Sök på tävlingsnummer för direktvisning av ölet. Exempel: "123" <p>Alternativt går det även att använda mobilens kamera (utanför appen) för att scanna ölets QR-kod.</p>' } }
-	
-	
+
+
 				]
 				,
 				onDestroyed: function () {
@@ -333,7 +337,7 @@ var beer_db = function () {
 					}
 				}
 			});
-	
+
 			introDriverObj.drive();
 			wentTotheWelcomePopup = true;
 
@@ -378,8 +382,8 @@ var beer_db = function () {
 
 
 
-		
-		
+
+
 		//on beer-popup guide click
 		$('#beer-popup-guide').on('click', function (e) {
 			//Driver for beer-popup
@@ -393,18 +397,18 @@ var beer_db = function () {
 				prevBtnText: 'Föregående',
 				doneBtnText: 'Stäng!',
 				steps: [
-					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet. OG (Original Gravity, sv. densitet) är uppmätt sockermängd/vörtstyrka innan jäsning. Densiteten efter jäsning anges som FG (Final Gravity)' , side: "bottom", align: 'center'  } },
-					{ element: '#popup-brewer-data', popover: { title: 'Öldata del 2', description: 'Alkoholhalten mäts eller beräknas utifrån OG/FG och anges i volymprocent (ABV). Ölets beska kommer oftast från alfasyran i humlen och anges i måttenheten IBU (International Bitterness Units) ' , side: "bottom", align: 'center'  } },
+					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet. OG (Original Gravity, sv. densitet) är uppmätt sockermängd/vörtstyrka innan jäsning. Densiteten efter jäsning anges som FG (Final Gravity)', side: "bottom", align: 'center' } },
+					{ element: '#popup-brewer-data', popover: { title: 'Öldata del 2', description: 'Alkoholhalten mäts eller beräknas utifrån OG/FG och anges i volymprocent (ABV). Ölets beska kommer oftast från alfasyran i humlen och anges i måttenheten IBU (International Bitterness Units) ', side: "bottom", align: 'center' } },
 					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck på texten för att visa stilguide / öltypsdefinition' } },
 					{ element: '#popup-drank legend', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
 					{ element: '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till 5 sjtärnor. Betyget bidrar med poäng i Folkets val.' } },
 					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
-					
+
 
 				]
-			});			
+			});
 			beerPopupDriverObj.drive();
-			
+
 		});
 
 
@@ -719,7 +723,7 @@ var beer_db = function () {
 		// Order beers by sort order
 
 		var sorted_beers_by_class = [];
-
+		var beerCount = 0;
 		$.each(beers, function (i, beer) {
 
 			var class_id = beer['class'];
@@ -727,20 +731,21 @@ var beer_db = function () {
 				sorted_beers_by_class[class_id] = [];
 
 			sorted_beers_by_class[class_id].push(i);
+			beerCount++;
 		});
+		if (beerCount > 0) {
+			//if (DEBUGMODE) {console.log("beers"); console.log(beers)};
 
-		//if (DEBUGMODE) {console.log("beers"); console.log(beers)};
 
+			//loop through the classes and sort the beers in each class (note: classes might be in random order, use .id )
+			$.each(classes, function (no_use, vote_class) {
+				//sort the beers in each class with current compare_function
 
-		//loop through the classes and sort the beers in each class (note: classes might be in random order, use .id )
-		$.each(classes, function (no_use, vote_class) {
-			//sort the beers in each class with current compare_function
+				sorted_beers_by_class[vote_class.id].sort(compare_function);
+				//if (DEBUGMODE) console.log("sorted_beers_by_class[" + vote_class.id + "]"); console.log(sorted_beers_by_class[vote_class.id]);
 
-			sorted_beers_by_class[vote_class.id].sort(compare_function);
-			//if (DEBUGMODE) console.log("sorted_beers_by_class[" + vote_class.id + "]"); console.log(sorted_beers_by_class[vote_class.id]);
-
-		});
-
+			});
+		}
 
 		// Sort beers into classes.
 		var items = {};
@@ -798,7 +803,7 @@ var beer_db = function () {
 
 
 			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group ">');
-			pages.push(items[vote_class.id].join(''));
+			if (beerCount > 0 ) pages.push(items[vote_class.id].join(''));
 			pages.push('</div>');
 			pages.push('</div>');
 
@@ -826,17 +831,17 @@ var beer_db = function () {
 		//assign the styles array to the modal
 		$('#style-guide-popup').find('#style-guide-popup-mainstyle').html(main_style.name + " (" + main_style.number + ")");
 		$('#style-guide-popup').find('#style-guide-popup-substyle').html(style_substyle.name + " (" + style_substyle.letter + ")");
-		$('#style-guide-popup').find('#style-guide-popup-og-range').html('OG ' + (style_substyle.ogMin || ' ' ) + ' - ' + (style_substyle.ogMax  || ' ') );
-		$('#style-guide-popup').find('#style-guide-popup-fg-range').html("FG " + (style_substyle.fgMin || ' ') + " - " + (style_substyle.fgMax  || ' '));
-		$('#style-guide-popup').find('#style-guide-popup-ibu-range').html("Beska " + (style_substyle.ibuMin || ' ' ) + " - " + (style_substyle.ibuMax || ' ' + " IBU"));
-		$('#style-guide-popup').find('#style-guide-popup-abv-range').html("ABV " + (style_substyle.abvMin || ' ' ) + " - " + (style_substyle.abvMax  || ' ' ) + " %" );
-		$('#style-guide-popup').find('#style-guide-popup-ebc-range').html("Färg " + (style_substyle.ebcMin || ' ' ) + " - " + (style_substyle.ebcMax || ' ' ) + " EBC");
+		$('#style-guide-popup').find('#style-guide-popup-og-range').html('OG ' + (style_substyle.ogMin || ' ') + ' - ' + (style_substyle.ogMax || ' '));
+		$('#style-guide-popup').find('#style-guide-popup-fg-range').html("FG " + (style_substyle.fgMin || ' ') + " - " + (style_substyle.fgMax || ' '));
+		$('#style-guide-popup').find('#style-guide-popup-ibu-range').html("Beska " + (style_substyle.ibuMin || ' ') + " - " + (style_substyle.ibuMax || ' ' + " IBU"));
+		$('#style-guide-popup').find('#style-guide-popup-abv-range').html("ABV " + (style_substyle.abvMin || ' ') + " - " + (style_substyle.abvMax || ' ') + " %");
+		$('#style-guide-popup').find('#style-guide-popup-ebc-range').html("Färg " + (style_substyle.ebcMin || ' ') + " - " + (style_substyle.ebcMax || ' ') + " EBC");
 		$('#style-guide-popup').find('#style-guide-popup-summary').html(style_substyle.summary || " ");
-		
-		$('#style-guide-popup').find('#style-guide-popup-aroma').html('<strong>Bouquet/arom: </strong>' + (style_substyle.aroma || " ") );
-		$('#style-guide-popup').find('#style-guide-popup-appearance').html('<strong>Utseende: </strong>' + (style_substyle.appearance || " ") );
-		$('#style-guide-popup').find('#style-guide-popup-flavor').html('<strong>Smak: </strong>' + (style_substyle.flavor || " ") );
-		$('#style-guide-popup').find('#style-guide-popup-texture').html('<strong>Munkänsla: </strong>' + (style_substyle.texture || " " ));
+
+		$('#style-guide-popup').find('#style-guide-popup-aroma').html('<strong>Bouquet/arom: </strong>' + (style_substyle.aroma || " "));
+		$('#style-guide-popup').find('#style-guide-popup-appearance').html('<strong>Utseende: </strong>' + (style_substyle.appearance || " "));
+		$('#style-guide-popup').find('#style-guide-popup-flavor').html('<strong>Smak: </strong>' + (style_substyle.flavor || " "));
+		$('#style-guide-popup').find('#style-guide-popup-texture').html('<strong>Munkänsla: </strong>' + (style_substyle.texture || " "));
 		$('#style-guide-popup').modal('show');
 	}
 
@@ -866,8 +871,8 @@ var beer_db = function () {
 		$("#popup-header").html(beer.entry_code + ". " + beer.name);
 		$("#popup-brewer").html(beer.brewer);
 		$("#popup-style").html(beer.styleName + " (" + beer.styleId + ") <i class=\"far fa-question-circle secondary-color\" style=\"vertical-align: middle;\"></i>");
-		$("#popup-og").html(parseInt(beer.OG)/1000 +1);
-		$("#popup-fg").html(parseInt(beer.FG)/1000 + 1);
+		$("#popup-og").html(parseInt(beer.OG) / 1000 + 1);
+		$("#popup-fg").html(parseInt(beer.FG) / 1000 + 1);
 		$("#popup-alcohol").html(beer.alk);
 		$("#popup-ibu").html(beer.IBU);
 
@@ -1110,6 +1115,9 @@ var beer_db = function () {
 					var open_closed_text = 'Betygsättningen öppnar om '
 						+ secondsToString(competition_seconds_to_open) + '.';
 				}
+			}
+			if (beersHidden) {
+				open_closed_text += ' <strong>Tävlingsbidrag är dolda innan tävling.</strong>';
 			}
 		}
 		update_rating_allowed();
