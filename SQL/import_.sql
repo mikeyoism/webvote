@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 12, 2024 at 08:22 PM
+-- Generation Time: Apr 12, 2024 at 07:56 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -22,7 +22,7 @@ SET time_zone = "+00:00";
 --
 DROP DATABASE IF EXISTS `webvote`;
 CREATE DATABASE IF NOT EXISTS `webvote` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `webvote3`;
+USE `webvote`;
 
 -- --------------------------------------------------------
 
@@ -50,7 +50,10 @@ CREATE TABLE `competitions` (
   `name` varchar(100) DEFAULT NULL,
   `openTime` datetime NOT NULL,
   `closeTime` datetime NOT NULL,
-  `testingOpenUntilTime` datetime DEFAULT NULL
+  `testingOpenUntilTime` datetime DEFAULT NULL,
+  `lastEventRegCache` datetime DEFAULT NULL,
+  `cssCompetitionTheme` varchar(100) DEFAULT NULL COMMENT 'Valfri, alternativ: se _config.php',
+  `styleDefinitionsUrl` varchar(100) DEFAULT NULL COMMENT 'styles json'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -102,24 +105,11 @@ CREATE TABLE `ratings` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `votesys_users`
+-- Table structure for table `votecodes`
 --
 
-DROP TABLE IF EXISTS `votesys_users`;
-CREATE TABLE `votesys_users` (
-  `username` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  `id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `voteCodes`
---
-
-DROP TABLE IF EXISTS `voteCodes`;
-CREATE TABLE `voteCodes` (
+DROP TABLE IF EXISTS `votecodes`;
+CREATE TABLE `votecodes` (
   `id` int(11) NOT NULL,
   `competitionId` int(11) NOT NULL,
   `code` char(6) NOT NULL
@@ -141,6 +131,19 @@ CREATE TABLE `votes` (
   `vote3` int(11) DEFAULT NULL,
   `votingMethod` enum('web','manual') NOT NULL,
   `creationTime` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `votesys_users`
+--
+
+DROP TABLE IF EXISTS `votesys_users`;
+CREATE TABLE `votesys_users` (
+  `username` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL,
+  `id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -202,15 +205,9 @@ ALTER TABLE `ratings`
   ADD KEY `ratings_ibfk_3` (`categoryId`,`beerEntryId`);
 
 --
--- Indexes for table `votesys_users`
+-- Indexes for table `votecodes`
 --
-ALTER TABLE `votesys_users`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `voteCodes`
---
-ALTER TABLE `voteCodes`
+ALTER TABLE `votecodes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `competitionId` (`competitionId`);
 
@@ -224,6 +221,12 @@ ALTER TABLE `votes`
   ADD KEY `categoryId_2` (`categoryId`,`vote1`),
   ADD KEY `categoryId_3` (`categoryId`,`vote2`),
   ADD KEY `categoryId_4` (`categoryId`,`vote3`);
+
+--
+-- Indexes for table `votesys_users`
+--
+ALTER TABLE `votesys_users`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `vote_weights_and_labels`
@@ -267,21 +270,21 @@ ALTER TABLE `ratings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `votesys_users`
+-- AUTO_INCREMENT for table `votecodes`
 --
-ALTER TABLE `votesys_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `voteCodes`
---
-ALTER TABLE `voteCodes`
+ALTER TABLE `votecodes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `votes`
 --
 ALTER TABLE `votes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `votesys_users`
+--
+ALTER TABLE `votesys_users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
