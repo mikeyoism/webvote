@@ -829,6 +829,7 @@ var beer_db = function () {
 	//popup full style guide
 	function popup_style_guide(main_style, style_substyle) {
 		//assign the styles array to the modal
+		
 		$('#style-guide-popup').find('#style-guide-popup-mainstyle').html(main_style.name + " (" + main_style.number + ")");
 		$('#style-guide-popup').find('#style-guide-popup-substyle').html(style_substyle.name + " (" + style_substyle.letter + ")");
 		$('#style-guide-popup').find('#style-guide-popup-og-range').html('OG ' + (style_substyle.ogMin || ' ') + ' - ' + (style_substyle.ogMax || ' '));
@@ -959,9 +960,11 @@ var beer_db = function () {
 			content: function () {
 				var txt = "<h6>" + beer.styleName + " (" + beer.styleId + ") ";
 				//popup-link to  style-guide-popup
-				txt += "<a href=\"#\" id=\"popup-style-guide-link\" class=\"btn btn-outline-secondary btn-sm  ml-2\">Full Typdef</a>";
+				if (style_main !== null && style_substyle !== null)
+					txt += "<a href=\"#\" id=\"popup-style-guide-link\" class=\"btn btn-outline-secondary btn-sm  ml-2\">Full Typdef</a>"; 
 				txt += "</h6>";
-				txt += "<p>" + style_subdesc + "</p>";
+				if (style_subdesc !== null)
+					txt += "<p>" + style_subdesc + "</p>";
 				return txt;
 			}
 		});
@@ -969,7 +972,8 @@ var beer_db = function () {
 		//style guide link click inside popover
 		$(document).on('click', '#popup-style-guide-link', function (e) {
 			$(this).parents(".popover").popover('hide');
-			popup_style_guide(style_main, style_substyle);
+			if (style_main !== null && style_substyle !== null)
+				popup_style_guide(style_main, style_substyle);
 			e.preventDefault();
 		});
 
