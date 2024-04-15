@@ -69,6 +69,9 @@ if (isset($competition['lastEventRegCache']) && !CONNECT_EVENTREG_DB) {
 
 }
 //has $opentimes[hideBeers] changed compared to last status read?
+if (!isset($_SESSION['hideBeers'])) {
+    $_SESSION['hideBeers'] = $openTimes['hideBeers'];
+}
 if (HIDE_BEERS_BEFORE_START && $openTimes['hideBeers'] != $_SESSION['hideBeers']) {
     $refreshPage = true;
     $_SESSION['hideBeers'] = $openTimes['hideBeers'];
