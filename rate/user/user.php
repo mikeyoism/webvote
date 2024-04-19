@@ -20,19 +20,24 @@ if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name'] > 1 && isset(
     $privilegeLevel = 0; //viewer
     $fv_event_id = $_SESSION['fv_event_id'];
     $et_event_id = $_SESSION['et_event_id'];
+    
+    //if competition is set in session, use it (might not be current competition)
     if (isset($_SESSION['fv_votesys_competition_id'])){
-        $competitionIdFV = $_SESSION['fv_votesys_competition_id'];
+        $competitionId = $_SESSION['fv_votesys_competition_id'];
     }
-    //etikett
-    if (isset($_SESSION['et_votesys_competition_id'])){
-        $competitionIdET = $_SESSION['et_votesys_competition_id'];
+    else
+    {
+        //get current competition
+        $dbAccess = new DbAccess();
+        $competitionId = getCompetitionId(); //Testing only
+        
     }
 } else {
     $event_username = null;
     $event_user_id = null;
     $privilegeLevel = null;
 
-    //$competitionIdFV = getCompetitionId();
+    
     $jsonReply['usrmsg'] = 'Du är inte inloggad, logga in på event.shbf.se ';
     header('Content-Type: application/json', true);
     echo json_encode($jsonReply);
@@ -40,14 +45,9 @@ if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name'] > 1 && isset(
 }
 //todo: local login option against eventreg db?
 
-$competitionIdFV = getCompetitionId(); //Testing only
-
-//post
-// $voteArgs = json_decode(file_get_contents('php://input'));
-
 $dbAccess = new DbAccess();
 
-$competition = $dbAccess->getCompetition($competitionIdFV);
+$competition = $dbAccess->getCompetition($competitionId);
 $openTimes = dbAccess::calcCompetitionTimes($competition);
 
 if ($openTimes['brewerLoginOpen'] !== true){
@@ -61,8 +61,13 @@ $voteCountStartTime = $openTimes['voteCountStartTime']; //typically null
 
 //get beers by event_username
 
-$beers = $dbAccess->getBeersByBrewer($competitionIdFV,$fv_event_id,$event_user_id);
-
+$beers = $dbAccess->getBeersByBrewer($competitionId,null/*$fv_event_id*/,$event_user_id);
+if ($beers === null){
+    $jsonReply['usrmsg'] = 'Inga öl hittades för användare ' . $event_username;
+    header('Content-Type: application/json', true);
+    echo json_encode($jsonReply);
+    die();
+} 
 //for each beer, get rating average, count and comments
 
 foreach ($beers as $key => $beer){

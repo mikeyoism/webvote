@@ -202,7 +202,7 @@ class DbAccess
         $closeTime = $competition['closeTime'];
         $testingOpenUntilTime = $competition['testingOpenUntilTime'];
         $brewerLoginOpenFrom = $competition['brewerLoginOpenFrom'];
-        
+
 
         $now = new DateTime();
         $timeBeforeOpen = date_diff($now, $openTime);
@@ -407,7 +407,8 @@ class DbAccess
         $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getBeer: Query failed: $sql");
 
         if ($result->num_rows < 1)
-            die("Invalid getBeer result, har ölen tilldelats FV-nr i eventdatasen? id=" . $beerEntryId . " num_rows: " . $result->num_rows);//. " sql: " . $sql);
+            //die("Invalid getBeer result, har ölen tilldelats FV-nr i eventdatasen? id=" . $competitionId . " num_rows: " . $result->num_rows);//. " sql: " . $sql);
+            return null;
 
         $beers = array();
         $classes = $this->getCategories($competitionId, true);
