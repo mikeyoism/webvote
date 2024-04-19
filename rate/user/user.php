@@ -8,8 +8,11 @@ if ($len >= 3){
 }
 session_start();
 require_once '../../vote/php/common.inc';
+$jsonReply = array();
+$jsonReply['beers'] = null;
+$jsonReply['usrmsg'] = null;
 
-$competitionIdFV = getCompetitionId(); //Testing only
+
 //logged in from event.shbf.se?
 if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name'] > 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)){
     $event_username = $_SESSION['user_name'];
@@ -30,19 +33,30 @@ if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name'] > 1 && isset(
     $privilegeLevel = null;
 
     //$competitionIdFV = getCompetitionId();
-    die('Not logged in');
+    $jsonReply['usrmsg'] = 'Du är inte inloggad, logga in på event.shbf.se ';
+    header('Content-Type: application/json', true);
+    echo json_encode($jsonReply);
+    die();    
 }
 //todo: local login option against eventreg db?
 
-
+$competitionIdFV = getCompetitionId(); //Testing only
 
 //post
-$voteArgs = json_decode(file_get_contents('php://input'));
+// $voteArgs = json_decode(file_get_contents('php://input'));
 
 $dbAccess = new DbAccess();
 
 $competition = $dbAccess->getCompetition($competitionIdFV);
 $openTimes = dbAccess::calcCompetitionTimes($competition);
+
+if ($openTimes['brewerLoginOpen'] !== true){
+    $jsonReply['usrmsg'] = 'Inloggning ej öppen, den öppnar ' . date_format($openTimes['brewerLoginOpenFrom'],'Y-m-d H:i:s');
+    header('Content-Type: application/json', true);
+    echo json_encode($jsonReply);    
+    die();
+}
+
 $voteCountStartTime = $openTimes['voteCountStartTime']; //typically null
 
 //get beers by event_username
@@ -71,5 +85,7 @@ foreach ($beers as $key => $beer){
 }
 
 
+$jsonReply['beers'] = $beers;
+$jsonReply['usrmsg'] = 'OK';
 header('Content-Type: application/json', true);
-echo json_encode($beers);
+echo json_encode($jsonReply);

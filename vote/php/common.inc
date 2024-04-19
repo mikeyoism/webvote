@@ -137,7 +137,7 @@ class DbAccess
 
         $voteCodeCount = $result->fetch_assoc()['c'];
 
-        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime,lastEventRegCache '
+        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime,lastEventRegCache, brewerLoginOpenFrom '
             . 'FROM competitions '
             . 'WHERE competitions.id=' . $this->escape($id);
         $result = $this->getConnection()->query($sql) or die("getCompetition: Query failed: $sql");
@@ -159,6 +159,12 @@ class DbAccess
         } else {
             $lastEventRegCache = new DateTime($row['lastEventRegCache']);
         }
+        
+        if (is_null($row['brewerLoginOpenFrom'])) {
+            $brewerLoginOpenFrom = $closeTime; //fallback to closeTime
+        } else {
+            $brewerLoginOpenFrom = new DateTime($row['brewerLoginOpenFrom']);
+        }
         //get evetreg event_id's corresponding to our $compentionId
         $evenreg_event_ids = $this->getEventReg_EventId($id);
         $ids = array();
@@ -174,6 +180,7 @@ class DbAccess
             'name' => $row['name'],
             'openTime' => $openTime,
             'closeTime' => $closeTime,
+            'brewerLoginOpenFrom' => $brewerLoginOpenFrom,  //when users can login to the brewer page at /rate/user for own beer statistics
             'testingOpenUntilTime' => $testingOpenUntilTime,
             'lastEventRegCache' => $lastEventRegCache,
             'voteCodeCount' => $voteCodeCount,
@@ -194,6 +201,8 @@ class DbAccess
         $openTime = $competition['openTime'];
         $closeTime = $competition['closeTime'];
         $testingOpenUntilTime = $competition['testingOpenUntilTime'];
+        $brewerLoginOpenFrom = $competition['brewerLoginOpenFrom'];
+        
 
         $now = new DateTime();
         $timeBeforeOpen = date_diff($now, $openTime);
@@ -234,7 +243,8 @@ class DbAccess
             $hideBeers = true;
         }
     
-
+        //are we beyond brewerLoginOpenFrom time?
+        $brewerLoginOpen = $now > $brewerLoginOpenFrom;
 
         return array(
             'openTime' => $openTime,
@@ -246,7 +256,9 @@ class DbAccess
             'timeBeforeOpen' => $timeBeforeOpen,
             'timeBeforeClose' => $timeBeforeClose,
             'timeBeforeOpenSeconds' => $timeBeforeOpenSeconds,
-            'voteCountStartTime' => $voteCountStartTime
+            'voteCountStartTime' => $voteCountStartTime,
+            'brewerLoginOpen' => $brewerLoginOpen,
+            'brewerLoginOpenFrom' => $brewerLoginOpenFrom
             
         );
     }
