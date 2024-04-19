@@ -137,7 +137,7 @@ class DbAccess
 
         $voteCodeCount = $result->fetch_assoc()['c'];
 
-        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime,lastEventRegCache '
+        $sql = 'SELECT name, openTime, closeTime, testingOpenUntilTime,lastEventRegCache, brewerLoginOpenFrom '
             . 'FROM competitions '
             . 'WHERE competitions.id=' . $this->escape($id);
         $result = $this->getConnection()->query($sql) or die("getCompetition: Query failed: $sql");
@@ -159,6 +159,12 @@ class DbAccess
         } else {
             $lastEventRegCache = new DateTime($row['lastEventRegCache']);
         }
+        
+        if (is_null($row['brewerLoginOpenFrom'])) {
+            $brewerLoginOpenFrom = $closeTime; //fallback to closeTime
+        } else {
+            $brewerLoginOpenFrom = new DateTime($row['brewerLoginOpenFrom']);
+        }
         //get evetreg event_id's corresponding to our $compentionId
         $evenreg_event_ids = $this->getEventReg_EventId($id);
         $ids = array();
@@ -174,6 +180,7 @@ class DbAccess
             'name' => $row['name'],
             'openTime' => $openTime,
             'closeTime' => $closeTime,
+            'brewerLoginOpenFrom' => $brewerLoginOpenFrom,  //when users can login to the brewer page at /rate/user for own beer statistics
             'testingOpenUntilTime' => $testingOpenUntilTime,
             'lastEventRegCache' => $lastEventRegCache,
             'voteCodeCount' => $voteCodeCount,
@@ -194,6 +201,8 @@ class DbAccess
         $openTime = $competition['openTime'];
         $closeTime = $competition['closeTime'];
         $testingOpenUntilTime = $competition['testingOpenUntilTime'];
+        $brewerLoginOpenFrom = $competition['brewerLoginOpenFrom'];
+
 
         $now = new DateTime();
         $timeBeforeOpen = date_diff($now, $openTime);
@@ -234,7 +243,8 @@ class DbAccess
             $hideBeers = true;
         }
     
-
+        //are we beyond brewerLoginOpenFrom time?
+        $brewerLoginOpen = $now > $brewerLoginOpenFrom;
 
         return array(
             'openTime' => $openTime,
@@ -246,7 +256,9 @@ class DbAccess
             'timeBeforeOpen' => $timeBeforeOpen,
             'timeBeforeClose' => $timeBeforeClose,
             'timeBeforeOpenSeconds' => $timeBeforeOpenSeconds,
-            'voteCountStartTime' => $voteCountStartTime
+            'voteCountStartTime' => $voteCountStartTime,
+            'brewerLoginOpen' => $brewerLoginOpen,
+            'brewerLoginOpenFrom' => $brewerLoginOpenFrom
             
         );
     }
@@ -363,6 +375,102 @@ class DbAccess
         );
 
         return $beer;
+    }
+    //get beer info from eventreg database, for a single brewer_id / (user_id in eventreg database)
+    public function getBeersByBrewer($competitionId,$event_id, $brewer_id)
+    {
+        if ($event_id == null){
+        $events = $this->getEventReg_EventId($competitionId);
+        $evenreg_event_ids = array();
+        foreach ($events as $event) {
+            array_push($evenreg_event_ids, $event['event_id']);
+        }
+        }
+        else{
+            $evenreg_event_ids = array($event_id);
+        }
+        if (count($evenreg_event_ids) < 1)
+            die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
+        $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
+
+        $sql = 'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, ' .
+            'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
+            'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
+            'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
+            'WHERE Beers.user_id =' . $brewer_id . ' AND Beers_in_event.event_id IN (' . implode(',', $evenreg_event_ids) . ') ' .
+            'AND Beers_in_event.deleted = 0 ' .
+            'AND Beer_data.deleted = 0 AND Beers.deleted = 0 ' .
+            'AND Users.deleted = 0 AND User_data.deleted = 0 ' .
+            'ORDER BY Beer_data.main_class, Beer_data.sub_class ASC';
+        ;
+
+        $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getBeer: Query failed: $sql");
+
+        if ($result->num_rows < 1)
+            //die("Invalid getBeer result, har ölen tilldelats FV-nr i eventdatasen? id=" . $competitionId . " num_rows: " . $result->num_rows);//. " sql: " . $sql);
+            return null;
+
+        $beers = array();
+        $classes = $this->getCategories($competitionId, true);
+        $entry=1;
+        $nextEntryId = 1;
+        $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
+        $classIndex = 0;
+        while ($row = $result->fetch_assoc()) {
+            $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+            if ($fv_class_id_nr == 0)
+                die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+            $classIndex = $classOffset + $fv_class_id_nr;
+            //find classes.id in $classes
+            $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
+                return ($var['id'] == $classIndex);
+            }));
+
+            if (!array_key_exists(0, $class))
+                die("Invalid class id." . $classIndex);
+            //find the class name in $classes by array key Id
+
+
+            //extract style name from type_name (format main_class.sub_class style_name)
+            $styleName = str_replace($row['main_class'] . ':' . $row['sub_class'] . ' ', '', $row['type_name']);
+
+            $entryId = $nextEntryId++;
+
+            $sql2 =
+                'SELECT Brewers_of_beer.brewer_id, Brewers.brewer_name FROM Brewers_of_beer ' .
+                'INNER JOIN Brewers USING (brewer_id) ' .
+                'WHERE Brewers_of_beer.beer_id =' . $row['beer_id'] . ' ' .
+                'AND Brewers_of_beer.deleted = 0';
+            $result2 = $this->getConnectionDb2_Eventreg()->query($sql2) or die("getBeers: Query failed: $sql2");
+            $i = 0;
+            $brewer_names = "";
+            while ($row2 = mysqli_fetch_array($result2)) {
+                if ($i > 0) {
+                    $brewer_names = $brewer_names . ", " . $row2['brewer_name'];
+                } else {
+                    $brewer_names = $row2['brewer_name'];
+                }
+                $i++;
+            }
+
+            $beer = array(
+                'class' => $class[0]['id'], //must always match id in categories/competitions
+                'entry_id' => $entry,
+                'entry_code' => $row['fv_competition_no'],
+                'styleId' => $row['main_class'] . $row['sub_class'],
+                'styleName' => $styleName,
+                'name' => $row['beer_name'],
+                'brewer' => $brewer_names,
+                'alk' => $row['alc'],
+                'OG' => $row['og'],
+                'FG' => $row['fg'],
+                'IBU' => $row['bu']
+            );
+            //note: no offset in arrayposition, as we use the entryId as key
+            $beers[$entryId] = $beer;
+        }
+
+        return $beers;
     }
 
 
@@ -1205,6 +1313,109 @@ class DbAccess
         $result = $this->getConnection()->query($sql) or die("getDrankCheckCount: Query failed: $sql");
         $drankCheckCount = $result->fetch_assoc()['c'];
         return $drankCheckCount;
+    }
+
+    //get rating count for a specific entry_code (Beer FV-nr)
+    public function getRatingCountForEntryCode($entryCode, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and ratingScore>0' . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getRatingCountForEntryCode: Query failed: $sql");
+        $ratingCount = $result->fetch_assoc()['c'];
+        return $ratingCount;
+    }
+    //get comments for a specific entry_code (Beer FV-nr)
+    public function getCommentsForEntryCode($entryCode, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select ratingComment from ratings where beerEntryId=' . $this->escape($entryCode) . ' and ratingComment is not null' . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getCommentsForEntryCode: Query failed: $sql");
+        $comments = array();
+        while ($row = $result->fetch_assoc()) {
+            array_push($comments, htmlspecialchars_decode($row['ratingComment']));
+        }
+        return $comments;
+    }
+    //get number of drankCheck's for a specific entry_code (Beer FV-nr)
+    public function getDrankCheckCountForEntryCode($entryCode, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        //note: in a correct db, drankcheck is always 1 if ratingScore>0, but we check both here for safety
+        $sql = 'select count(drankCheck) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and (drankCheck=1)' . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getDrankCheckCountForEntryCode: Query failed: $sql");
+        $drankCheckCount = $result->fetch_assoc()['c'];
+        return $drankCheckCount;
+    }
+    //get ratingScores for a specific entry_code (Beer FV-nr)
+    public function getRatingScoresForEntryCode($entryCode, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select ratingScore from ratings where beerEntryId=' . $this->escape($entryCode) . ' and ratingScore>0' . $extraCond;
+        $result = $this->getConnection()->query($sql) or die("getRatingScoresForEntryCode: Query failed: $sql");
+        $ratingScores = array();
+        while ($row = $result->fetch_assoc()) {
+            $ratingScores[] = $row['ratingScore'];
+        }
+        return $ratingScores;
+    }
+    //get ratingScores for a specific entry_code (Beer FV-nr) 
+    public function getRatingStarCountForEntryCode($entryCode, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
+        $result = $this->getConnection()->query($sql) or die("getRatingScoreCountForEntryCode: Query failed: $sql");
+        $ratingScoreCount = array();
+        while ($row = $result->fetch_assoc()) {
+            $ratingScoreCount[$row['ratingScore']] = $row['c'];
+        }
+        return $ratingScoreCount;
+    }
+
+    
+
+
+
+
+
+
+
+
+//
+
+    public function getRatingScoreCountForEntryCode($entryCode, $voteCountStartTime)
+    {
+        if ($voteCountStartTime === null) {
+            $extraCond = '';
+        } else {
+            $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+        $sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
+        $result = $this->getConnection()->query($sql) or die("getRatingScoreCountForEntryCode: Query failed: $sql");
+        $ratingScoreCount = array();
+        while ($row = $result->fetch_assoc()) {
+            $ratingScoreCount[$row['ratingScore']] = $row['c'];
+        }
+        return $ratingScoreCount;
     }
 
     //cache-lagrar öldata från eventReg, i filer för att undvika att läsa från db varje gång

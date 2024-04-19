@@ -290,3 +290,12 @@
     overflow:auto;
     max-height:calc(100vh - 125px);
   }
+
+
+
+
+  .card-header {
+    background-color: #D2C199;
+    font-weight: bold;
+    color: black;
+  }
