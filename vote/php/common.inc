@@ -129,7 +129,18 @@ class DbAccess
         else
             return null;
     }
+    //git reintegrated
+    public function getCompetitions()
+    {
+        $sql = 'SELECT id, name, openTime, closeTime FROM competitions ORDER BY id';
+        $result = $this->getConnection()->query($sql) or die ("getCompetitions: Query failed: $sql");
 
+    	$rows = array();
+	    while ($row = $result->fetch_assoc()) {
+	        array_push($rows, array('id' => $row['id'], 'name' => $row['name'], 'openTime' => $row['openTime'], 'closeTime' => $row['closeTime']));
+	    }
+	    return $rows;
+    }
     public function getCompetition($id)
     {
         $sql = 'SELECT count(*) as c FROM voteCodes WHERE competitionId=' . $this->escape($id);
@@ -1523,6 +1534,10 @@ class DbAccess
 
         return $ret;
     }
+}
+//git reintegrated
+function isCompetitionSet() {
+    return isset($_GET['competitionId']);
 }
 
 function getCompetitionId()

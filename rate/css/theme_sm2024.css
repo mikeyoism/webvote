@@ -26,7 +26,15 @@
     content: url('front_programblad_sm2024.png');
 
 }
+/* /pub folder */
+.pub-footer-logo img {
+    content: url('logo-SM-hembryggd-öl-2024_.svg');
+    max-width: 100%;
+    max-height: 100%;
+    padding: 0%;
+    margin-left: 10%;
 
+}
 /*for adjusting the the carousel container for #eventposter-slide*/
 #modal-content-eventposter_img {
     /* border: none;*/
@@ -79,7 +87,10 @@
     opacity: 0.85;
     max-width: 375px;
 }
-
+.competition-status-main-public {
+    opacity: 0.85;
+    /* max-width: 375px; */
+}
 
 
 .carousel-control-prev-icon {

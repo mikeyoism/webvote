@@ -1,0 +1,8 @@
+//vscode configuration file
+{
+    "typeAcquisition": {
+        "include": [
+            "jquery"
+        ]
+    }
+}
