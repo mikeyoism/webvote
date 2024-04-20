@@ -15,12 +15,37 @@ if (isset($_POST['login'])) {
 }
 
 $competitionId = getCompetitionId();
-
+    
 if (isLoggedIn()) {
     list($privilegeLevel, $username) = requireLoggedIn($competitionId, 1);
 } else {
     $privilegeLevel = 0;
 }
+
+if (!isCompetitionSet()) {
+    ?>
+    <head>
+    <meta charset="utf-9"/>
+    <title>Administration</title>
+    <link rel="stylesheet" href="css/themes/shbf.css" />
+    </head>
+    <body>
+    <h1>Administration</h1>
+    <ul>
+    <?php
+        $competitions = $dbAccess->getCompetitions();
+        foreach ($competitions as $competition) {
+            print "<li><a href='?competitionId=" . $competition['id'] . "'>" . $competition['name'] . "</a></li>";
+        }   
+    ?>
+    </ul>
+    </body>
+    </html>
+    <?php
+        exit;
+    }
+    
+
 
 $competition = $dbAccess->getCompetition($competitionId);
 $openTimes = dbAccess::calcCompetitionTimes($competition);

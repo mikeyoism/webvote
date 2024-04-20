@@ -109,10 +109,10 @@ class DbAccess
     {
         $url = $this->getBeerStyleGuideUrl($compentionId);
         if (!empty($url)) {
-         
+
             try {
                 $json = file_get_contents($url);
-                $json = mb_convert_encoding($json,"UTF-8");
+                $json = mb_convert_encoding($json, "UTF-8");
             } catch (Exception $e) {
                 die('Error no beer styles found from url: ' . $url);
             }
@@ -122,24 +122,23 @@ class DbAccess
             $styles = json_decode($json, true);
             if (empty($styles)) {
                 die('Error decoding beer styles from url: ' . $url);
-            
+
             }
             return $styles;
-        }
-        else
+        } else
             return null;
     }
     //git reintegrated
     public function getCompetitions()
     {
         $sql = 'SELECT id, name, openTime, closeTime FROM competitions ORDER BY id';
-        $result = $this->getConnection()->query($sql) or die ("getCompetitions: Query failed: $sql");
+        $result = $this->getConnection()->query($sql) or die("getCompetitions: Query failed: $sql");
 
-    	$rows = array();
-	    while ($row = $result->fetch_assoc()) {
-	        array_push($rows, array('id' => $row['id'], 'name' => $row['name'], 'openTime' => $row['openTime'], 'closeTime' => $row['closeTime']));
-	    }
-	    return $rows;
+        $rows = array();
+        while ($row = $result->fetch_assoc()) {
+            array_push($rows, array('id' => $row['id'], 'name' => $row['name'], 'openTime' => $row['openTime'], 'closeTime' => $row['closeTime']));
+        }
+        return $rows;
     }
     public function getCompetition($id)
     {
@@ -170,7 +169,7 @@ class DbAccess
         } else {
             $lastEventRegCache = new DateTime($row['lastEventRegCache']);
         }
-        
+
         if (is_null($row['brewerLoginOpenFrom'])) {
             $brewerLoginOpenFrom = $closeTime; //fallback to closeTime
         } else {
@@ -197,7 +196,7 @@ class DbAccess
             'voteCodeCount' => $voteCodeCount,
             'eventReg_ids' => $ids,
             'eventReg_Info' => $eventInfo,
-            
+
 
         );
     }
@@ -248,12 +247,12 @@ class DbAccess
         }
         $hideBeers = false;
         //calc seconds to open
-         $timeBeforeOpenSeconds = $timeBeforeOpen->invert ? 0 : $timeBeforeOpen->days * 24 * 60 * 60 + $timeBeforeOpen->h * 60 * 60 + $timeBeforeOpen->i * 60 + $timeBeforeOpen->s;
-             //until 3 hours before competition[timeBeforeOpenSeconds], hide beers
+        $timeBeforeOpenSeconds = $timeBeforeOpen->invert ? 0 : $timeBeforeOpen->days * 24 * 60 * 60 + $timeBeforeOpen->h * 60 * 60 + $timeBeforeOpen->i * 60 + $timeBeforeOpen->s;
+        //until 3 hours before competition[timeBeforeOpenSeconds], hide beers
         if (HIDE_BEERS_BEFORE_START && $open == false && $timeBeforeOpenSeconds > 14400) {
             $hideBeers = true;
         }
-    
+
         //are we beyond brewerLoginOpenFrom time?
         $brewerLoginOpen = $now > $brewerLoginOpenFrom;
 
@@ -270,7 +269,7 @@ class DbAccess
             'voteCountStartTime' => $voteCountStartTime,
             'brewerLoginOpen' => $brewerLoginOpen,
             'brewerLoginOpenFrom' => $brewerLoginOpenFrom
-            
+
         );
     }
 
@@ -388,16 +387,15 @@ class DbAccess
         return $beer;
     }
     //get beer info from eventreg database, for a single brewer_id / (user_id in eventreg database)
-    public function getBeersByBrewer($competitionId,$event_id, $brewer_id)
+    public function getBeersByBrewer($competitionId, $event_id, $brewer_id)
     {
-        if ($event_id == null){
-        $events = $this->getEventReg_EventId($competitionId);
-        $evenreg_event_ids = array();
-        foreach ($events as $event) {
-            array_push($evenreg_event_ids, $event['event_id']);
-        }
-        }
-        else{
+        if ($event_id == null) {
+            $events = $this->getEventReg_EventId($competitionId);
+            $evenreg_event_ids = array();
+            foreach ($events as $event) {
+                array_push($evenreg_event_ids, $event['event_id']);
+            }
+        } else {
             $evenreg_event_ids = array($event_id);
         }
         if (count($evenreg_event_ids) < 1)
@@ -423,7 +421,7 @@ class DbAccess
 
         $beers = array();
         $classes = $this->getCategories($competitionId, true);
-        $entry=1;
+        $entry = 1;
         $nextEntryId = 1;
         $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
         $classIndex = 0;
@@ -1017,12 +1015,25 @@ class DbAccess
 
             //sort the array by weightedScore (instead of beerEntryId)
             usort($ratingResults, function ($a, $b) {
-                $sort = $b['weightedScore'] - $a['weightedScore'];
+                //note: sort is reversed, as we want the highest score first
+                //sort must return an integer!
+                if ($a['weightedScore'] === $b['weightedScore'])
+                    $sort = 0;
+                else
+                    $sort = $a['weightedScore'] > $b['weightedScore'] ? -1 : 1;
                 //utjämningsregler vid lika poäng
-                if ($sort == 0)
-                    $sort = $b['votersCount'] - $a['votersCount'];
-                if ($sort == 0)
-                    $sort = $b['ratingScore'] - $a['ratingScore'];
+                if ($sort == 0) {
+                    if ($a['votersCount'] === $b['votersCount'])
+                        $sort = 0;
+                    else
+                        $sort = $a['votersCount'] > $b['votersCount'] ? -1 : 1;
+                }
+                if ($sort == 0){
+                    if ($a['ratingScore'] === $b['ratingScore'])
+                        $sort = 0;
+                    else                    
+                    $sort = $a['ratingScore'] > $b['ratingScore'] ? -1 : 1;
+                }
                 return $sort;
             });
         }
@@ -1402,7 +1413,6 @@ class DbAccess
         return $ratingScoreCount;
     }
 
-    
 
 
 
@@ -1411,7 +1421,8 @@ class DbAccess
 
 
 
-//
+
+    //
 
     public function getRatingScoreCountForEntryCode($entryCode, $voteCountStartTime)
     {
@@ -1536,7 +1547,8 @@ class DbAccess
     }
 }
 //git reintegrated
-function isCompetitionSet() {
+function isCompetitionSet()
+{
     return isset($_GET['competitionId']);
 }
 
