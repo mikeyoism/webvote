@@ -58,9 +58,9 @@ foreach ($categories as $category) {
 </p>
 <table >
  <?php if (CONST_SYS_JS_DEBUG) {?>
-<tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th><th><strong>(Normaliserad)</strong></th></th><th>Antal röstare</th><th>(Oviktad råpoäng)</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th>
+<tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th></th><th>Antal betyg</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th><th>(Oviktad råpoäng)</th>
 <?php } else { ?>
-  <tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th></th><th>Antal röstare</th><th>(Oviktad råpoäng)</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th>  
+  <tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th></th><th>Antal betyg</th><th>Ölets Namn</th><th>Bryggare</th><th>(Oviktad råpoäng (publ. ej))</th>  
 <?php
 }
     $voteResult = $dbAccess->getRatingResultTot($category['id'], $voteCountStartTime);
@@ -69,14 +69,12 @@ foreach ($categories as $category) {
         <tr>
         <td><?=$row['beerEntryId']?></td>
         <td><?=round($row['weightedScore'],5)?></td>
-        <?php if (CONST_SYS_JS_DEBUG){?> 
-          <td><?=round($row['weightedScoreNorm'],5)?></td>
-        <?php }?>
         <td><?=$row['votersCount']?></td>
-        <td><?=$row['ratingScore']?></td>
-        <td><?=$row['weightedMeanValue']?></td>
         <td><?=$row['beerName']?></td>
         <td><?=$row['brewer']?></td>
+        <td><?=$row['ratingScore']?></td>
+        
+
         </tr>
 <?php
     }
