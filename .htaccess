@@ -1,3 +1,9 @@
+
+RewriteEngine on
+RewriteRule ^(index\.html)?$ /rate [L,QSA] #OK
+
+
+
 order deny,allow
-deny from all
+allow from all
 
