@@ -94,9 +94,9 @@ define("CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL",true);
 
 //output js & php script debug i klient? Viktigt att sätta false i produktion
 //ger extra fel och info rutor för testning 
-define("CONST_SYS_JS_DEBUG", true); 
+define("CONST_SYS_JS_DEBUG", false); 
 //php extension som inte alltid finns installerad, och är depricerad (one.com)
-define("APC_CACHE_ENABLED", false);
+define("APC_CACHE_ENABLED", true);
 
 
 
