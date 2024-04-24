@@ -1,38 +1,38 @@
 93	 Klass 2	Maltdominerad öl
-177	3A - Engelsk dark mild	Annie Löves Mild	Johan Wallèn, Andreas Nilsson	3.6	37	11	19
-150	3A - Engelsk dark mild	Mild Matters	Fredrik Olsson	4.1	42	10	20
-236	3C - Irländsk red ale	Kellys röda	Olle Wreede	3.9	43	12	22
-232	3E - Brittisk brown ale	Gröna Radhusets Ångest	Ola Kagebeck	4.7	48	12	27
-180	3E - Brittisk brown ale	Fryer Brown	Johan Wallèn	5.3	52	12	21
-248	4A - Engelsk best bitter	SandbyBitter	Ted Elmenheim, Henrik Persson	4.2	42	10	30
-164	4A - Engelsk best bitter	SheepFucker Best Bitter	Henrik Kristedal	4.5	47	13	40
-145	4A - Engelsk best bitter	Best Bitter v1	Marcus	4.2	43	11	27
-114	4A - Engelsk best bitter	Gubbens Nästan Bästa Best Bitter	Claes Eliasson	4.2	44	12	35
-255	4A - Engelsk best bitter	Gubbens Nästan Bästa Best Bitter	Claes Eliasson	4.2	44	12	35
-133	4B - English strong bitter - ESB	Extra Prolific Bitter	Mikael Josefsson	6.2	62	14	41
-195	4G - ?vriga klassiska i kategori Karakt?rsfull Ale	Serbster Rolands Bitterbier	Kjell Aleklett, Håkan Persson, Olle Qvennerstedt	6.0	56	11	92
-131	5G - Barley wine	Barley Legal	Marcus Gustafsson, Mattias Hellström	16.5	171	50	90
-172	5G - Barley wine	Godnatt Yxskaft (2019)	Tor Björnsson, Johan Wallén, Christoffer Johansson, Pontus Olsson, Niclas Rickardsson	18.0	150	20	100
-181	5H - Övriga klassiska i kategori Kraftig Ale	Scarlet Harlot	Johan Wallèn, Fredrik Olsson	6.8	66	14	59
-198	5H - Övriga klassiska i kategori Kraftig Ale	Inglorious Bastard	Marcus Stenman	7.0	1	1	90
-182	5H - Övriga klassiska i kategori Kraftig Ale	Scarlet Harlot	Johan Wallèn	6.8	66	14	59
-147	7A - Dry stout	Just Another Dry Stout	Fredrik Ek	4.5	1	1	38
-159	7A - Dry stout	Torra Torkel	Hannes Christensen, Anders Norman	3.9	42	12	38
-124	7B - Extra stout	Edwards extra	Dennis Augustzen	7.5	70	12	20
-234	7B - Extra stout	Gröna radhusets djupa mörker	Ola Kagebeck	5.2	52	12	40
-233	7C - Brown porter	Fem maltkorn är fler än fyra humlekottar	Ola Kagebeck	5.7	58	14	60
-165	7C - Brown porter	Father Jack´s London Porter	Henrik Kristedal	5.3	55	15	30
-186	7D - Porter	Korpulent	Jonas Lorenthsson	5.5	59	17	31
-112	7D - Porter	Slätmossens Köksbryggeri: I väntan på so	Bo Ström, Per Thoren	5.9	60	15	30
-127	8D - Imperial stout	Bältarens Svarta	Emil Sjöberg, Fredrik Jakobsson	8.7	91	25	50
-238	8D - Imperial stout	Death Star	Paul Thacker	9.3	89	18	49
-105	8D - Imperial stout	ChokladMonstret	Andreas Dahlqvist	9.7	91	17	51
-219	9B - Blonde	Josephine	Mats Hellman, Bo Eriksson, Mattias Hansson, Kåre Bondesson	6.6	58	10	15
-251	9B - Blonde	Blondie	Tobias Bredenwall, Peter Bergman, Peter Blomberg, Staffan Odenstad, Esko Airas	7.3	63	8	17
-201	11E - Porter/Stout special	Barrel Aged Hot Chocolate	Jens modin, anders jansson, Marcus hotakainen	12.5	175	80	80
-250	11E - Porter/Stout special	Slemmig Torsk	Tobias Bredenwall, Peter Bergman, Peter Blomberg, Staffan Odenstad, Esko Airas	14.1	117	22	79
-108	11E - Porter/Stout special	Liquified Chocolate Cake	benny selin, jonatan stolt	11.6	105	26	25
-167	11E - Porter/Stout special	Dumle	Joakim Pettersson	5.6	60	12	30
-246	11E - Porter/Stout special	Lindegaards Caribbean Porter	sonny Knudsen	6.9	65	12	35
-175	11E - Porter/Stout special	Go, Fika Go!	Tor Björnsson, James Blom McLean	8.0	110	50	30
-210	11E - Porter/Stout special	Double Milk Chocolate Porter	Malte Ekelin, Svante Ekelin	6.7	69	18	31
+285	3C - Irländsk red ale	Blood Rites	Sebastian Larsson	4.9	50	12	21
+252	3E - Brittisk brown ale	Brunte	Mijo Balic	5.5	52	10	35
+293	3G - Övriga klassiska i kategori Mild ale	The Christoph Waltz	Staffan Högfeldt, Andreas Högfeldt, Thomas Thelin, Olof Fors, Agnis Zambars, Peter Myrén, Douglas Berggren	5.8	58	14	35
+219	4A - Engelsk best bitter	Jammy Bastards	Martin Björck, Victoria Björck, Kristoffer Björk, Niklas Wilke, Stefan Alexi, Patrik Jargenius, Fredrik Wallerfrost	4.8	43	7	32
+262	4A - Engelsk best bitter	Rågskalk	Ola Kagebeck	4.1	46	16	70
+232	4A - Engelsk best bitter	Maybe My Best Bitter	Martin Persson	4.2	43	11	36
+166	4A - Engelsk best bitter	Sundsborgs Bitter	Johan Höjesjö	3.5	11	3	30
+216	4A - Engelsk best bitter	Olsson´s London Pride	Fredrik Olsson	4.2	48	6	35
+281	4A - Engelsk best bitter	SheepFucker Best Bitter	Henrik Kristedal	4.5	46	12	35
+266	4A - Engelsk best bitter	Tweed	Olle Wreede, Karl Wreede	4.5	46	12	40
+105	4B - English strong bitter - ESB	Oxtungans ESB	Ronny Hagala	5.6	64	22	41
+251	4B - English strong bitter - ESB	(G)OAT	Mijo Balic	5.2	50	10	35
+135	5G - Barley wine	Gold Guardian	Marcus Gustafsson, Mattias Hellström	9.6	90	18	83
+154	5G - Barley wine	Stoned Hamster Bourbon BA	anders jansson, Jens modin, Marcus hotakainen	13.4	134	35	73
+213	5H - Övriga klassiska i kategori Kraftig Ale	Stamsjö Champagne IPA	Hans Holmberg, Sten-Otto Holmberg, Kenneth Johansson	12.4	74	-18	80
+243	5H - Övriga klassiska i kategori Kraftig Ale	GuldIvar Flinthjärta	Torbjörn Andersson, Niklas Stenlås	12.5	109	14	34
+280	7A - Dry stout	Craggy Island Dry Stout	Henrik Kristedal, Pernilla Zackrisson	3.9	42	12	47
+128	7A - Dry stout	Nightshade	Joakim Thörnroth	4.2	44	12	41
+226	7A - Dry stout	Irr-landets stout	Kent Eriksson Pripp	4.1	44	12	30
+141	7A - Dry stout	Skelzer Epproives	Gustav Wenemark	4.1	41	10	37
+270	7B - Extra stout	Löfhbrygg&#39;s extra stout	Theo Löfholm	5.0	50	12	50
+118	7D - Porter	The stout munk at port	Hampus Jönsson, Johan Eklund	7.5	80	23	11
+227	7F - Milk/Sweet Stout	Belfast &#38; furious	Markus Lauri	5.5	66	24	15
+253	8B - Modern Stout & Porter	Gamle Svarten	Mijo Balic	6.5	60	10	35
+140	8C - Imperial porter	Bryggaren &#38; Drejarens Imp Lakrits Po	George Smidlund	8.5	88	25	37
+107	8D - Imperial stout	Bältarens mörker	Emil Sjöberg, Fredrik Jakobsson	11.0	104	28	50
+145	8D - Imperial stout	Imperial stout	Malte Ekelin	11.0	99	15	77
+201	8D - Imperial stout	Out in the Swedish Woods	Mattias Lindal	11.0	111	30	0
+248	8D - Imperial stout	Black beak	Torbjörn Köhl	8.4	89	26	25
+214	8E - Övriga klassiska i kategori Kraftig Stout/Porter	Stamsjö Bourbon Chili Stout	Hans Holmberg, Sten-Otto Holmberg, Kenneth Johansson	11.4	99	20	34
+267	9B - Blonde	Blondin Belga	Olof Samuelsson	6.6	60	10	23
+271	9B - Blonde	Leffes Morsa	Peter Nilsson, Mikael Krona	6.7	65	14	22
+130	9B - Blonde	Belgaren	Joakim Thörnroth	6.0	58	12	22
+263	11E - Porter/Stout special	Ur askan i flaskan	Ola Kagebeck	6.2	68	20	30
+247	11E - Porter/Stout special	Raven&#39;s nest	Torbjörn Köhl	8.9	91	24	20
+288	11E - Porter/Stout special	Just idag är jag stark	M.m.m. Gastro! (Will Shepard and Daniel Tuftström)	10.6	105	24	39
+239	11E - Porter/Stout special	Barkarby Calling	Tobias Bredenwall, Esko Airas, Staffan Odenstad, Peter Blomberg, Peter Bergman	8.1	70	11	31

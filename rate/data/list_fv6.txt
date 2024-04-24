@@ -1,23 +1,29 @@
 97	 Klass 6	Övriga öl
-218	11A - Frukt, b?r och gr?nsaks?l	Verrouviller groseil de Süsskind	Mats Hellman, Kåre Bondesson, Mattias Hansson, Bo Eriksson	10.8	86	2	1
-212	11A - Frukt, b?r och gr?nsaks?l	Blåbärssuris	Maja Koivunen, Tove Gremlin	8.1	80	18	17
-142	11A - Frukt, bär och grönsaksöl	Drottningen af Breweriet	Tobias Strand, Daniel Markänger, Johan Lövgren, Nisse Mannerby, Jonas Saltin	4.8	48	12	5
-122	11A - Frukt, bär och grönsaksöl	Margareta är sur	Dennis Augustzen	4.7	50	14	10
-123	11A - Frukt, bär och grönsaksöl	mr mangoo	Dennis Augustzen	5.5	50	12	10
-151	11A - Frukt, bär och grönsaksöl	Hallonsuris	George Smidlund	4.2	51	19	0
-102	11A - Frukt, bär och grönsaksöl	Heavy’s Mango Tango	Andreas Blomstrand	6.4	60	12	38
-158	11A - Frukt, bär och grönsaksöl	Trollmors SAFT	Hannes Christensen	6.0	56	14	10
-200	11D - Modifierade öl	Hallonkris	anders jansson, Marcus hotakainen, Jens modin	5.7	55	12	20
-249	11D - Modifierade öl	Vad vill du ha? Överraska mig!	Ted Elmenheim, Henrik Persson	6.5	59	11	50
-216	11D - Modifierade öl	Humle och Dumle	David Gustafsson	8.2	68	8	37
-240	11D - Modifierade öl	Black to the roots	Peter Hogstrom	7.1	66	12	50
-239	11D - Modifierade öl	DEIFIED Mid NEIPA	Peter Blom, Mathias Örnqvist	5.0	48	10	34
-104	11D - Modifierade öl	Granskott	Andreas Dahlqvist	6.0	53	8	24
-103	11D - Modifierade öl	Black Tropical	Andreas Blomstrand	6.0	60	15	50
-213	11F - Rököl, typ Bamberg	Seamus&#39; mistake	Maja Koivunen	5.5	54	12	28
-187	11F - Rököl, typ Bamberg	Prickig Korp	Jonas Lorenthsson	5.1	54	15	24
-179	11I - Trä- och fatlagrade öl	Kokomo 18month rum BA Imp Stout 2020	Johan Wallèn, Christoffer Johansson, Tor Björnsson	12.4	108	29	100
-205	11I - Trä- och fatlagrade öl	I HAVE FAITH IN YOU	Tomas	16.0	36	15	50
-168	11I - Trä- och fatlagrade öl	Gamla Pengar Punsch Oaked Double Mash IS	Martin Björck, Victoria Björck, Kristoffer Björk, Niklas Wilke, Stefan Alexi, Patrik Jargenius, Fredrik Wallerfrost	13.1	131	47	66
-101	11I - Trä- och fatlagrade öl	Allsorts Barrel Stout	Jonas Domeij	8.5	80	20	67
-217	11L - ?vriga, ?vriga klassiska ?ltyper	Cidre Robin	Mats Hellman, Patrik Lewander	7.1	58	4	0
+208	11A - Frukt, bär och grönsaksöl	Pink Love	Henrik Andersson, Tommi Sjöberg, Magnus Johansson	5.6	54	11	20
+138	11A - Frukt, bär och grönsaksöl	Bryggaren &#38; Drejarens Hallonsuris	George Smidlund	7.0	72	18	0
+237	11A - Frukt, bär och grönsaksöl	Crimson Tide	Quill &#38; Seach brewery	6.0	16	5	15
+120	11A - Frukt, bär och grönsaksöl	Not a no but still ok	Hampus Jönsson, Jessica Jönsson	6.0	72	29	85
+197	11A - Frukt, bär och grönsaksöl	MELONA MELONA	Rickard Berglund	6.5	59	10	25
+254	11A - Frukt, bär och grönsaksöl	Omberg (Björnbärs- &#38; Laktrisgose)	Thommy Lindholm	4.7	44	12	0
+296	11A - Frukt, bär och grönsaksöl	The Jan Banan	Staffan Högfeldt, Andreas Högfeldt, Thomas Thelin, Olof Fors, Agnis Zambars, Peter Myrén, Douglas Berggren	6.2	57	10	25
+129	11A - Frukt, bär och grönsaksöl	Hallongåsen	Joakim Thörnroth	5.5	50	6	7
+124	11A - Frukt, bär och grönsaksöl	Ad ultimum serere Pelargonium graveolens	Jonas Höglund, Mikael Josefsson, Martin Daun	5.5	49	7	27
+165	11D - Modifierade öl	Iittalo Pils	Arwid Komulainen	5.3	46	6	45
+190	11D - Modifierade öl	Mango Sour	Fredrik Annmo	5.9	62	17	15
+191	11D - Modifierade öl	Dinner at the Zoo Hallon/Vanilj IPA	Fredrik Annmo	6.2	66	19	71
+196	11D - Modifierade öl	Gryningsfränden	Kristian Larsson	7.0	73	20	42
+259	11D - Modifierade öl	Sub-Zero Cold IPA	Nikola Zivotic	6.8	60	8	68
+142	11D - Modifierade öl	Big Black Choc	Peter Hogstrom	9.4	93	22	55
+119	11D - Modifierade öl	Bärz	Hampus Jönsson, Jessica Jönsson	5.0	60	15	10
+131	11D - Modifierade öl	Hops in the snow	Joakim Thörnroth	7.4	68	12	76
+113	11D - Modifierade öl	Hökmossens Lakritsvete	Håkan Liljegren	6.3	66	17	30
+204	11F - Rököl, typ Bamberg	Prickig Korp	Jonas Lorenthsson	5.1	52	13	29
+176	11F - Rököl, typ Bamberg	Rauchgeist	Simon Hyttfors, Jesper Grahm, Niklas Hedström, Axel Hellman	5.3	53	13	22
+182	11F - Rököl, typ Bamberg	Kamado Smoke	Linus Falemo	5.3	54	14	28
+106	11G - Rökbock	Rök i sinne	Emil Sjöberg, Fredrik Jakobsson	9.0	80	16	24
+115	11G - Rökbock	Rauchbier Paradox	Jonas Eriksson	7.0	74	17	25
+249	11G - Rökbock	Svenkerla Rauchbock	Simon Svensson	8.9	82	19	40
+153	11I - Trä- och fatlagrade öl	Japanese Spacedog BA	anders jansson, Jens modin, Marcus hotakainen	17.2	148	28	154
+181	11I - Trä- och fatlagrade öl	Wood You Smoke That Stout?	Linus Falemo, Jonatan Nygren	10.0	104	37	40
+156	11I - Trä- och fatlagrade öl	Ölagille Troll-Stout Imp BBA	Mattias Hallberg, Elliot Hallberg	11.6	140	68	15
+235	11I - Trä- och fatlagrade öl	The Dark Batch	Quill &#38; Seach brewery	12.0	32	12	40

@@ -1,22 +1,35 @@
 92	 Klass 1	Lager och Underjäst öl
-140	1B - Export	Geschwint Export	Erik Nord	6.2	59	12	25
-242	1C - Märzen	Qualitätskontrolle	Simon Hyttfors, Niklas Hedström, Jesper Grahm	5.0	53	15	19
-189	1F - Schwarzbier	May the schwarz be with you	Jonatan nygren	5.1	51	12	35
-139	1G - Tjeckisk pilsner	Solhems UrPils ver5	Ronny Hagala, Jonas Lööw	4.6	44	9	32
-244	1G - Tjeckisk pilsner	Lindegaards czech pilsner	sonny Knudsen, Luisa Knudsen	4.8	49	12	34
-245	1G - Tjeckisk pilsner	Lindegaards Tmave`pivo	sonny Knudsen	5.7	58	14	24
-208	1G - Tjeckisk pilsner	Novaczech	Malte Ekelin, Svante Ekelin	5.8	54	10	34
-117	1H - Tysk pilsner	Gubbis Lager	Dan Lundqvist	5.5	53	11	29
-163	1H - Tysk pilsner	Automagisk Altruism	Tobias Janius, Christian Lindskog	5.2	50	11	44
-176	1I - Internationell lager	Simplemente bueno	Johan Wallèn	4.5	41	7	19
-120	1I - Internationell lager	Källarölen från Väst	David Broheim, Patrik Lindgren	4.7	47	10	31
-110	1J - Övriga klassiska i kategori Mild/karaktärsfull Lager	Midsummer Wet Dream	benny selin, jonatan stolt	4.9	55	18	19
-129	2A - Bock	Tack å bock	Peter Nilsson	7.3	69	12	26
-130	2A - Bock	Syndabocken	Peter Nilsson	7.3	69	12	26
-184	2A - Bock	Zombie Duck	Anders Tilander	5.3	52	12	64
-243	2A - Bock	Hirschbock	Simon Hyttfors, Niklas Hedström, Jesper Grahm	6.2	74	27	24
-141	2B - Dubbelbock	G.O.A.T.	Erik Nord	7.4	79	23	19
-111	2C - Modern Ljus Lager	Slätmossens Köksbryggeri Nya Zeeland Lag	Bo Ström, Per Thoren	5.2	54	15	45
-227	2C - Modern Ljus Lager	Rustiko Buckwheat Pils	Henrik Hildemar	5.3	50	10	50
-116	2C - Modern Ljus Lager	LBN Lager	Dan Lundqvist	5.1	48	9	13
-214	2C - Modern Ljus Lager	Get It On	Emil Skala	5.8	57	13	64
+233	1A - Helles	Helles i Munnen	Martin Persson	5.1	50	11	22
+277	1A - Helles	Lagerlicious	Samuel Mancho, Andreas Zalbo	6.4	16	4	30
+228	1B - Export	BLACK SWAN DRAUT	Kjell Aleklett, Göran Netinder, Håkan Persson, Lars Callert	5.5	52	10	35
+241	1B - Export	Die Mauer	Tobias Bredenwall, Esko Airas, Staffan Odenstad, Peter Blomberg, Peter Bergman	5.3	54	13	29
+160	1B - Export	NORRBACKS GULD	Eric Norrback, Mattias Wall	5.4	50	10	20
+172	1C - Märzen	Nytt hopp	Henrik Geimer	5.8	57	12	24
+112	1C - Märzen	Die Toten Lederhosen	Petter Wigle	5.6	58	15	20
+146	1C - Märzen	Barke Märzen	Malte Ekelin	4.6	52	17	26
+255	1C - Märzen	Västanå	Thommy Lindholm	5.3	48	8	23
+256	1C - Märzen	HefeKleineGroße	Christoffer Johansson, Diana Birath	5.1	54	15	23
+215	1D - Frankisk lager	Frankly Mr Shankly	Fredrik Olsson	5.1	50	11	35
+170	1D - Frankisk lager	Franktastisk	Joakim Pettersson, Kathrin Almerfors	5.2	52	12	32
+102	1F - Schwarzbier	Schwarze Katze	Erik Nord	5.3	52	12	29
+183	1F - Schwarzbier	Dagspöket Schwarzbier	Jonatan nygren	5.2	50	10	35
+273	1G - Tjeckisk pilsner	Mondän Bohäm	Petri Rydhammar	5.6	54	12	50
+245	1G - Tjeckisk pilsner	Broby check	Gordon Liljegren	4.2	42	10	39
+103	1G - Tjeckisk pilsner	Pivo Nord	Erik Nord, Jenny Nord	4.7	50	14	4
+244	1H - Tysk pilsner	Broby Pils	Gordon Liljegren	5.3	50	10	39
+220	1H - Tysk pilsner	Einfache Leute	Martin Björck, Victoria Björck, Kristoffer Björk, Niklas Wilke, Stefan Alexi, Patrik Jargenius, Fredrik Wallerfrost	5.3	47	7	38
+189	1I - Internationell lager	El Niño Mexikansk lager	Fredrik Annmo	5.4	52	11	19
+195	1J - Övriga klassiska i kategori Mild/karaktärsfull Lager	Skymningsmakaren	Kristian Larsson	4.6	51	16	23
+169	1J - Övriga klassiska i kategori Mild/karaktärsfull Lager	Steinbier	Daniel Borg	5.5	51	9	25
+185	1J - Övriga klassiska i kategori Mild/karaktärsfull Lager	Cream4myHoney	benny selin	5.4	55	14	16
+101	2A - Bock	My Maibock brings all the boys...	Erik Nord	7.1	66	12	26
+229	2B - Dubbelbock	Fredslager Tre Kungar	Kjell Aleklett, Håkan Persson	8.2	80	17	25
+175	2B - Dubbelbock	Derivator	Simon Hyttfors, Jesper Grahm, Niklas Hedström, Axel Hellman	7.7	75	20	26
+177	2C - Modern Ljus Lager	Breakfast Pils	Ted Elmenheim, Henrik Persson	4.8	47	10	40
+148	2C - Modern Ljus Lager	En Humlig Lager	Maja	5.6	56	13	40
+143	2C - Modern Ljus Lager	The Hop Trolls magic decoction	Peter Hogstrom	5.5	54	12	40
+123	2C - Modern Ljus Lager	Get It On	Emil Skala	5.8	57	13	65
+274	2C - Modern Ljus Lager	Jepun umop	Henrik Hildemar, Claes Holmberg	5.5	50	8	45
+116	2C - Modern Ljus Lager	Skäggets Skogsbäckslager	Hampus Jönsson, Johan Eklund, Robert Nilsson	5.5	53	9	19
+174	2C - Modern Ljus Lager	En ohelig allians	Henrik Geimer	4.8	45	9	35
+292	2C - Modern Ljus Lager	The Gary Busey	Staffan Högfeldt, Andreas Högfeldt, Thomas Thelin, Olof Fors, Agnis Zambars, Peter Myrén, Douglas Berggren	5.3	53	13	30

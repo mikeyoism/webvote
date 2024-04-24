@@ -1,4 +1,10 @@
 98	 Klass 7	Cider och Mjöd
-188	12A - Mjöd	VERRY BERRY MJÖD : MORS LILLA OLLE	Jonatan nygren	12.0	150	60	0
-192	12B - Cider	Fredrik - a Wealthy man	Kent Eriksson Pripp	5.1	12	3	0
-109	12B - Cider	Becider	benny selin, jonatan stolt	6.8	50	-2	0
+272	12A - Mjöd	Smacka	Peter Nilsson, Kristoffer Lundholm	13.2	130	30	0
+231	12A - Mjöd	Gamla Upsalas Vikingamjöd	Kjell Aleklett, Kerstin Weibull Lundberg	10.1	84	8	10
+198	12A - Mjöd	Lokes famn	Henrik Lindqvist	6.3	50	0	0
+199	12A - Mjöd	Frejas smekning	Henrik Lindqvist	12.5	94	0	0
+200	12A - Mjöd	Friggs kyss	Henrik Lindqvist, Kalle Nilsson	11.7	100	0	0
+297	12A - Mjöd	The Chevy Chase	Staffan Högfeldt, Andreas Högfeldt, Thomas Thelin, Olof Fors, Agnis Zambars, Peter Myrén, Douglas Berggren	14.0	147	40	0
+194	12A - Mjöd	Februus Favorit	Hannes Christensen, Anders Norman, Johanna Petters	15.0	180	66	0
+188	12B - Cider	BeCider Vintage 2020	benny selin	7.2	55	0	0
+180	12B - Cider	Wood You Smoke That Cider?	Linus Falemo	5.8	42	0	0

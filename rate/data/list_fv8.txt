@@ -1,5 +1,8 @@
 99	 Klass 8	Folköl
-229	9H - Saison	Pettit Table	Mikael Näslund, Samuel Mancho	3.5	26	1	39
-254	10E - Berliner weisse	Påskmust Occult Sour	Claes Eliasson	3.3	35	10	0
-241	11D - Modifierade öl	Emmer och Elände	Peter Hogstrom, Anette Bengtson	3.3	38	13	14
-183	11H - Övrig rököl	Grätzklipparöl	Johan Wallèn, Angelica Jansson	3.2	31	7	22
+290	1I - Internationell lager	The Ernest Hemingway	Staffan Högfeldt, Andreas Högfeldt, Thomas Thelin, Olof Fors, Agnis Zambars, Peter Myrén, Douglas Berggren	3.4	30	4	0
+257	3A - Engelsk dark mild	Johnny Mildhölm	Christoffer Johansson, Diana Birath	3.5	37	11	19
+224	9E - Brune	Henkes Hinkare folkamber	Henrik Gidlund	3.0	40	18	35
+133	11A - Frukt, bär och grönsaksöl	Krustys Raspberry Liquorice Sour	Erik Ernerudh, Johan Ernerudh	2.9	27	5	5
+144	11D - Modifierade öl	The first cut is the deepest	Peter Hogstrom, Anette Bengtson	3.4	35	9	7
+284	11D - Modifierade öl	Akka Salmiakki	Johan Pettersson	3.5	35	9	3
+193	11D - Modifierade öl	Mästerkattens Spetsade Mjölkstout	Hannes Christensen, Anders Norman	3.3	37	19	35

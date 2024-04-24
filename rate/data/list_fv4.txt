@@ -1,21 +1,29 @@
 95	 Klass 4	Jästdominerad öl
-260	6C - Mörkt veteöl av sydtysk typ	Dark and Funky	William Shepard, Sophia Shepard	5.3	55	14	15
-226	6C - Mörkt veteöl av sydtysk typ	Besserweissen von Dunkel	Mikael Mekras, Georgios Goussis	4.9	48	11	13
-118	6D - Belgisk wit	How to garden	Dan Lundqvist	4.1	41	10	18
-253	6D - Belgisk wit	Wit snake	Tobias Bredenwall, Peter Bergman, Peter Blomberg, Staffan Odenstad, Esko Airas	5.2	50	11	14
-157	6G - Övriga klassiska veteöl	Het Grote Wit - Superwit	Gustav Dominicus, Niklas Stenlås, Magnus Isaksson	9.5	78	6	33
-132	9A - Ljus belgisk ale	Tony Tigers en bra start på dagen	Marcus Gustafsson, Mattias Hellström	5.9	52	7	30
-220	9C - Tripel	Joseph	Mats Hellman, Bo Eriksson, Kåre Bondesson, Mattias Hansson	9.1	80	10	15
-215	9C - Tripel	Svarvarbo Tripel	Martin Pless, Thomas Pless	8.6	77	12	35
-223	9C - Tripel	Munkjävlarnas Tripel	Mikael Jansson, James Skanllsjö	8.4	82	15	23
-221	9C - Tripel	Triple X Dinkelfriend	Matthias Flodström	9.6	81	8	31
-224	9F - Dubbel	Munkjävlarnas dubbel	Mikael Jansson	6.5	64	14	37
-225	9F - Dubbel	Belgo Diplo	Mikael Mekras, Georgios Goussis	6.2	63	16	26
-191	9G - Mörk stark belgisk ale	My favourite things	Markus Lauri	8.0	79	18	34
-178	9H - Saison	Les Incompétents	Johan Wallèn, Christoffer Johansson	5.6	50	7	30
-230	9H - Saison	l&#39;or de la saison	Mikael Näslund, Samuel Mancho	6.4	51	2	25
-162	9H - Saison	Deux Amoureux	Tobias Janius, Magnus Vasilis	6.7	53	4	38
-209	9H - Saison	SWE 4 Saison	Lovisa Koivunen	6.5	54	5	25
-154	9I - Bière de garde	Lafamilja biere de garde	Gogo jägestedt, daniel jägestedt, joel jägestedt	8.0	1	2	5
-194	9J - Supersaison	Westgötha Soldatöl alla Westgötha ryttar	Kjell Aleklett	7.8	69	10	59
-106	9K - Belgiskt och franskt specialöl	Glätte XX	Arno Lepisk	5.5	53	11	66
+283	6A - Ljus veteöl av sydtysk typ	What&#39;s love got to do WHEAT it	Sanna Marliden, Johan Pettersson	4.1	46	15	12
+186	6B - Klassisk veteöl av sydtysk typ	Zymo Vice	benny selin	4.9	52	15	8
+261	6C - Mörkt veteöl av sydtysk typ	Besserweissen von Dunkel	Mikael Mekras, Georgios Goussis	4.9	50	13	12
+279	6D - Belgisk wit	Witty Pete	Philip O&#39;Toole, Mångsysslarbryggeriet	4.9	48	10	18
+238	6D - Belgisk wit	WIT OR WITOUT YOU	Tobias Bredenwall, Esko Airas, Staffan Odenstad, Peter Blomberg, Peter Bergman	6.8	60	10	14
+206	6E - Weizenbock	VeteRaven	Jonas Lorenthsson	7.4	72	16	15
+136	6E - Weizenbock	BayerStout	Marcus Gustafsson, Mattias Hellström	6.2	65	18	20
+122	6G - Övriga klassiska veteöl	Libirium Love	Emil Skala	4.3	40	7	8
+139	9A - Ljus belgisk ale	Bryggaren &#38; Drejarens Belgian Pale A	George Smidlund	5.3	54	14	29
+132	9C - Tripel	HEDEBREW TRIPEL	Johan Hedestad	9.3	82	11	34
+212	9C - Tripel	Gläntans Tripel	Andreas Skoogh	8.9	76	12	34
+150	9D - Ljus stark belgisk ale	Sharess	Johanna Koivunen, Niklas Terörde	7.4	70	14	29
+147	9F - Dubbel	En Belgisk Dubbel	Maja	7.4	70	14	31
+260	9F - Dubbel	Vafanheteren	Mikael Mekras, Georgios Goussis	6.3	65	17	27
+217	9G - Mörk stark belgisk ale	the monk	Gogo Jägestedt	9.1	80	10	1
+207	9G - Mörk stark belgisk ale	Heart of darkness	Henrik Andersson, Tommi Sjöberg, Magnus Johansson	10.4	91	12	27
+268	9G - Mörk stark belgisk ale	ChockUffes brorsa	Per Persson	8.5	75	10	25
+295	9G - Mörk stark belgisk ale	The Bengt Frithiofsson	Staffan Högfeldt, Andreas Högfeldt, Thomas Thelin, Olof Fors, Agnis Zambars, Peter Myrén, Douglas Berggren	8.8	80	13	20
+173	9H - Saison	Den ljusa sidan	Henrik Geimer	5.7	52	10	36
+275	9H - Saison	Vall-on, vall-off	Henrik Hildemar, Claes Holmberg	6.2	55	8	30
+210	9H - Saison	Orek Saison	Jonatan Kero	6.6	49	2	37
+250	9H - Saison	Hopfen Saison (Saison IPA)	Magnus Vasilis	6.0	55	5	35
+278	9H - Saison	rainbow season	Mikael Näslund	6.6	56	4	7
+258	9H - Saison	Allmänhetens Saison	Lukas Hagel	6.2	50	3	25
+125	9H - Saison	Ad ultimum serere	Jonas Höglund, Mikael Josefsson, Martin Daun	5.5	49	7	27
+225	9J - Supersaison	Rabarbersaison	Henrik Gidlund, Maria Gidlund	8.0	57	0	24
+151	9J - Supersaison	Berry Booty	Fredrik Gustavsson, Drolle Malm, Loke Almgren	7.6	67	9	25
+230	9K - Belgiskt och franskt specialöl	&#34;KLICK&#34; Champagneöl	Kjell Aleklett, Håkan Persson	10.8	102	20	47

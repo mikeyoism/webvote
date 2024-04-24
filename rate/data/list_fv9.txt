@@ -1,56 +1,55 @@
 100	 Etikett	Bästa öletikett
-901	1B - Export	Geschwint Export	Erik Nord	6.2	59	12	25
-933	1H - Tysk pilsner	Eleganta Edgar	Hannes Christensen	5.3	50	10	37
-923	1J - Övriga klassiska i kategori Mild/karaktärsfull Lager	Midsummer Wet Dream	benny selin, jonatan stolt	4.9	55	18	19
-902	2B - Dubbelbock	G.O.A.T.	Erik Nord	7.4	79	23	19
-911	2C - Modern Ljus Lager	Kungl. Askö Lager	Kjell Aleklett	5.0	56	18	40
-910	2D - Modern M?rk Lager	Olarsbo Lager	Kjell Aleklett, Håkan Persson	4.8	50	14	26
-937	4A - Engelsk best bitter	SandbyBitter	Ted Elmenheim, Henrik Persson	4.2	42	10	30
-940	4B - English strong bitter - ESB	START for breakfast	Johan Hedestad	6.3	62	14	28
-914	4C - Pale ale (APA)	Golden Gate Sommar APA	Kjell Aleklett, Håkan Persson	5.0	52	14	68
-941	4C - Pale ale (APA)	Apa Nr 7	Gordon Liljegren	5.8	56	12	34
-921	4C - Pale ale (APA)	The Missionary - Elder	benny selin, jonatan stolt	5.7	55	15	32
-955	4C - Pale ale (APA)	Honey High	Viktor Pihl	4.7	1	2	1
-952	4C - Pale ale (APA)	Grimnirs Gris	Daniel Tuftström	6.3	62	14	30
-912	4G - ?vriga klassiska i kategori Karakt?rsfull Ale	Serbster Rolands Bitterbier	Kjell Aleklett, Håkan Persson, Olle Qvennerstedt	6.0	56	11	92
-925	5B - Strong pale ale	Pale Ale Dot	Matthias Flodström, Helene Winberg	6.6	65	15	45
-930	5C - IPA	lafamilja hoppzan	joel jägestedt, Gogo jägestedt, daniel jägestedt	6.2	1	2	10
-945	5D - New England IPA - Vermont IPA	Liquid remedy	Mikael Näslund, Samuel Mancho	6.6	58	12	57
-919	5D - New England IPA - Vermont IPA	nitroneipa	Dennis Augustzen	7.5	70	12	40
-904	5E - Black IPA	Hops in the Dark	Ronny Hagala, Jonas Lööw	7.5	70	14	58
-935	5E - Black IPA	Kolsvarta Krampus	Hannes Christensen, Anders Norman	5.8	56	12	70
-949	5E - Black IPA	The Mosh Pit	Tor Björnsson, Christoffer Johansson	8.5	79	14	100
-947	5G - Barley wine	Godnatt Yxskaft (2019)	Tor Björnsson, Johan Wallén, Christoffer Johansson, Pontus Olsson, Niclas Rickardsson	18.0	150	20	100
-954	6C - Mörkt veteöl av sydtysk typ	Dark and Funky	William Shepard, Sophia Shepard	5.3	55	14	15
-927	6F - Hopfenweizen	Korpfenweizen	Jonas Lorenthsson	7.0	69	16	45
-918	7B - Extra stout	Edwards extra	Dennis Augustzen	7.5	70	12	20
-905	7C - Brown porter	Fem maltkorn är fler än fyra humlekottar	Ola Kagebeck	5.7	58	14	60
-928	7D - Porter	Korpulent	Jonas Lorenthsson	5.5	59	17	31
-939	8D - Imperial stout	Mavens ImpStout, Puttes Imperial failure	Mats Åsvärn	8.8	86	20	90
-948	8D - Imperial stout	Sunny Afternoon in Satan&#39;s Backyard	Tor Björnsson, Alexander Sjölund	10.0	110	36	60
-924	9C - Tripel	Triple X Dinkelfriend	Matthias Flodström	9.6	81	8	31
-913	9H - Saison	Saison med smak av havtorn och pomerans	Kjell Aleklett, Göran Netinder, Håkan Persson	5.5	56	15	44
-934	9H - Saison	Simpla Sigge	Hannes Christensen	5.4	49	8	35
-943	9H - Saison	Pettit Table	Mikael Näslund, Samuel Mancho	3.5	26	1	39
-944	9H - Saison	l&#39;or de la saison	Mikael Näslund, Samuel Mancho	6.4	51	2	25
-932	9I - Bière de garde	Lafamilja biere de garde	Gogo jägestedt, daniel jägestedt, joel jägestedt	8.0	1	2	5
-907	9J - Supersaison	Westgötha Soldatöl alla Westgötha ryttar	Kjell Aleklett	7.8	69	10	59
-906	9L - Historiskt belgiskt ?l	Morbrors vallonöl anno 1646	Kjell Aleklett, Göran Netinder, Håkan Persson	7.6	71	14	85
-908	9L - Historiskt belgiskt ?l	Herreöl à la Uppländska Vallonbruk	Kjell Aleklett, Göran Netinder, Håkan Persson	8.6	79	14	66
-909	9L - Historiskt belgiskt ?l	Svensköl à la Uppländska Vallonbruk	Kjell Aleklett, Göran Netinder, Håkan Persson	5.6	52	10	56
-931	10C - Fruktlambik	lafamilja framboise inte bitter bara sur	Gogo Jägestedt, daniel jägestedt, joel jägestedt	6.8	1	2	5
-926	10E - Berliner weisse	Påskmust Occult Sour	Claes Eliasson	3.3	35	10	0
-903	10E - Berliner weisse	Raspberry Mojito!	Niklas Mannberg	5.0	50	10	0
-920	10F - Övriga klassiska syrliga öl	Poseidon	Filip Strand, Per Karlsson, Stefan Eriksson	5.0	53	15	5
-953	10F - Övriga klassiska syrliga öl	Peaches and Cream	William Shepard, Sophia Shepard	4.7	51	15	15
-951	10F - Övriga klassiska syrliga öl	Hydrornas krutsuris	Drolle, Loke	6.0	62	18	11
-950	10F - Övriga klassiska syrliga öl	Banan Melon Kiwi &#38; Citron	Tor Björnsson, Johan Wallén, Frej Björnsson	6.2	56	9	0
-916	11A - Frukt, bär och grönsaksöl	Margareta är sur	Dennis Augustzen	4.7	50	14	10
-917	11A - Frukt, bär och grönsaksöl	mr mangoo	Dennis Augustzen	5.5	50	12	10
-946	11A - Frukt, bär och grönsaksöl	Hallonsuris	George Smidlund	4.2	51	19	0
-936	11A - Frukt, bär och grönsaksöl	Trollmors SAFT	Hannes Christensen	6.0	56	14	10
-915	11D - Modifierade öl	LONDON BITTER - trestegshumlad amber ale	Kjell Aleklett, Olle Qvennerstedt	4.7	48	12	98
-938	11D - Modifierade öl	Vad vill du ha? Överraska mig!	Ted Elmenheim, Henrik Persson	6.5	59	11	50
-922	11E - Porter/Stout special	Liquified Chocolate Cake	benny selin, jonatan stolt	11.6	105	26	25
-929	11F - Rököl, typ Bamberg	Prickig Korp	Jonas Lorenthsson	5.1	54	15	24
-942	11I - Trä- och fatlagrade öl	Kokomo 18month rum BA Imp Stout 2020	Johan Wallèn, Christoffer Johansson, Tor Björnsson	12.4	108	29	100
+922	1A - Helles	Helles i Munnen	Martin Persson	5.1	50	11	22
+909	1B - Export	BLACK SWAN DRAUT	Kjell Aleklett, Göran Netinder, Håkan Persson, Lars Callert	5.5	52	10	35
+948	1E - Centraleuropeisk mörk lager	Darkos Dunkel	Hannes Christensen	4.7	48	12	24
+901	1F - Schwarzbier	Schwarze Katze	Erik Nord	5.3	52	12	29
+928	1F - Schwarzbier	Dagspöket Schwarzbier	Jonatan nygren	5.2	50	10	35
+916	1J - Övriga klassiska i kategori Mild/karaktärsfull Lager	Cream4myHoney	benny selin	5.4	55	14	16
+906	2B - Dubbelbock	Fredslager Tre Kungar	Kjell Aleklett, Håkan Persson	8.2	80	17	25
+937	2B - Dubbelbock	Derivator	Simon Hyttfors, Jesper Grahm, Niklas Hedström, Axel Hellman	7.7	75	20	26
+933	4D - Brown ale (amerikansk)	Hobbit Brown Ale	Anders Olsson	5.9	60	15	35
+907	4E - Engelsk IPA	King Ale’s Golden Ale	Kjell Aleklett, Håkan Persson	6.0	57	11	5
+935	5C - IPA	Spiderpig	Erik	6.6	62	11	75
+945	5D - New England IPA - Vermont IPA	Fläder-Bertil	Kim	6.5	64	14	50
+927	5D - New England IPA - Vermont IPA	Terror Zone	Fredrik Winkvist	7.5	71	14	40
+918	5D - New England IPA - Vermont IPA	Duck Duck IPA	benny selin	6.0	56	10	55
+929	5D - New England IPA - Vermont IPA	Grumliga tankar NEIPA	Jonatan nygren	7.8	74	15	5
+924	5E - Black IPA	Korpspaint Black Metal IPA	Jonas Lorenthsson	7.4	70	14	59
+934	5F - Dubbel IPA	Hop Life	Erik	8.0	72	10	80
+953	5F - Dubbel IPA	Örminge Lillgård Dubbel IPA	Joakim Hörsing	7.3	70	15	90
+939	5G - Barley wine	1632	Fredrik Annmo	10.9	105	22	50
+947	5G - Barley wine	BBBABW blend 2	Johan Huke, Fredrik Nyberg, Calle Eriksson Sjöstedt	14.4	108	16	72
+904	5G - Barley wine	Stoned Hamster Bourbon BA	anders jansson, Jens modin, Marcus hotakainen	13.4	134	35	73
+920	5H - Övriga klassiska i kategori Kraftig Ale	Stamsjö Champagne IPA	Hans Holmberg, Sten-Otto Holmberg, Kenneth Johansson	12.4	74	-18	80
+917	6B - Klassisk veteöl av sydtysk typ	Zymo Vice	benny selin	4.9	52	15	8
+925	6E - Weizenbock	VeteRaven	Jonas Lorenthsson	7.4	72	16	15
+954	7A - Dry stout	Skelzer Epproives	Gustav Wenemark	4.1	41	10	37
+951	7B - Extra stout	Löfhbrygg&#39;s extra stout	Theo Löfholm	5.0	50	12	50
+940	8B - Modern Stout & Porter	Onyx	Fredrik Annmo	4.9	52	15	31
+944	8D - Imperial stout	Troublemaki’n mole	Tobias Älvenstrand, Thomas Nilsson	13.0	114	27	52
+942	9B - Blonde	Blondin Belga	Olof Samuelsson	6.6	60	10	23
+932	9C - Tripel	HEDEBREW TRIPEL	Johan Hedestad	9.3	82	11	34
+926	9G - Mörk stark belgisk ale	the monk	Gogo Jägestedt	9.1	80	10	1
+912	9G - Mörk stark belgisk ale	Heart of darkness	Henrik Andersson, Tommi Sjöberg, Magnus Johansson	10.4	91	12	27
+943	9G - Mörk stark belgisk ale	ChockUffes brorsa	Per Persson	8.5	75	10	25
+946	9H - Saison	Saison Dubob	Bob Sjögren, Linus sjögren	6.4	51	2	27
+921	9H - Saison	rainbow season	Mikael Näslund	6.6	56	4	7
+938	9J - Supersaison	Berry Booty	Fredrik Gustavsson, Drolle Malm, Loke Almgren	7.6	67	9	25
+910	9K - Belgiskt och franskt specialöl	&#34;KLICK&#34; Champagneöl	Kjell Aleklett, Håkan Persson	10.8	102	20	47
+908	9L - Historiskt belgiskt öl	HERREÖL de GEER- recept från 1600-talet	Kjell Aleklett, Hans-Björn Eriksson, Göran Netinder, Håkan Persson	8.8	79	12	22
+914	10C - Fruktlambik	The oaked eastern slope grape lambic	Henrik Andersson	6.5	51	1	15
+905	10C - Fruktlambik	African Wonjo Flower Sour	anders jansson, Jens modin, Marcus hotakainen	6.5	60	10	10
+902	10C - Fruktlambik	Rökta Skrieket!	Niklas Mannberg	5.0	50	5	0
+931	10F - Övriga klassiska syrliga öl	Sour Furries	M.m.m Gastro! (Will Shepard and Viktor Pihl)	4.1	47	16	14
+913	11A - Frukt, bär och grönsaksöl	Pink Love	Henrik Andersson, Tommi Sjöberg, Magnus Johansson	5.6	54	11	20
+952	11A - Frukt, bär och grönsaksöl	Ad ultimum serere Pelargonium graveolens	Jonas Höglund, Mikael Josefsson, Martin Daun	5.5	49	7	27
+915	11B - Kryddöl	Capsicum Fili Dumdum	Tomas Johansson, Torkel Andersson	5.2	52	12	52
+941	11D - Modifierade öl	Pineapple Smoothie	Fredrik Annmo	6.7	68	17	15
+950	11D - Modifierade öl	Mästerkattens Spetsade Mjölkstout	Hannes Christensen, Anders Norman	3.3	37	19	35
+930	11E - Porter/Stout special	Just idag är jag stark	M.m.m. Gastro! (Will Shepard and Daniel Tuftström)	10.6	105	24	39
+923	11F - Rököl, typ Bamberg	Prickig Korp	Jonas Lorenthsson	5.1	52	13	29
+936	11F - Rököl, typ Bamberg	Rauchgeist	Simon Hyttfors, Jesper Grahm, Niklas Hedström, Axel Hellman	5.3	53	13	22
+903	11I - Trä- och fatlagrade öl	Japanese Spacedog BA	anders jansson, Jens modin, Marcus hotakainen	17.2	148	28	154
+911	12A - Mjöd	Gamla Upsalas Vikingamjöd	Kjell Aleklett, Kerstin Weibull Lundberg	10.1	84	8	10
+949	12A - Mjöd	Februus Favorit	Hannes Christensen, Anders Norman, Johanna Petters	15.0	180	66	0
+919	12B - Cider	BeCider Vintage 2020	benny selin	7.2	55	0	0
