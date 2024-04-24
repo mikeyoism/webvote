@@ -146,8 +146,8 @@ else {
             <p>När EventReg-databasen är Redo (Anmälan är stängd och FV-Nr har genererats för alla öl & etiketter) eller när det sker uppdateringar i den, ska du hämta senaste ölinfo:</p><br>
         <button type="submit" name='cacheEventRegData'>Spara ner senaste ölinfo från från Event-Reg databasen</button>
         </form>    
-            <p>Informationen som visas i betygsättningssystemet för besökarna mellanlagras (i klenterna) för bästa prestanda, och uppdateras när du trycker på knappen.</p>
-            <p>Om prestandan är god (mindre tävlingar) går det bra att istället aktivera live-uppdateringar från Event-reg till klienterna med inställning CONNECT_EVENTREG_DB i _config.php</p>
+            <p>Informationen som visas i betygsättningssystemet för besökarna mellanlagras (i webbläsar-klienterna /data) för bästa prestanda, och uppdateras när du trycker på knappen.</p>
+            <p>Om prestandan är god (mindre tävlingar) går det bra att istället aktivera live-uppdateringar från Event-reg direkt till klienterna med inställning CONNECT_EVENTREG_DB i _config.php</p>
             <p>Notera att andra funktioner, som presentationen tävlingsresultatet alltid live-läser från Event-reg, och inte påverkas av detta.</p>
                 <br>
         <?php
