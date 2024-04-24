@@ -53,7 +53,8 @@ CREATE TABLE `competitions` (
   `testingOpenUntilTime` datetime DEFAULT NULL,
   `lastEventRegCache` datetime DEFAULT NULL,
   `cssCompetitionTheme` varchar(100) DEFAULT NULL COMMENT 'Valfri, alternativ: se _config.php',
-  `styleDefinitionsUrl` varchar(100) DEFAULT NULL COMMENT 'styles json'
+  `styleDefinitionsUrl` varchar(100) DEFAULT NULL COMMENT 'styles json',
+  'brewerLoginOpenFrom' datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
