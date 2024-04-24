@@ -44,7 +44,14 @@ $resetVoteCode = isset($_SESSION['public_vote_terminal']) && $_SESSION['public_v
 
 
 $jsonReply = array();
-$jsonReply['sys_cat'] = array_keys($categories);
+//get all category id's from the categories array
+$sys_cats = array();
+foreach($categories as $id => $cat)
+{
+    
+    array_push($sys_cats, (int)$cat['id']);
+}   
+$jsonReply['sys_cat'] = $sys_cats;//array_keys($categories);
 
 $voteCode = strtoupper($voteArgs->vote_code);
 $voteCodeId = $dbAccess->checkVoteCode($competitionId, $voteCode);
