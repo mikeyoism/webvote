@@ -206,7 +206,7 @@ class DbAccess
      * Computes some practical information from the competitino open and close times.
      * This is separate from getting the competition information itself for the benefit of caching.
      */
-    public static function calcCompetitionTimes($competition)
+    public static function calcCompetitionTimes($competition,$returnForApi = false)
     {
         $openTime = $competition['openTime'];
         $closeTime = $competition['closeTime'];
@@ -231,18 +231,18 @@ class DbAccess
             $voteCountStartTime = $openTime;
         } else if ($timeBeforeOpen->invert) {
             $open = true;
-            $openCloseText = 'Röstningen stänger om ' . self::formatDateInterval($timeBeforeClose) . '.';
+            $openCloseText = 'Röstningen stänger om ' . self::formatDateInterval($timeBeforeClose,$returnForApi) . '.';
             $voteCountStartTime = $openTime;
         } else if ($timeBeforeTestingClose != null && !$timeBeforeTestingClose->invert) {
             $open = true;
             $openCloseText = 'Röstningen öppen för test och stänger om ' .
-                self::formatDateInterval($timeBeforeTestingClose) . '.';
+                self::formatDateInterval($timeBeforeTestingClose,$returnForApi) . '.';
             $timeBeforeClose = $timeBeforeTestingClose;
             $voteCountStartTime = null;
         } else {
             $open = false;
             $openCloseText = 'Röstningen öppnar om ' .
-                self::formatDateInterval($timeBeforeOpen) . '.';
+                self::formatDateInterval($timeBeforeOpen,$returnForApi) . '.';
             $voteCountStartTime = null;
         }
         $hideBeers = false;
@@ -1525,9 +1525,12 @@ class DbAccess
         return $this->getConnection()->real_escape_string($s);
     }
 
-    private static function formatDateInterval($diff)
+    private static function formatDateInterval($diff, $noSecords = false)
     {
-        $ret = $diff->format(' %y år, %m månader, %d dagar, %h timmar, %i minuter, %s sekunder');
+        if ($noSecords == true)
+            $ret = $diff->format(' %y år, %m månader, %d dagar, %h timmar, %i minuter');
+        else
+            $ret = $diff->format(' %y år, %m månader, %d dagar, %h timmar, %i minuter, %s sekunder');
 
         $ret = str_replace(
             array(' 0 år,', ' 0 månader,', ' 0 dagar,', ' 0 timmar,', ' 0 minuter,'),

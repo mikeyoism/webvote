@@ -685,7 +685,7 @@ class statisticsController extends RestController
                     $competitionId = getCompetitionId();
                 }                
                 $competition = $dbAccess->getCompetition($competitionId);
-                $openTimes = $dbAccess->calcCompetitionTimes($competition);
+                $openTimes = $dbAccess->calcCompetitionTimes($competition,true);
                 $competitionStatusText = $openTimes['openCloseText'];
                 $responseData = json_encode($competitionStatusText);
             } catch (Exception $e) {
