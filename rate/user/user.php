@@ -7,6 +7,8 @@ if ($len >= 3){
   session_set_cookie_params(0, '/', '.'. $domain[$len-2] . '.' . $domain[$len-1]); //like '.shbf.se'
 }
 session_start();
+//print_r($_SESSION);
+//die();
 require_once '../../vote/php/common.inc';
 $jsonReply = array();
 $jsonReply['beers'] = null;
@@ -14,7 +16,8 @@ $jsonReply['usrmsg'] = null;
 
 
 //logged in from event.shbf.se?
-if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name'] > 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0)){
+if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name']) > 1 && isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0){
+    //die("user set");
     $event_username = $_SESSION['user_name'];
     $event_user_id = $_SESSION['user_id'];
     $privilegeLevel = 0; //viewer
@@ -33,6 +36,9 @@ if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name'] > 1 && isset(
         
     }
 } else {
+    //print("user_name=".$_SESSION['user_name']);
+    //print("user_id=".$_SESSION['user_id']);
+    //die();
     $event_username = null;
     $event_user_id = null;
     $privilegeLevel = null;
