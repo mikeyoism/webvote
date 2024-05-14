@@ -36,6 +36,7 @@ var beer_db = function () {
 	var competition_seconds_to_close = 0;
 	var competition_seconds_to_open = 0;
 	var competition_has_closed = false; //only true if competition has closed after first being open
+	var competition_allow_comments_and_checkins = false;
 
 	//url parameters competition id and beer id
 	var cid = null;
@@ -549,7 +550,7 @@ var beer_db = function () {
 					user_rating_class.push(rating);
 				}
 
-				//saveToLocalStorage();
+				
 				store_ratings().done(function () {
 					//find the validated rating from the server, now in user_data.ratings
 					//(not updated if competition is closed etc)
@@ -1041,17 +1042,18 @@ var beer_db = function () {
 		}
 		else {
 			//disable drank and comment if competition has not yet opened
-			//it's ok to leave comments and drank-checks, after competition/rating has closed
-			if (!competition_open && !competition_has_closed) {
-
-				drank_checking_allowed = false;
-				$('.rating-comment').prop('disabled', true);
-			}
-			else {
+			//it's ok to leave comments and drank-checks, after competition/rating has closed (Server-side check)
+			if (competition_allow_comments_and_checkins){
 
 				drank_checking_allowed = vote_code_ok;
 				$('.rating-comment').prop('disabled', !vote_code_ok);
 			}
+			else  {
+
+				drank_checking_allowed = false;
+				$('.rating-comment').prop('disabled', true);
+			}
+			
 		}
 		//if (DEBUGMODE) { console.log('@update_rating_allowed, vote_code_ok=' + vote_code_ok + ', competition_open=' + competition_open); }		
 	}
@@ -1269,6 +1271,9 @@ var beer_db = function () {
 				}
 				if (response.competition_seconds_to_open != null) {
 					competition_seconds_to_open = response.competition_seconds_to_open;
+				}
+				if (response.competition_allow_comments_and_checkins != null) {
+					competition_allow_comments_and_checkins = response.competition_allow_comments_and_checkins;
 				}
 
 				if (response.refresh_page != null && response.refresh_page === true) {

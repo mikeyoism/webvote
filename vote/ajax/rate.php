@@ -67,7 +67,13 @@ if ($voteCodeId == 0) {
     $openTimes = dbAccess::calcCompetitionTimes($competition);
     if (isset($voteArgs->ratings)) {
         if ($openTimes['open'] === false) {
-            list($status, $msg) = array('WARNING', 'Röstningen är STÄNGD!');
+            //store only comments & drankChecks when competition is closed
+            if ($openTimes['allowCommentsAndCheckins'] === true) {
+                list($status, $msg) = storeRatings($dbAccess, $competition, $voteCodeId, $voteArgs->ratings, true /*competitionClosed*/);
+                $msg .= " Röstningen är STÄNGD!"; //but OK
+            } else {
+                list($status, $msg) = array('WARNING', 'Röstningen är STÄNGD!');
+            }
         } else {
 
             list($status, $msg) = storeRatings($dbAccess, $competition, $voteCodeId, $voteArgs->ratings);
@@ -87,7 +93,7 @@ header('Content-Type: application/json', true);
 $jsonOut = json_encode($jsonReply);
 echo $jsonOut;
 
-function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings)
+function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings, $competitionClosed = false)
 {
 
     //rating by categoryId
@@ -129,7 +135,7 @@ function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings)
                     $ratingComment = htmlspecialchars($ratingComment,ENT_QUOTES); //sanitera
                 }
 
-                list($ivoteR, $errorString) = $dbAccess->storeRating($voteCodeId, $rating->categoryId, $rating->beerEntryId, $ratingScore, $ratingComment, $drankCheck);
+                list($ivoteR, $errorString) = $dbAccess->storeRating($voteCodeId, $rating->categoryId, $rating->beerEntryId, $ratingScore, $ratingComment, $drankCheck, false /*validate*/, $competitionClosed);
                 
                 if ($ivoteR == -1) {
                     $failures++;

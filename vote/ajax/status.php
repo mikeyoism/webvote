@@ -88,7 +88,7 @@ $jsonReply['competition_status'] = $openTimes['openCloseText'];
 $jsonReply['competition_seconds_to_open'] = $competition['openTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
 $jsonReply['competition_seconds_to_close'] = $competition['closeTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
 $jsonReply['competition_closes_hhmm'] = $competition['closeTime']->format('H:i');
-
+$jsonReply['competition_allow_comments_and_checkins'] = $openTimes['allowCommentsAndCheckins'];
 $jsonReply['ENABLE_RATING'] = ENABLE_RATING;
 $jsonReply['ENABLE_VOTING'] = ENABLE_VOTING;
 $jsonReply['ENABLE_VOTING_AS_RATING'] = $VotingAsRating;

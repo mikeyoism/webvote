@@ -213,10 +213,12 @@ class DbAccess
         $testingOpenUntilTime = $competition['testingOpenUntilTime'];
         $brewerLoginOpenFrom = $competition['brewerLoginOpenFrom'];
 
+        $timeAfterCloseSeconds = NULL;
 
         $now = new DateTime();
         $timeBeforeOpen = date_diff($now, $openTime);
         $timeBeforeClose = date_diff($now, $closeTime);
+        
 
         if ($testingOpenUntilTime === null) {
             $timeBeforeTestingClose = null;
@@ -226,9 +228,12 @@ class DbAccess
 
         if ($timeBeforeClose->invert) {
             $open = false;
-            $timeBeforeClose = NULL;
+            
             $openCloseText = 'Röstningen har stängt.';
             $voteCountStartTime = $openTime;
+            //calc seconds past since close
+            $timeAfterCloseSeconds = $timeBeforeClose->days * 24 * 60 * 60 + $timeBeforeClose->h * 60 * 60 + $timeBeforeClose->i * 60 + $timeBeforeClose->s;
+            $timeBeforeClose = NULL;
         } else if ($timeBeforeOpen->invert) {
             $open = true;
             $openCloseText = 'Röstningen stänger om ' . self::formatDateInterval($timeBeforeClose,$returnForApi) . '.';
@@ -256,16 +261,22 @@ class DbAccess
         //are we beyond brewerLoginOpenFrom time?
         $brewerLoginOpen = $now > $brewerLoginOpenFrom;
 
+        //if compention has closed, we can't vote, but we can stoere comments and drankchecks for another 24h
+        $allowCommentsAndCheckins = $open || ($timeAfterCloseSeconds !== NULL && $timeAfterCloseSeconds < 86400);
+
+
         return array(
             'openTime' => $openTime,
             'closeTime' => $closeTime,
             'open' => $open,
             'openForTest' => $testingOpenUntilTime != null,
             'hideBeers' => $hideBeers,
+            'allowCommentsAndCheckins' => $allowCommentsAndCheckins,
             'openCloseText' => $openCloseText,
             'timeBeforeOpen' => $timeBeforeOpen,
             'timeBeforeClose' => $timeBeforeClose,
             'timeBeforeOpenSeconds' => $timeBeforeOpenSeconds,
+            'timeAfterCloseSeconds' => $timeAfterCloseSeconds,
             'voteCountStartTime' => $voteCountStartTime,
             'brewerLoginOpen' => $brewerLoginOpen,
             'brewerLoginOpenFrom' => $brewerLoginOpenFrom
@@ -794,7 +805,7 @@ class DbAccess
     }
 
     //store rating (insert or update), returns false on failure (true on success, or if rating is unchanged)
-    public function storeRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck, $validateBeerEntryId = false)
+    public function storeRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck, $validateBeerEntryId = false, $competitionClosed = false)
     {
         //validate beerEntryId against eventreg database
         //(not neccessary for rating, as the app will/should only send valid beerEntryId's)
@@ -814,7 +825,10 @@ class DbAccess
         $result = $this->getConnection()->query($sql) or die("storeRating: Query failed: $sql");
 
         if ($result->num_rows == 0) {
-
+            if ($competitionClosed == true) {
+                $ratingScore = null; //no rating allowed after competition is closed (comments & drankcheck are still allowed)
+            }
+            //insert new rating
             if ($this->insertRating($voteCodeId, $categoryId, $beerEntryId, $ratingScore, $ratingComment, $drankCheck) === true)
                 return array(1, "OK!");
         } else {
@@ -823,6 +837,9 @@ class DbAccess
             if ($row['ratingScore'] != $ratingScore || $row['ratingComment'] != $ratingComment || $row['drankCheck'] != $drankCheck) {
 
                 $ratingScore = $ratingScore === null ? 'null' : $ratingScore;
+                if ($competitionClosed == true) {
+                    $ratingScore = $row['ratingScore']; //amintain value, no rating changes allowed after competition is closed (comments & drankcheck are still allowed)
+                }
                 $drankCheck = $drankCheck === null ? 'null' : $drankCheck;
                 $ratingComment = $ratingComment === null ? 'null' : "'" . $ratingComment . "'";
 
