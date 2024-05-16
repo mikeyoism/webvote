@@ -342,11 +342,16 @@ class DbAccess
         if ($result->num_rows != 1)
             die("Invalid getBeer result, har ölen tilldelats FV-nr i eventdatasen? id=" . $beerEntryId . " num_rows: " . $result->num_rows);//. " sql: " . $sql);
 
+        
+        $classes = $this->getCategories($competitionId, true);
+        //get first/lowest id in categories, 
+        $classOffset = intval($classes[0]['id'])-1;
+
         $row = $result->fetch_assoc();
         $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
         if ($fv_class_id_nr == 0)
             die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
-        $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
+        
         $classIndex = $classOffset + $fv_class_id_nr;
         $nextEntryId = 1;
         $classes = $this->getCategories($competitionId, true);
@@ -432,9 +437,12 @@ class DbAccess
 
         $beers = array();
         $classes = $this->getCategories($competitionId, true);
+        //get first/lowest id in categories, 
+        $classOffset = intval($classes[0]['id'])-1;
         $entry = 1;
         $nextEntryId = 1;
-        $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
+
+
         $classIndex = 0;
         while ($row = $result->fetch_assoc()) {
             $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
@@ -533,7 +541,10 @@ class DbAccess
         $classes = $this->getCategories($competitionId, true);
         $beers = array();
         $nextEntryId = 1;
-        $classOffset = CONST_SETTING_CATEGORY_OFFSET - 1;
+        //get first/lowest id in categories, 
+        $classOffset = intval($classes[0]['id'])-1;
+    
+        
         $classIndex = 0;
         while ($row = $result->fetch_assoc()) {
             //store beer info in arrays grouped by FvMainClass
@@ -612,7 +623,7 @@ class DbAccess
     public function getCategories($competitionId, $NoEntries = false)
     {
         $sql = 'select id, name, description from categories ' .
-            'where competitionId="' . $this->escape($competitionId) . '"';
+            'where competitionId="' . $this->escape($competitionId) . '" order by id';
         $result = $this->getConnection()->query($sql) or die("getCategories: Query failed: $sql");
 
         $categories = array();

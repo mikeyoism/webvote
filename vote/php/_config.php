@@ -51,8 +51,7 @@ define("CONST_SETTING_VOTE_CODE_LENGTH",6);
 
 //LIVE-läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
 define("CONNECT_EVENTREG_DB",false);
-///1=No Offset in Category-table, TODO; fix this
-define("CONST_SETTING_CATEGORY_OFFSET",92); 
+
 //intervall klienter ska fråga efter systatus, i millisekunder
 //(sysstatus = fönsterat som visar hur länge tävlig är öppen/stängd mm i klienten)
 define("SETTING_SYSSTATUS_INTERVAL",10000);
