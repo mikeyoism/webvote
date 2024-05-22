@@ -741,8 +741,11 @@ var beer_db = function () {
 			//loop through the classes and sort the beers in each class (note: classes might be in random order, use .id )
 			$.each(classes, function (no_use, vote_class) {
 				//sort the beers in each class with current compare_function
-
-				sorted_beers_by_class[vote_class.id].sort(compare_function);
+				
+				//sort, provided that the class has any beers (not undefined or null)
+				if (sorted_beers_by_class[vote_class.id] != undefined && sorted_beers_by_class[vote_class.id] != null)
+					sorted_beers_by_class[vote_class.id].sort(compare_function);
+				
 				//if (DEBUGMODE) console.log("sorted_beers_by_class[" + vote_class.id + "]"); console.log(sorted_beers_by_class[vote_class.id]);
 
 			});
@@ -751,31 +754,34 @@ var beer_db = function () {
 		// Sort beers into classes.
 		var items = {};
 		$.each(classes, function (no_use, vote_class) {
-			$.each(sorted_beers_by_class[vote_class.id], function (j, entry_id) {
+			// For each class, create a list of beers.
+			//provided that the class has any beers (not undefined or null)
+			if (sorted_beers_by_class[vote_class.id] != undefined && sorted_beers_by_class[vote_class.id] != null)
+				$.each(sorted_beers_by_class[vote_class.id], function (j, entry_id) {
 
 
-				var beer = beers[entry_id];
-				var class_id = beer['class'];
+					var beer = beers[entry_id];
+					var class_id = beer['class'];
 
 
-				var rating = get_rating(class_id, beer.entry_code);
+					var rating = get_rating(class_id, beer.entry_code);
 
-				items[class_id] = items[class_id] || [];
-				items[class_id].push(
-					'<a class="list-group-item list-group-item-action" id="' + entry_id + '" href="#" data-toggle="modal" data-target="#beer-popup">'
-					+ '<span class="float-right" id="rating-display-' + entry_id + '">'
-					+ get_rating_string(rating.ratingScore == null ? 0 : rating.ratingScore)
-					+ '</span>'
-					+ '<span class="float-right" id="drank-display-' + entry_id + '" style="padding-right: 10px;margin-top:5px;">'
-					+ get_drank_string(rating.drankCheck)
-					+ '</span>'
+					items[class_id] = items[class_id] || [];
+					items[class_id].push(
+						'<a class="list-group-item list-group-item-action" id="' + entry_id + '" href="#" data-toggle="modal" data-target="#beer-popup">'
+						+ '<span class="float-right" id="rating-display-' + entry_id + '">'
+						+ get_rating_string(rating.ratingScore == null ? 0 : rating.ratingScore)
+						+ '</span>'
+						+ '<span class="float-right" id="drank-display-' + entry_id + '" style="padding-right: 10px;margin-top:5px;">'
+						+ get_drank_string(rating.drankCheck)
+						+ '</span>'
 
-					+ '<span class="beer-number">' + beer.entry_code + '</span>. '
-					+ '<span class="beer-name">' + beer.name + '</span><br>'
-					+ '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
-					+ '</a>');
+						+ '<span class="beer-number">' + beer.entry_code + '</span>. '
+						+ '<span class="beer-name">' + beer.name + '</span><br>'
+						+ '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
+						+ '</a>');
 
-			});
+				});
 		});
 
 		// For each class, remove any previous tab-page, create it, and fill it with its list of beers.
@@ -804,7 +810,7 @@ var beer_db = function () {
 
 
 			pages.push('<div id="beerlist-' + vote_class.id + '" class="list-group ">');
-			if (beerCount > 0 ) pages.push(items[vote_class.id].join(''));
+			if (beerCount > 0 && items[vote_class.id] !== undefined && items[vote_class.id] !== null) pages.push(items[vote_class.id].join(''));
 			pages.push('</div>');
 			pages.push('</div>');
 
