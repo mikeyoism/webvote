@@ -57,12 +57,10 @@ foreach ($categories as $category) {
  varav <strong><?=$dbAccess->getRatingCount($category['id'], $voteCountStartTime)?></strong> har fått ett betyg.
 </p>
 <table >
- <?php if (CONST_SYS_JS_DEBUG) {?>
-<tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th></th><th>Antal betyg</th><th style="margin-right:10px">(Snittpoäng)</th><th>Ölets Namn</th><th>Bryggare</th><th>(Oviktad råpoäng)</th>
-<?php } else { ?>
+
   <tr><th>Öl-nr# </th><th><strong>Viktad tävlingspoäng </strong></th></th><th>Antal betyg</th><th>Ölets Namn</th><th>Bryggare</th><th>(Oviktad råpoäng (publ. ej))</th>  
 <?php
-}
+
     $voteResult = $dbAccess->getRatingResultTot($category['id'], $voteCountStartTime);
     foreach ($voteResult as $row) {
 ?>
