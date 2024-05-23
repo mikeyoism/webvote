@@ -182,7 +182,7 @@ class DbAccess
         foreach ($evenreg_event_ids as $event) {
             array_push($ids, $event['event_id']);
             //store event info in array, by id
-            $eventInfo[$event['event_id']] = array('event_name' => $event['event_name'], 'competition' => $event['competition']);
+            $eventInfo[$event['event_id']] = array('event_name' => $event['event_name'], 'competition' => $event['competition'], 'fv_allow_user_votesys_category_selection' => $event['fv_allow_user_votesys_category_selection']);
         }
 
         return array(
@@ -206,7 +206,7 @@ class DbAccess
      * Computes some practical information from the competitino open and close times.
      * This is separate from getting the competition information itself for the benefit of caching.
      */
-    public static function calcCompetitionTimes($competition,$returnForApi = false)
+    public static function calcCompetitionTimes($competition, $returnForApi = false)
     {
         $openTime = $competition['openTime'];
         $closeTime = $competition['closeTime'];
@@ -218,7 +218,7 @@ class DbAccess
         $now = new DateTime();
         $timeBeforeOpen = date_diff($now, $openTime);
         $timeBeforeClose = date_diff($now, $closeTime);
-        
+
 
         if ($testingOpenUntilTime === null) {
             $timeBeforeTestingClose = null;
@@ -228,7 +228,7 @@ class DbAccess
 
         if ($timeBeforeClose->invert) {
             $open = false;
-            
+
             $openCloseText = 'Röstningen har stängt.';
             $voteCountStartTime = $openTime;
             //calc seconds past since close
@@ -236,18 +236,18 @@ class DbAccess
             $timeBeforeClose = NULL;
         } else if ($timeBeforeOpen->invert) {
             $open = true;
-            $openCloseText = 'Röstningen stänger om ' . self::formatDateInterval($timeBeforeClose,$returnForApi) . '.';
+            $openCloseText = 'Röstningen stänger om ' . self::formatDateInterval($timeBeforeClose, $returnForApi) . '.';
             $voteCountStartTime = $openTime;
         } else if ($timeBeforeTestingClose != null && !$timeBeforeTestingClose->invert) {
             $open = true;
             $openCloseText = 'Röstningen öppen för test och stänger om ' .
-                self::formatDateInterval($timeBeforeTestingClose,$returnForApi) . '.';
+                self::formatDateInterval($timeBeforeTestingClose, $returnForApi) . '.';
             $timeBeforeClose = $timeBeforeTestingClose;
             $voteCountStartTime = null;
         } else {
             $open = false;
             $openCloseText = 'Röstningen öppnar om ' .
-                self::formatDateInterval($timeBeforeOpen,$returnForApi) . '.';
+                self::formatDateInterval($timeBeforeOpen, $returnForApi) . '.';
             $voteCountStartTime = null;
         }
         $hideBeers = false;
@@ -300,7 +300,7 @@ class DbAccess
     //get eventreg event_id and info corresponding to our $compentionId
     public function getEventReg_EventId($competitionId)
     {
-        $sql = 'SELECT event_id, event_name,comp FROM Events WHERE deleted= 0 AND votesys_competition_id=' . $this->escape($competitionId);
+        $sql = 'SELECT event_id, event_name,comp, fv_allow_user_votesys_category_selection FROM Events WHERE deleted= 0 AND votesys_competition_id=' . $this->escape($competitionId);
         $result = $this->getConnectionDb2_Eventreg()->query($sql) or die("getEventId: Query failed: $sql");
         if ($result->num_rows < 1)
             die("Invalid eventreg competition id." . $competitionId . " num_rows: " . $result->num_rows);
@@ -308,7 +308,13 @@ class DbAccess
         //return list of event_ids (typiskt FV + etikett tävling)
         $events = array();
         while ($row = $result->fetch_assoc()) {
-            array_push($events, array('event_id' => $row['event_id'], 'event_name' => $row['event_name'], 'competition' => $row['comp'])); //comp = FV, ET, DT
+            array_push($events, array(
+                'event_id' => $row['event_id'],
+                'event_name' => $row['event_name'],
+                'competition' => $row['comp'],
+                'fv_allow_user_votesys_category_selection' => $row['fv_allow_user_votesys_category_selection']
+            )
+            ); //comp = FV, ET, DT
         }
         return $events;
     }
@@ -326,7 +332,7 @@ class DbAccess
             die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
         $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
 
-        $sql = 'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, ' .
+        $sql = 'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, Beer_data.votesys_category, ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
             'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
             'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
@@ -342,25 +348,42 @@ class DbAccess
         if ($result->num_rows != 1)
             die("Invalid getBeer result, har ölen tilldelats FV-nr i eventdatasen? id=" . $beerEntryId . " num_rows: " . $result->num_rows);//. " sql: " . $sql);
 
-        
-        $classes = $this->getCategories($competitionId, true);
-        //get first/lowest id in categories, 
-        $classOffset = intval($classes[0]['id'])-1;
 
         $row = $result->fetch_assoc();
-        $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-        if ($fv_class_id_nr == 0)
-            die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
-        
-        $classIndex = $classOffset + $fv_class_id_nr;
-        $nextEntryId = 1;
         $classes = $this->getCategories($competitionId, true);
+
+        //if Beer_data.votesys_category is set, use that as class id
+        if ($row['votesys_category'] != null) {
+            $classIndex = $row['votesys_category'];
+
+            //find array position in $classes
+            $fv_class_id_nr = array_search($classIndex, array_column($classes, 'id')) + 1;
+
+
+            if ($fv_class_id_nr == 0 || $fv_class_id_nr === false)
+                die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+
+        } else { //deprecated, static FvClass lookup (sm-2024 only)
+
+            //get first/lowest id in categories, 
+            $classOffset = intval($classes[0]['id']) - 1;
+
+            $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+            if ($fv_class_id_nr == 0)
+                die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
+
+            $classIndex = $classOffset + $fv_class_id_nr;
+        }
+
+
+        $nextEntryId = 1;
+        //integrity check, find the class name in $classes by array key Id
         $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
             return ($var['id'] == $classIndex);
         }));
         if (!array_key_exists(0, $class))
             die("Invalid class id." . $classIndex);
-        //find the class name in $classes by array key Id
+
 
 
         //extract style name from type_name (format main_class.sub_class style_name)
@@ -418,7 +441,7 @@ class DbAccess
             die("Invalid eventreg,getBeers, competition id." . $competitionId + " num_rows: " + count($evenreg_event_ids));
         $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
 
-        $sql = 'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, ' .
+        $sql = 'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, Beer_data.votesys_category, ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
             'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
             'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
@@ -438,17 +461,31 @@ class DbAccess
         $beers = array();
         $classes = $this->getCategories($competitionId, true);
         //get first/lowest id in categories, 
-        $classOffset = intval($classes[0]['id'])-1;
+        $classOffset = intval($classes[0]['id']) - 1;
         $entry = 1;
         $nextEntryId = 1;
-
-
         $classIndex = 0;
+
         while ($row = $result->fetch_assoc()) {
-            $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-            if ($fv_class_id_nr == 0)
-                die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
-            $classIndex = $classOffset + $fv_class_id_nr;
+
+            //if Beer_data.votesys_category is set, use that as class id
+            if ($row['votesys_category'] != null) {
+                $classIndex = $row['votesys_category'];
+
+                //find array position in $classes
+                $fv_class_id_nr = array_search($classIndex, array_column($classes, 'id')) + 1;
+
+
+                if ($fv_class_id_nr == 0 || $fv_class_id_nr === false)
+                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+
+            } else { //deprecated, static FvClass lookup (sm-2024 only)
+                $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+                if ($fv_class_id_nr == 0)
+                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+                $classIndex = $classOffset + $fv_class_id_nr;
+            }
+
             //find classes.id in $classes
             $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
                 return ($var['id'] == $classIndex);
@@ -516,7 +553,7 @@ class DbAccess
         //set big selects - one.com requires this, not oderlan (we should probably improve the sql query instead of using this setting, atm the query is as in the eventreg code)
         $result = $this->getConnectionDb2_Eventreg()->query("SET SESSION SQL_BIG_SELECTS=1") or die("getBeers: no big select support in database.");
         //get all beers in the competition
-        $sql = 'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, ' .
+        $sql = 'SELECT Beers_in_event.event_id,Beers.beer_id, Beers.user_id, Beer_data.beer_name, Beer_data.main_class, Beer_data.sub_class, Beer_data.type_name, Beer_data.votesys_category,  ' .
             'Beer_data.low_alc, Beer_data.og, Beer_data.fg, Beer_data.bu, Beer_data.alc,User_data.name,Beers_in_event.fv_competition_no  FROM Beers ' .
             'INNER JOIN Beer_data USING (beer_id) INNER JOIN Beers_in_event USING (beer_id) ' .
             'INNER JOIN Users USING (user_id) INNER JOIN User_data USING (user_id) ' .
@@ -541,32 +578,48 @@ class DbAccess
         $classes = $this->getCategories($competitionId, true);
         $beers = array();
         $nextEntryId = 1;
-        //get first/lowest id in categories, 
-        $classOffset = intval($classes[0]['id'])-1;
-    
-        
         $classIndex = 0;
-        while ($row = $result->fetch_assoc()) {
-            //store beer info in arrays grouped by FvMainClass
-            if ($row['fv_competition_no'] >= 900) { //etikett tävling (övriga fält lika som för ditto öl) //TODO improve this with more info than just number via $evenreg_event_ids ("ET","FV")
-                $fv_class_id_nr = 8;
-                $classIndex = $classOffset + $fv_class_id_nr + 1;
-            } else {
-                $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-                if ($fv_class_id_nr == 0)
-                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
-                $classIndex = $classOffset + $fv_class_id_nr;
-            }
 
+        while ($row = $result->fetch_assoc()) {
+
+            //if Beer_data.votesys_category is set, use that as class id
+            if ($row['votesys_category'] != null) {
+                $classIndex = $row['votesys_category'];
+
+                //find array position in $classes
+                $fv_class_id_nr = array_search($classIndex, array_column($classes, 'id')) + 1;
+
+
+                if ($fv_class_id_nr == 0 || $fv_class_id_nr === false)
+                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+
+            } else { //deprecated, static FvClass lookup (sm-2024 only)
+                //get first/lowest id in categories, 
+                $classOffset = intval($classes[0]['id']) - 1;
+                //store beer info in arrays grouped by FvMainClass
+                if ($row['fv_competition_no'] >= 900) { //etikett tävling (övriga fält lika som för ditto öl) //TODO improve this with more info than just number via $evenreg_event_ids ("ET","FV")
+                    $fv_class_id_nr = 8;
+                    $classIndex = $classOffset + $fv_class_id_nr + 1;
+                } else {
+                    $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+                    if ($fv_class_id_nr == 0)
+                        die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+                    $classIndex = $classOffset + $fv_class_id_nr;
+
+
+                }
+            }
 
             //find classes.id in $classes
             $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
                 return ($var['id'] == $classIndex);
             }));
-
+            //find the class name in $classes by array key Id
             if (!array_key_exists(0, $class))
                 die("Invalid class id." . $classIndex);
-            //find the class name in $classes by array key Id
+
+
+
 
 
             //extract style name from type_name (format main_class.sub_class style_name)
@@ -666,14 +719,14 @@ class DbAccess
         $sql = 'INSERT IGNORE INTO entries '
             . 'VALUES '
             . implode(
-                ',',
-                array_map(
-                    function ($c) use ($catId) {
-                        return "(null, $catId, $c)";
-                    },
-                    $codes
-                )
-            );
+            ',',
+            array_map(
+                function ($c) use ($catId) {
+                    return "(null, $catId, $c)";
+                },
+                $codes
+            )
+        );
         $stmt = $this->getConnection()->prepare($sql) or die("addCategoryEntries: prepare failed: $sql");
         $stmt->execute() or die("addCategoryEntries: Execute failed: $sql");
     }
@@ -727,14 +780,14 @@ class DbAccess
         $sql = 'INSERT IGNORE INTO voteCodes (id, competitionId, code) '
             . 'VALUES '
             . implode(
-                ',',
-                array_map(
-                    function ($c) use ($compId) {
-                        return "(null, $compId, '$c')";
-                    },
-                    $codes
-                )
-            );
+            ',',
+            array_map(
+                function ($c) use ($compId) {
+                    return "(null, $compId, '$c')";
+                },
+                $codes
+            )
+        );
         $stmt = $this->getConnection()->prepare($sql) or die("insertVoteCodes: prepare failed: $sql");
         $stmt->execute() or die("insertVoteCodes: Execute failed: $sql");
     }
@@ -902,7 +955,7 @@ class DbAccess
         $votes = array();
         while ($row = $result->fetch_assoc()) {
             $votes[$row['categoryId']] =
-                array('1' => $row['vote1'], '2' => $row['vote2'], '3' => $row['vote3']);
+            array('1' => $row['vote1'], '2' => $row['vote2'], '3' => $row['vote3']);
         }
         return $votes;
     }
@@ -1056,11 +1109,11 @@ class DbAccess
                     else
                         $sort = $a['votersCount'] > $b['votersCount'] ? -1 : 1;
                 }
-                if ($sort == 0){
+                if ($sort == 0) {
                     if ($a['ratingScore'] === $b['ratingScore'])
                         $sort = 0;
-                    else                    
-                    $sort = $a['ratingScore'] > $b['ratingScore'] ? -1 : 1;
+                    else
+                        $sort = $a['ratingScore'] > $b['ratingScore'] ? -1 : 1;
                 }
                 return $sort;
             });
