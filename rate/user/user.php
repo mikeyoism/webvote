@@ -77,10 +77,11 @@ if ($beers === null){
 //for each beer, get rating average, count and comments
 
 foreach ($beers as $key => $beer){
-    $ratingCount = $dbAccess->getRatingCountForEntryCode($beer['entry_code'],$voteCountStartTime);
-    $ratingComments = $dbAccess->getCommentsForEntryCode($beer['entry_code'],null);
-    $startCounts = $dbAccess->getRatingScoreCountForEntryCode($beer['entry_code'],$voteCountStartTime);
-    $drankCount = $dbAccess->getDrankCheckCountForEntryCode($beer['entry_code'],null);
+    $ratingCount = $dbAccess->getRatingCountForEntryCode($beer['votesys_category'],$beer['entry_code'],$voteCountStartTime);
+    $ratingComments = $dbAccess->getCommentsForEntryCode($beer['votesys_category'],$beer['entry_code'],null);
+    $startCounts = $dbAccess->getRatingScoreCountForEntryCode($beer['votesys_category'],$beer['entry_code'],$voteCountStartTime);
+    $drankCount = $dbAccess->getDrankCheckCountForEntryCode($beer['votesys_category'],$beer['entry_code'],null);
+
     //add to $beer
     $beer['ratingCount'] = $ratingCount;
     $beer['ratingComments'] = $ratingComments;
