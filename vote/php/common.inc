@@ -117,7 +117,7 @@ class DbAccess
                 die('Error no beer styles found from url: ' . $url);
             }
             if (empty($json) || $json === false) {
-                die('Error reading beer styles from url: ' . $url);
+                die(' Error reading beer styles from Url: "' . $url . '"' . ' defined in competitions');
             }
             $styles = json_decode($json, true);
             if (empty($styles)) {

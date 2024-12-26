@@ -26,7 +26,7 @@ date_default_timezone_set("Europe/Stockholm");
 //-COMPETITION SETUP START
 
 //for testing/used if not set by param
-define("COMPETITION_ID", 42);
+define("COMPETITION_ID", 46);
 define("ENABLE_RATING", true);
 
 //överskrid vissa inställningar i denna fil med värden från db
@@ -40,7 +40,7 @@ define("HIDE_BEERS_BEFORE_START",true);
 //cssTheme - css-fil i rate/css/ för tävlingsspecifik design (event poster etc)
 //like theme_sm2024.css
 //lämnas tom för enbart grunddesign
-define("CSS_COMPETITION_THEME", "theme_sm2024.css"); 
+define("CSS_COMPETITION_THEME",  "");
 
 
 //Längd på röstkoder - överskrid inte satt maxlängd i db.
@@ -50,7 +50,7 @@ define("CONST_SETTING_VOTE_CODE_LENGTH",6);
  Kan ändras under pågående tävling*/
 
 //LIVE-läs ölinfo från eventreg-database (annars från cache-filer som sätts upp på admin-sidan)
-define("CONNECT_EVENTREG_DB",false);
+define("CONNECT_EVENTREG_DB",true);
 
 //intervall klienter ska fråga efter systatus, i millisekunder
 //(sysstatus = fönsterat som visar hur länge tävlig är öppen/stängd mm i klienten)
