@@ -355,8 +355,11 @@ class DbAccess
         //if Beer_data.votesys_category is set, use that as class id
         if ($row['votesys_category'] != null) {
             $classIndex = $row['votesys_category'];
-
-            //find array position in $classes
+            
+            if ($classIndex == 0)
+                die("getBeersByBrewer: Illegal Beer_data.votesys_category=0 detected for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] );
+            
+                //find array position in $classes
             $fv_class_id_nr = array_search($classIndex, array_column($classes, 'id')) + 1;
 
 
@@ -382,7 +385,7 @@ class DbAccess
             return ($var['id'] == $classIndex);
         }));
         if (!array_key_exists(0, $class))
-            die("Invalid class id." . $classIndex);
+        print("getBeer: Invalid class/Category id." . $classIndex . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
 
 
 
@@ -473,6 +476,9 @@ class DbAccess
             if ($row['votesys_category'] != null) {
                 $classIndex = $row['votesys_category'];
 
+                if ($classIndex == 0)
+                    die("getBeersByBrewer: Illegal Beer_data.votesys_category=0 detected for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] );
+
                 //find array position in $classes
                 $fv_class_id_nr = array_search($classIndex, array_column($classes, 'id')) + 1;
 
@@ -493,7 +499,7 @@ class DbAccess
             }));
 
             if (!array_key_exists(0, $class))
-                die("Invalid class id." . $classIndex);
+                print("getBeersByBrewer: Invalid class/Category id." . $classIndex . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
             //find the class name in $classes by array key Id
 
 
@@ -587,6 +593,11 @@ class DbAccess
             //if Beer_data.votesys_category is set, use that as class id
             if ($row['votesys_category'] != null) {
                 $classIndex = $row['votesys_category'];
+                
+                
+                if ($classIndex == 0)
+                    die("getBeers: Illegal Beer_data.votesys_category=0 detected for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] );
+
 
                 //find array position in $classes
                 $fv_class_id_nr = array_search($classIndex, array_column($classes, 'id')) + 1;
@@ -618,7 +629,7 @@ class DbAccess
             }));
             //find the class name in $classes by array key Id
             if (!array_key_exists(0, $class))
-                die("Invalid class id." . $classIndex);
+                print("getBeers: Invalid class/Category id." . $classIndex . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
 
 
 
