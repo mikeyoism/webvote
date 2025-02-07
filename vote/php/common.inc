@@ -353,7 +353,7 @@ class DbAccess
         $classes = $this->getCategories($competitionId, true);
 
         //if Beer_data.votesys_category is set, use that as class id
-        if ($row['votesys_category'] != null) {
+        if ($row['votesys_category'] != null && $row['votesys_category'] != 0) { //&& ($row['votesys_category'] != 0 är en temp fix tillvidare, pga event_reg ej lirar ihop om fv_allow flaggan är false
             $classIndex = $row['votesys_category'];
             
             if ($classIndex == 0)
@@ -384,9 +384,9 @@ class DbAccess
         $class = array_values(array_filter($classes, function ($var) use ($classIndex) {
             return ($var['id'] == $classIndex);
         }));
-        if (!array_key_exists(0, $class))
-        print("getBeer: Invalid class/Category id." . $classIndex . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
-
+        if (!array_key_exists(0, $class)){
+            print("getBeer: Invalid class/Category id." . $classIndex . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
+        }
 
 
         //extract style name from type_name (format main_class.sub_class style_name)
@@ -473,7 +473,7 @@ class DbAccess
         while ($row = $result->fetch_assoc()) {
 
             //if Beer_data.votesys_category is set, use that as class id
-            if ($row['votesys_category'] != null) {
+            if ($row['votesys_category'] != null && $row['votesys_category'] != 0) { //&& ($row['votesys_category'] != 0 är en temp fix tillvidare, pga event_reg ej lirar ihop om fv_allow flaggan är false
                 $classIndex = $row['votesys_category'];
 
                 if ($classIndex == 0)
@@ -498,8 +498,9 @@ class DbAccess
                 return ($var['id'] == $classIndex);
             }));
 
-            if (!array_key_exists(0, $class))
+            if (!array_key_exists(0, $class)){
                 print("getBeersByBrewer: Invalid class/Category id." . $classIndex . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
+            }
             //find the class name in $classes by array key Id
 
 
@@ -591,7 +592,7 @@ class DbAccess
         while ($row = $result->fetch_assoc()) {
 
             //if Beer_data.votesys_category is set, use that as class id
-            if ($row['votesys_category'] != null) {
+            if ($row['votesys_category'] != null && $row['votesys_category'] != 0) { //&& ($row['votesys_category'] != 0 är en temp fix tillvidare, pga event_reg ej lirar ihop om fv_allow flaggan är false
                 $classIndex = $row['votesys_category'];
                 
                 
@@ -628,8 +629,9 @@ class DbAccess
                 return ($var['id'] == $classIndex);
             }));
             //find the class name in $classes by array key Id
-            if (!array_key_exists(0, $class))
+            if (!array_key_exists(0, $class)){
                 print("getBeers: Invalid class/Category id." . $classIndex . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
+            }
 
 
 
