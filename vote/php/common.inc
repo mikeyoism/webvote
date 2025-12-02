@@ -1415,6 +1415,7 @@ class DbAccess
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
         $sql = 'select count(ratingScore) as c from ratings where categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond;
+        
         $result = $this->getConnection()->query($sql) or die("getRatingCount: Query failed: $sql");
         $ratingCount = $result->fetch_assoc()['c'];
         return $ratingCount;
@@ -1429,6 +1430,7 @@ class DbAccess
         }
         //note: in a correct db, drankcheck is always 1 if ratingScore>0, but we check both here for safety
         $sql = 'select count(drankCheck) as c from ratings where categoryId=' . $this->escape($categoryId) . ' and (drankCheck=1)' . $extraCond;
+        
         $result = $this->getConnection()->query($sql) or die("getDrankCheckCount: Query failed: $sql");
         $drankCheckCount = $result->fetch_assoc()['c'];
         return $drankCheckCount;
@@ -1442,9 +1444,12 @@ class DbAccess
         } else {
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
-        $sql = 'select count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond;
+        //$sql = 'select count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond;
+        $sql = 'select count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode)  . ' and ratingScore>0' . $extraCond;
+        
         $result = $this->getConnection()->query($sql) or die("getRatingCountForEntryCode: Query failed: $sql");
         $ratingCount = $result->fetch_assoc()['c'];
+        //print("getRatingCountForEntryCode:" . $sql);
         return $ratingCount;
     }
     //get comments for a specific entry_code (Beer FV-nr)
@@ -1455,7 +1460,8 @@ class DbAccess
         } else {
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
-        $sql = 'select ratingComment from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingComment is not null' . $extraCond;
+        //$sql = 'select ratingComment from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingComment is not null' . $extraCond;
+        $sql = 'select ratingComment from ratings where beerEntryId=' . $this->escape($entryCode)  . ' and ratingComment is not null' . $extraCond;
         $result = $this->getConnection()->query($sql) or die("getCommentsForEntryCode: Query failed: $sql");
         $comments = array();
         while ($row = $result->fetch_assoc()) {
@@ -1472,7 +1478,8 @@ class DbAccess
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
         //note: in a correct db, drankcheck is always 1 if ratingScore>0, but we check both here for safety
-        $sql = 'select count(drankCheck) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and (drankCheck=1)' . $extraCond;
+        //$sql = 'select count(drankCheck) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and (drankCheck=1)' . $extraCond;
+        $sql = 'select count(drankCheck) as c from ratings where beerEntryId=' . $this->escape($entryCode)  . ' and (drankCheck=1)' . $extraCond;
         $result = $this->getConnection()->query($sql) or die("getDrankCheckCountForEntryCode: Query failed: $sql");
         $drankCheckCount = $result->fetch_assoc()['c'];
         return $drankCheckCount;
@@ -1485,7 +1492,8 @@ class DbAccess
         } else {
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
-        $sql = 'select ratingScore from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond;
+        //$sql = 'select ratingScore from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond;
+        $sql = 'select ratingScore from ratings where beerEntryId=' . $this->escape($entryCode)  . ' and ratingScore>0' . $extraCond;
         $result = $this->getConnection()->query($sql) or die("getRatingScoresForEntryCode: Query failed: $sql");
         $ratingScores = array();
         while ($row = $result->fetch_assoc()) {
@@ -1501,7 +1509,8 @@ class DbAccess
         } else {
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
-        $sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
+        //$sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
+        $sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode)  . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
         $result = $this->getConnection()->query($sql) or die("getRatingScoreCountForEntryCode: Query failed: $sql");
         $ratingScoreCount = array();
         while ($row = $result->fetch_assoc()) {
@@ -1520,7 +1529,8 @@ class DbAccess
         } else {
             $extraCond = ' and creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
         }
-        $sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
+        ///$sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode) . ' and categoryId=' . $this->escape($categoryId) . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
+        $sql = 'select ratingScore, count(ratingScore) as c from ratings where beerEntryId=' . $this->escape($entryCode)  . ' and ratingScore>0' . $extraCond . ' group by ratingScore';
         $result = $this->getConnection()->query($sql) or die("getRatingScoreCountForEntryCode: Query failed: $sql");
         $ratingScoreCount = array();
         while ($row = $result->fetch_assoc()) {
@@ -1646,15 +1656,31 @@ function isCompetitionSet()
 
 function getCompetitionId()
 {
-
-    if (!isset($_GET['competitionId'])) {
-        if (COMPETITION_ID !== null)
-            return COMPETITION_ID;
-        else
-            die('Missing competition');
+    //mj 251202: lagraing av competitionId i sessionen för hantering av flera parallella tävlingar
+    //om  competitionId i URL:en så sparas den i sessionen, och aktivt url-byte via param krävs för att byta tävling
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
 
-    return $_GET['competitionId'];
+    //URL param always wins if provided
+    if (isset($_GET['competitionId']) && $_GET['competitionId'] !== '') {
+        $_SESSION['competitionId'] = $_GET['competitionId'];
+        return $_SESSION['competitionId'];
+    }
+
+    //Fallback to session
+    if (isset($_SESSION['competitionId'])) {
+        
+        return $_SESSION['competitionId'];
+    }
+
+    // Fallback to constant
+    if (defined('COMPETITION_ID') && COMPETITION_ID !== null) {
+        return COMPETITION_ID;
+    }
+
+    // 4. Failure
+    die('Missing competition');
 }
 
 function isLoggedIn()

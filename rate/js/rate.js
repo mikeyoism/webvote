@@ -102,12 +102,16 @@ var beer_db = function () {
 	};
 
 	function get_competition_data() {
+		
+		var competitionIdFromUrl = UrlParameters('competitionId') || UrlParameters('cid'); 
+
 		return $.ajax({
 			type: 'GET',
 			cache: 'false',
 			url: 'php/ajax.php',
 			dataType: 'json',
-			data: {},
+			// Only send competitionId if we actually have it by url parameter
+			data: competitionIdFromUrl ? { competitionId: competitionIdFromUrl } : {},				
 			success: function (response) {
 				competition_id = response.competition_id;
 				classes = response.classes;
