@@ -126,12 +126,14 @@ if (!$openTimes['open'] && !$openTimes['timeBeforeOpen']->invert) {
 <?php
 //if no EventReg competition id is set, show a warning
 $eventRegIds = $competition['eventReg_ids'];
-if ((!isset($eventRegIds) || count($eventRegIds) < 1 ) && ENABLE_RATING) {
+$enableRating = getCompetitionSetting($competitionId, 'ENABLE_RATING', false);
+$enableBayesian = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING', false);
+if ((!isset($eventRegIds) || count($eventRegIds) < 1 ) && $enableRating) {
     print "</p><p style='background-color:yellow'>OBS! Det finns inget tävlings-ID för denna tävling.  ".
         "knutet i EventReg-systemet (ölregisteringsystemet). Detta måste sättas upp i dess databas, för att Rating ska fungera! Tabell.Kolumn Events.votesys_competition_id.</p>";
 }
 else {
-    if  (ENABLE_RATING) {
+    if  ($enableRating) {
         $eventRegIdsString = implode(', ', $competition['eventReg_ids']);
 
         print " och det är knutet mot öl-registreringssystemet (EventReg-databasen) med ID'n: ". $eventRegIdsString;
@@ -179,24 +181,30 @@ if ($privilegeLevel == 2) {
 
 
 <hr>
-<?php if (ENABLE_RATING) { ?>
-<h3>Visa <a href="showRateResult.php?competitionId=<?=$competitionId?>">tävlingsresultatet, rating</h3>
+<?php if ($enableRating) { ?>
+<?php
+    if ($enableBayesian) { ?>
+<h3>Visa <a href="showBayesianResult.php?competitionId=<?=$competitionId?>">tävlingsresultatet (Bayesian rating)</a></h3>
+<?php } else { ?>
+<h3>Visa <a href="showRateResult.php?competitionId=<?=$competitionId?>">tävlingsresultatet, rating</a></h3>
+<?php } ?>
 <?php } else{ ?>
-<h5>Visa <a href="showVotes.php?competitionId=<?=$competitionId?>">röstningsresultatet</h5>.
+<h5>Visa <a href="showVotes.php?competitionId=<?=$competitionId?>">röstningsresultatet</a></h5>
 <?php } ?>
 <hr>
 
 <?php
 $categories = $dbAccess->getCategories($competitionId);
-if (ENABLE_VOTING && !CONNECT_EVENTREG_DB_VOTING) { 
-?>  
+$enableVoting = !$enableRating;
+if ($enableVoting && !CONNECT_EVENTREG_DB_VOTING) {
+?>
 <p style="background-color:yellow">OBS att "Deltagande nummer" inte används av rate-systemet, och enbart behöver fyllas i för det äldre vote-systemet (om/när det används)
 Även votesytemet kan istället för dessa deltagande-nummer veriefiera öl mot Event-reg databasen se inställning CONNECT_EVENTREG_DB_VOTING i _config.php</p>
 
 <?php
 }
 
-if (ENABLE_VOTING && !CONNECT_EVENTREG_DB_VOTING) { 
+if ($enableVoting && !CONNECT_EVENTREG_DB_VOTING) {
 foreach ($categories as $category) {
 ?>
 <p><b>Deltagande nummer i kategori <?=$category['name']?> (<?=$category['description']?>)</b>:

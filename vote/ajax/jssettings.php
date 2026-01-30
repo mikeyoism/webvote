@@ -32,36 +32,42 @@ if(isset($_POST['operation']))
     if ($operation == "getjssettings")
     {
         header('Content-Type: application/json', true);
+        require_once "../php/common.inc";
+        $competitionId = getCompetitionId();
+
         $jsonReply = array();
         $jsonReply["msgtype"] = "ok"; //dummy
 
-        
+        $enableRating = getCompetitionSetting($competitionId, 'ENABLE_RATING', false);
+        $enableBayesian = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING', false);
+
         $jsonReply["SETTING_SYSSTATUS_INTERVAL"] = SETTING_SYSSTATUS_INTERVAL;
         $jsonReply["CONST_SYS_JS_DEBUG"] = CONST_SYS_JS_DEBUG;
-        $jsonReply["ENABLE_RATING"] =ENABLE_RATING;
-        $jsonReply["CONST_SETTING_VOTE_CODE_LENGTH"] = CONST_SETTING_VOTE_CODE_LENGTH;        
-        
+        $jsonReply["ENABLE_RATING"] = $enableRating;
+        $jsonReply["CONST_SETTING_VOTE_CODE_LENGTH"] = CONST_SETTING_VOTE_CODE_LENGTH;
+
         $jsonReply["CSS_COMPETITION_THEME"] = CSS_COMPETITION_THEME;
         $jsonReply['HIDE_BEERS_BEFORE_START'] = HIDE_BEERS_BEFORE_START;
 
+        $jsonReply['ENABLE_BAYESIAN_RATING'] = $enableBayesian;
+        $jsonReply['RATING_MAX_SCORE'] = ($enableBayesian) ? 10 : 5;
+
         //legacy vote settings - not used for rating
-        $jsonReply["ENABLE_VOTING"] =ENABLE_VOTING; //same as ENABLE_RATING
+        $jsonReply["ENABLE_VOTING"] = !$enableRating; // opposite of ENABLE_RATING
         $jsonReply["CONST_SETTING_SHOW_HELP_POPUP"] =CONST_SETTING_SHOW_HELP_POPUP;
         $jsonReply["CONST_SETTING_BEERID_NUMBERSPAN_LENGTH"] = CONST_SETTING_BEERID_NUMBERSPAN_LENGTH;
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY"] = CONST_SETTING_VOTES_PER_CATEGORY;
         //används nu i backend only
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY_SAME"] = CONST_SETTING_VOTES_PER_CATEGORY_SAME;
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL"] = CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL;
-        
+
         if (EXTEND_FROM_DB){
             //read some settings from db, and override value from _config.php
-            require_once "../php/common.inc";
             $dbAccess = new DbAccess();
-            $competitionId = getCompetitionId();
             $cssTheme = $dbAccess->getCssCompetitionTheme($competitionId);
             if ($cssTheme != "")
                 $jsonReply["CSS_COMPETITION_THEME"] = $cssTheme;
-            
+
         }
 
         echo  json_encode($jsonReply);

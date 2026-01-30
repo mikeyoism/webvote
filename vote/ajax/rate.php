@@ -95,6 +95,12 @@ echo $jsonOut;
 
 function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings, $competitionClosed = false)
 {
+    // Determine valid rating range based on Bayesian configuration
+    // Bayesian rating uses 1-10 scale, standard rating uses 1-5
+    $competitionId = $competition['id'];
+    $enableBayesian = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING', false);
+    $maxRating = ($enableBayesian) ? 10 : 5;
+    $minRating = 1;
 
     //rating by categoryId
     // one $rating  like {
@@ -106,23 +112,34 @@ function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings, $competit
     // }
     $successes = 0;
     $failures = 0;
+    $failureMessages = array();
     foreach ($ratings as $categoryId => $catOfRatings) {
-        
+
         //foreach ratings array, call storeRating
         foreach ($catOfRatings as $clientKey => $rating) {
             if ($rating->beerEntryId > 0 && $categoryId == $rating->categoryId) { //exta check
-                
+
                 //ratingScore, garantera att den finns, +  att det är en int eller null
                 if (!isset($rating->ratingScore))
                     $rating->ratingScore = "";
                 $ratingScore = $rating->ratingScore  == "" ?  null : $rating->ratingScore;
                 if ($ratingScore !== null && ($ratingScore = filter_var($ratingScore, FILTER_VALIDATE_INT)) === false) {
-                    return array("WARNING", "ogiltig röst, ej heltal @ " . $rating->beerEntryId); //ska aldrig hända, men...
+                    $failures++;
+                    $failureMessages[] = "ogiltig röst, ej heltal @ " . $rating->beerEntryId;
+                    continue;
+                }
+                // Validate rating score is within valid range
+                if ($ratingScore !== null && ($ratingScore < $minRating || $ratingScore > $maxRating)) {
+                    $failures++;
+                    $failureMessages[] = "ogiltig röst, måste vara mellan $minRating och $maxRating @ " . $rating->beerEntryId;
+                    continue;
                 }
                 //drankCheck, garantera att det är en int eller null
                 $drankCheck = $rating->drankCheck  == "" ?  null : $rating->drankCheck;
                 if ($drankCheck !== null && ($drankCheck = filter_var($drankCheck, FILTER_VALIDATE_INT)) === false) {
-                    return array("WARNING", "ogiltig drankCheck, ej heltal @ " . $rating->beerEntryId); //ska aldrig händ
+                    $failures++;
+                    $failureMessages[] = "ogiltig drankCheck, ej heltal @ " . $rating->beerEntryId;
+                    continue;
                 }
                 //ratingComment
                 $ratingComment = null;
@@ -147,7 +164,11 @@ function storeRatings($dbAccess, $competition, $voteCodeId,  $ratings, $competit
         }
     }
     if ($failures > 0) {
-        return array('WARNING', "Något gick fel, ". $failures ." av " . ($failures + $successes) ." betyg har inte registrerats");
+        $msg = "Något gick fel, ". $failures ." av " . ($failures + $successes) ." betyg har inte registrerats";
+        if (!empty($failureMessages)) {
+            $msg .= ": " . implode(", ", $failureMessages);
+        }
+        return array('WARNING', $msg);
     } else {
         return array('OK', $successes ."st betyg registrerades");
     }

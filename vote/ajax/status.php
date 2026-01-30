@@ -33,12 +33,14 @@ if (APC_CACHE_ENABLED) {
 }
 
 $openTimes = dbAccess::calcCompetitionTimes($competition);
+$enableRating = getCompetitionSetting($competitionId, 'ENABLE_RATING', false);
+$enableVoting = !$enableRating;
 $VotingAsRating = ENABLE_VOTING_AS_RATING;
 if (!$isRateSystem && $openTimes['open'] == true) {
     //legacy voting, överskrid om det är tillåtet eller ej
-    if (!ENABLE_VOTING && !ENABLE_VOTING_AS_RATING) {
+    if (!$enableVoting && !ENABLE_VOTING_AS_RATING) {
         //informera om nya betygssystemet
-        if (ENABLE_RATING)
+        if ($enableRating)
             $openTimes['openCloseText'] = "Röstningen är inaktiverad. Vi har bytt till ett nytt röstsystem. Surfa istället till <a href='https://rate.shbf.se'>rate.shbf.se</a> för att rösta.";
 
     } else if (ENABLE_VOTING_AS_RATING == true) {
@@ -77,6 +79,16 @@ if (HIDE_BEERS_BEFORE_START && $openTimes['hideBeers'] != $_SESSION['hideBeers']
     $_SESSION['hideBeers'] = $openTimes['hideBeers'];
 }
 
+//has Bayesian rating setting changed?
+$enableBayesian = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING', false);
+if (!isset($_SESSION['enableBayesian_' . $competitionId])) {
+    $_SESSION['enableBayesian_' . $competitionId] = $enableBayesian;
+}
+if ($enableBayesian !== $_SESSION['enableBayesian_' . $competitionId]) {
+    $refreshPage = true;
+    $_SESSION['enableBayesian_' . $competitionId] = $enableBayesian;
+}
+
 
 $jsonReply = array();
 $jsonReply['update_interval'] = SETTING_SYSSTATUS_INTERVAL;
@@ -89,8 +101,8 @@ $jsonReply['competition_seconds_to_open'] = $competition['openTime']->getTimeSta
 $jsonReply['competition_seconds_to_close'] = $competition['closeTime']->getTimeStamp() - (new DateTime())->getTimeStamp();
 $jsonReply['competition_closes_hhmm'] = $competition['closeTime']->format('H:i');
 $jsonReply['competition_allow_comments_and_checkins'] = $openTimes['allowCommentsAndCheckins'];
-$jsonReply['ENABLE_RATING'] = ENABLE_RATING;
-$jsonReply['ENABLE_VOTING'] = ENABLE_VOTING;
+$jsonReply['ENABLE_RATING'] = $enableRating;
+$jsonReply['ENABLE_VOTING'] = $enableVoting;
 $jsonReply['ENABLE_VOTING_AS_RATING'] = $VotingAsRating;
 
 

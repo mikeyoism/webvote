@@ -127,6 +127,11 @@
     color: grey;
 }
 
+/* Ensure d-none works on rating fieldsets */
+.rating.d-none {
+    display: none !important;
+}
+
 .rating > input {
     position: absolute;
     left: -10000px;
@@ -299,3 +304,228 @@
     font-weight: bold;
     color: black;
   }
+
+/* ============ BAYESIAN RATING STYLES ============ */
+
+/* Slider section container */
+.vote-slider-section {
+    padding: 8px 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.vote-slider-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.vote-slider-value {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #333;
+}
+
+.vote-slider-container {
+    padding: 0 4px;
+}
+
+.slider-wrapper {
+    position: relative;
+}
+
+.slider-track-container {
+    position: relative;
+    padding: 8px 0;
+}
+
+.slider-labels {
+    position: relative;
+    height: 20px;
+    margin-top: 0;
+}
+
+.slider-label {
+    position: absolute;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Position "1" label at the 10% mark, accounting for thumb offset
+   Thumb is ~24px wide, so thumb center at value 1 is at: 12px + 10% * (100% - 24px) ≈ 10% + 10px */
+.slider-label-min {
+    left: calc(10% + 10px);
+    transform: translateX(-50%);
+}
+
+/* Position "10" label at the right end, offset by half thumb width */
+.slider-label-max {
+    right: 12px;
+    transform: translateX(50%);
+}
+
+/* Main slider input styling */
+.vote-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(to right, #FFD43B 0%, #FFD43B var(--value-percentage, 0%), #dbdbdb var(--value-percentage, 0%), #dbdbdb 100%);
+    outline: none;
+    margin: 0;
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Webkit (Chrome, Safari, Edge) thumb */
+.vote-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #494949;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vote-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.vote-slider::-webkit-slider-thumb:active {
+    transform: scale(1.1);
+    background: #333;
+}
+
+/* Firefox thumb */
+.vote-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #494949;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vote-slider::-moz-range-thumb:hover {
+    transform: scale(1.15);
+}
+
+.vote-slider::-moz-range-thumb:active {
+    transform: scale(1.1);
+    background: #333;
+}
+
+/* Firefox track */
+.vote-slider::-moz-range-track {
+    height: 6px;
+    background: #dbdbdb;
+    border-radius: 3px;
+}
+
+/* Current rating display in header */
+#popup-current-rating-display {
+    font-size: 0.95rem;
+    padding: 2px 6px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 1.2rem;
+}
+
+/* Bayesian mode footer styling */
+#beer-popup-footer-bayesian {
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Mobile responsive adjustments for slider */
+@media only screen and (max-width: 576px) {
+    .vote-slider-section {
+        padding: 4px 0;
+    }
+
+    .vote-slider::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
+    }
+
+    .vote-slider::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+    }
+
+    .slider-labels {
+        margin-top: 4px;
+    }
+
+    /* Adjust label positions for larger thumb (28px) */
+    .slider-label-min {
+        left: calc(10% + 12px);
+    }
+
+    .slider-label-max {
+        right: 14px;
+    }
+}
+
+/* Touch-friendly on mobile */
+@media (pointer: coarse) {
+    .vote-slider::-webkit-slider-thumb {
+        width: 32px;
+        height: 32px;
+    }
+
+    .vote-slider::-moz-range-thumb {
+        width: 32px;
+        height: 32px;
+    }
+
+    .slider-track-container {
+        padding: 12px 0;
+    }
+
+    /* Adjust label positions for larger touch thumb (32px) */
+    .slider-label-min {
+        left: calc(10% + 14px);
+    }
+
+    .slider-label-max {
+        right: 16px;
+    }
+}
+
+/* Beer list rating/drank display container */
+.rating-drank-container {
+    display: inline-flex;
+    float: right;
+    flex-direction: row-reverse;
+}
+
+.rating-drank-container.bayesian-mode {
+    flex-direction: row; /* Bayesian: drank appears to the right of rating */
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-drank-container.bayesian-mode [id^="drank-display-"] {
+    min-width: 1.2em; /* Reserve space even when empty */
+    text-align: center;
+    margin-top: 0 !important; /* Override inline style for proper vertical centering */
+}
+
+/* ============ END BAYESIAN STYLES ============ */
