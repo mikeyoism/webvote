@@ -2,6 +2,7 @@
 $domain = explode('.',$_SERVER['HTTP_HOST']);
 $len =count($domain);
 //set session across subdomains (to fetch session from event.shbf.se)
+//disable @LHBF + move session_start(); before any output
 if ($len >= 3){
   $some_name = session_name("regrate");
   session_set_cookie_params(0, '/', '.'. $domain[$len-2] . '.' . $domain[$len-1]); //like '.shbf.se'
@@ -43,8 +44,8 @@ if (isset($_SESSION['user_name']) && strlen($_SESSION['user_name']) > 1 && isset
     $event_user_id = null;
     $privilegeLevel = null;
 
-    
-    $jsonReply['usrmsg'] = 'Du är inte inloggad, logga in på event.shbf.se ';
+    //TODO: make displayed url dynamic
+    $jsonReply['usrmsg'] = ' Du är inte inloggad, logga in på event.shbf.se ';
     header('Content-Type: application/json', true);
     echo json_encode($jsonReply);
     die();    
@@ -55,9 +56,10 @@ $dbAccess = new DbAccess();
 
 $competition = $dbAccess->getCompetition($competitionId);
 $openTimes = dbAccess::calcCompetitionTimes($competition);
+$jsonReply['usrmsg'] = 'Hjärtligt tack ' . $event_username  . ", för din medverkan i tävlingen!<br>";
 
 if ($openTimes['brewerLoginOpen'] !== true){
-    $jsonReply['usrmsg'] = 'Inloggning ej öppen, den öppnar ' . date_format($openTimes['brewerLoginOpenFrom'],'Y-m-d H:i:s');
+    $jsonReply['usrmsg'] = ' Inloggning ej öppen, den öppnar ' . date_format($openTimes['brewerLoginOpenFrom'],'Y-m-d H:i:s');
     header('Content-Type: application/json', true);
     echo json_encode($jsonReply);    
     die();
@@ -69,7 +71,7 @@ $voteCountStartTime = $openTimes['voteCountStartTime']; //typically null
 
 $beers = $dbAccess->getBeersByBrewer($competitionId,null/*$fv_event_id*/,$event_user_id);
 if ($beers === null){
-    $jsonReply['usrmsg'] = 'Inga öl hittades för användare ' . $event_username;
+    $jsonReply['usrmsg'] = ' Inga öl hittades för användare ' . $event_username;
     header('Content-Type: application/json', true);
     echo json_encode($jsonReply);
     die();
