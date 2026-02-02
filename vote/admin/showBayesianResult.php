@@ -282,7 +282,7 @@ $bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING
             <td><?=htmlspecialchars($row['beerEntryId'])?></td>
             <td><?=htmlspecialchars($row['beerName'])?></td>
             <td><?=htmlspecialchars($row['brewer'])?></td>
-            <td class="score-cell"><?=$row['bayesianScore'] > 0 ? round($row['bayesianScore'], 3) : '-'?></td>
+            <td class="score-cell"><?=$row['bayesianScore'] > 0 ? round($row['bayesianScore'], 4) : '-'?></td>
             <td class="score-cell"><?=$row['voteCount']?></td>
             <td class="score-cell"><?=$row['medianScore'] > 0 ? round($row['medianScore'], 3) : '-'?></td>
             <td class="score-cell"><?=$row['standardDeviation'] > 0 ? round($row['standardDeviation'], 3) : '-'?></td>
