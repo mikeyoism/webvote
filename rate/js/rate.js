@@ -88,7 +88,7 @@ var beer_db = function () {
 					// Toggle help text and rating interface based on rating mode
 					if (ENABLE_BAYESIAN_RATING) {
 						// Update help text for Bayesian mode
-						$('#help-rating-explanation').text('Tävlingspoängen som systemet beräknar fram görs med hjälp av Bayesiansk viktning. Rösta gärna på så många öl du hinner för att ge ett bättre underlag!');
+						$('#help-rating-explanation').text('Tävlingspoängen som systemet beräknar fram görs med hjälp av Bayesiansk viktning. Rösta gärna på alla öl du dricker för att ge ett bra underlag!');
 						// Show slider interface, hide radio button stars
 						$('.rating-standard-only').addClass('d-none');
 						$('.rating-bayesian-only').removeClass('d-none');
