@@ -251,10 +251,11 @@ $bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING
 
     <div class="stats-box">
         <p>
+            Statistik i kategorin:
             <strong><?=$beerCount?>st</strong> registrerade tävlingsbidrag |
-            <strong><?=$voteCodeCount?>st</strong> besökare har druckit av
-            <strong><?=$drankCheckCount?></strong> olika öl,
-            varav <strong><?=$ratingCount?></strong> har fått ett betyg.
+            <strong><?=$voteCodeCount?>st</strong> besökare har gjort
+            <strong><?=$ratingCount?>st</strong> betygsättningar och
+            <strong><?=$drankCheckCount?>st</strong> drucken-markeringar
         </p>
     </div>
 
