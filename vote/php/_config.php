@@ -30,7 +30,7 @@ define("COMPETITION_ID", 46);
 define("ENABLE_RATING", true);
 
 /* --------------- ------ BAYESIAN MODE SECTION ---------------------------- */
-// Bayesian rating mode - requires ENABLE_RATING to be true. Please use PER-COMPETITION SETTINGS for bayesian competitions and set ENABLE_RATING, ENABLE_BAYESIAN_RATING, BAYESIAN_PSEUDO_VOTE_COUNT, BAYESIAN_MIN_VOTES_THRESHOLD, BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES.
+// Bayesian rating mode - requires ENABLE_RATING to be true. Please use PER-COMPETITION SETTINGS for bayesian competitions and set ENABLE_RATING, ENABLE_VOTING, ENABLE_BAYESIAN_RATING, BAYESIAN_PSEUDO_VOTE_COUNT, BAYESIAN_MIN_VOTES_THRESHOLD, BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES.
 // When enabled, uses 1-10 star rating scale and Bayesian weighted scoring
 //define("ENABLE_BAYESIAN_RATING", true);
 
@@ -54,16 +54,17 @@ define("ENABLE_RATING", true);
 // Override settings per competition ID. If not set, falls back to global defines above.
 //
 // Supported settings in code:
-//   ENABLE_RATING                      
-//   ENABLE_BAYESIAN_RATING             
-//   BAYESIAN_PSEUDO_VOTE_COUNT         
-//   BAYESIAN_MIN_VOTES_THRESHOLD       
+//   ENABLE_RATING
+//   ENABLE_VOTING
+//   ENABLE_BAYESIAN_RATING
+//   BAYESIAN_PSEUDO_VOTE_COUNT
+//   BAYESIAN_MIN_VOTES_THRESHOLD
 //   BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES 
 //
 // Example (Competition ID to the left and all settings for that competition to the right on that row):
 // $COMPETITION_SETTINGS = [
-//     1 => ['ENABLE_RATING' => true, 'ENABLE_BAYESIAN_RATING' => true, 'BAYESIAN_PSEUDO_VOTE_COUNT' => 45, 'BAYESIAN_MIN_VOTES_THRESHOLD' => 20, 'BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES' => 1],
-//     2 => ['ENABLE_RATING' => true, 'ENABLE_BAYESIAN_RATING' => false],
+//     1 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => true, 'BAYESIAN_PSEUDO_VOTE_COUNT' => 45, 'BAYESIAN_MIN_VOTES_THRESHOLD' => 20, 'BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES' => 1],
+//     2 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => false],
 // ];
 
 /* --------------------- END PER-COMPETITION SETTINGS ---------------------- */

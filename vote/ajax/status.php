@@ -34,7 +34,7 @@ if (APC_CACHE_ENABLED) {
 
 $openTimes = dbAccess::calcCompetitionTimes($competition);
 $enableRating = getCompetitionSetting($competitionId, 'ENABLE_RATING', false);
-$enableVoting = !$enableRating;
+$enableVoting = getCompetitionSetting($competitionId, 'ENABLE_VOTING', false);
 $VotingAsRating = ENABLE_VOTING_AS_RATING;
 if (!$isRateSystem && $openTimes['open'] == true) {
     //legacy voting, överskrid om det är tillåtet eller ej

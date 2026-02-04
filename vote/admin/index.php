@@ -195,7 +195,7 @@ if ($privilegeLevel == 2) {
 
 <?php
 $categories = $dbAccess->getCategories($competitionId);
-$enableVoting = !$enableRating;
+$enableVoting = getCompetitionSetting($competitionId, 'ENABLE_VOTING', false);
 if ($enableVoting && !CONNECT_EVENTREG_DB_VOTING) {
 ?>
 <p style="background-color:yellow">OBS att "Deltagande nummer" inte används av rate-systemet, och enbart behöver fyllas i för det äldre vote-systemet (om/när det används)

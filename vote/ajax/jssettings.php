@@ -40,6 +40,7 @@ if(isset($_POST['operation']))
 
         $enableRating = getCompetitionSetting($competitionId, 'ENABLE_RATING', false);
         $enableBayesian = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING', false);
+        $enableVoting = getCompetitionSetting($competitionId, 'ENABLE_VOTING', false);
 
         $jsonReply["SETTING_SYSSTATUS_INTERVAL"] = SETTING_SYSSTATUS_INTERVAL;
         $jsonReply["CONST_SYS_JS_DEBUG"] = CONST_SYS_JS_DEBUG;
@@ -50,10 +51,10 @@ if(isset($_POST['operation']))
         $jsonReply['HIDE_BEERS_BEFORE_START'] = HIDE_BEERS_BEFORE_START;
 
         $jsonReply['ENABLE_BAYESIAN_RATING'] = $enableBayesian;
-        $jsonReply['RATING_MAX_SCORE'] = ($enableBayesian) ? 10 : 5;
+        $jsonReply['RATING_MAX_SCORE'] = ($enableBayesian) ? 10 : 5; //Changing these values won't change it everywhere as system is designed for 10 and 5 in other places and doesn't always use this setting.
 
         //legacy vote settings - not used for rating
-        $jsonReply["ENABLE_VOTING"] = !$enableRating; // opposite of ENABLE_RATING
+        $jsonReply["ENABLE_VOTING"] = $enableVoting;
         $jsonReply["CONST_SETTING_SHOW_HELP_POPUP"] =CONST_SETTING_SHOW_HELP_POPUP;
         $jsonReply["CONST_SETTING_BEERID_NUMBERSPAN_LENGTH"] = CONST_SETTING_BEERID_NUMBERSPAN_LENGTH;
         $jsonReply["CONST_SETTING_VOTES_PER_CATEGORY"] = CONST_SETTING_VOTES_PER_CATEGORY;
