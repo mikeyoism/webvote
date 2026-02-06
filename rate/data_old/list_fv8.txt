@@ -1,0 +1,5 @@
+99	 Klass 8	Folköl
+229	9H - Saison	Pettit Table	Mikael Näslund, Samuel Mancho	3.5	26	1	39
+254	10E - Berliner weisse	Påskmust Occult Sour	Claes Eliasson	3.3	35	10	0
+241	11D - Modifierade öl	Emmer och Elände	Peter Hogstrom, Anette Bengtson	3.3	38	13	14
+183	11H - Övrig rököl	Grätzklipparöl	Johan Wallèn, Angelica Jansson	3.2	31	7	22

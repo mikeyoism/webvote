@@ -1,0 +1,22 @@
+92	 Klass 1	Lager och Underjäst öl
+140	1B - Export	Geschwint Export	Erik Nord	6.2	59	12	25
+242	1C - Märzen	Qualitätskontrolle	Simon Hyttfors, Niklas Hedström, Jesper Grahm	5.0	53	15	19
+189	1F - Schwarzbier	May the schwarz be with you	Jonatan nygren	5.1	51	12	35
+139	1G - Tjeckisk pilsner	Solhems UrPils ver5	Ronny Hagala, Jonas Lööw	4.6	44	9	32
+244	1G - Tjeckisk pilsner	Lindegaards czech pilsner	sonny Knudsen, Luisa Knudsen	4.8	49	12	34
+245	1G - Tjeckisk pilsner	Lindegaards Tmave`pivo	sonny Knudsen	5.7	58	14	24
+208	1G - Tjeckisk pilsner	Novaczech	Malte Ekelin, Svante Ekelin	5.8	54	10	34
+117	1H - Tysk pilsner	Gubbis Lager	Dan Lundqvist	5.5	53	11	29
+163	1H - Tysk pilsner	Automagisk Altruism	Tobias Janius, Christian Lindskog	5.2	50	11	44
+176	1I - Internationell lager	Simplemente bueno	Johan Wallèn	4.5	41	7	19
+120	1I - Internationell lager	Källarölen från Väst	David Broheim, Patrik Lindgren	4.7	47	10	31
+110	1J - Övriga klassiska i kategori Mild/karaktärsfull Lager	Midsummer Wet Dream	benny selin, jonatan stolt	4.9	55	18	19
+129	2A - Bock	Tack å bock	Peter Nilsson	7.3	69	12	26
+130	2A - Bock	Syndabocken	Peter Nilsson	7.3	69	12	26
+184	2A - Bock	Zombie Duck	Anders Tilander	5.3	52	12	64
+243	2A - Bock	Hirschbock	Simon Hyttfors, Niklas Hedström, Jesper Grahm	6.2	74	27	24
+141	2B - Dubbelbock	G.O.A.T.	Erik Nord	7.4	79	23	19
+111	2C - Modern Ljus Lager	Slätmossens Köksbryggeri Nya Zeeland Lag	Bo Ström, Per Thoren	5.2	54	15	45
+227	2C - Modern Ljus Lager	Rustiko Buckwheat Pils	Henrik Hildemar	5.3	50	10	50
+116	2C - Modern Ljus Lager	LBN Lager	Dan Lundqvist	5.1	48	9	13
+214	2C - Modern Ljus Lager	Get It On	Emil Skala	5.8	57	13	64

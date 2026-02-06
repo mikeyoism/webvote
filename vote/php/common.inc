@@ -1856,75 +1856,78 @@ function FvClass($low_alc, $main_class, $sub_class)
     // if it is null, the function will just fetch default to values defined in this fuction (will match the eventreg database, but not out competition-database!)
     $as_numeric = true;
     if (!empty($low_alc)) {
-        $fv_class = !$as_numeric ? 'Folköl' : '8';
-    } elseif (($main_class == 1) || ($main_class == 2)) {
-        $fv_class = !$as_numeric ? 'Lager och underjäst öl' : '1';
-    } elseif (
-        (($main_class == 3) && ($sub_class != 'F')) ||
-        (($main_class == 4) && ($sub_class == 'A')) ||
-        (($main_class == 4) && ($sub_class == 'B')) ||
-        (($main_class == 4) && ($sub_class == 'F')) ||
-        (($main_class == 4) && ($sub_class == 'G')) ||
-        (($main_class == 5) && ($sub_class == 'A')) ||
-        (($main_class == 5) && ($sub_class == 'G')) ||
-        (($main_class == 5) && ($sub_class == 'H')) ||
-        ($main_class == 7) ||
-        ($main_class == 8) ||
-        (($main_class == 9) && ($sub_class == 'B')) ||
-        (($main_class == 9) && ($sub_class == 'E')) ||
-        (($main_class == 11) && ($sub_class == 'E')) ||
-        (($main_class == 11) && ($sub_class == 'K'))
-    ) {
-        $fv_class = !$as_numeric ? 'Maltdominerad öl' : '2';
-    } elseif (
-        (($main_class == 3) && ($sub_class == 'F')) ||
-        (($main_class == 4) && ($sub_class == 'C')) ||
-        (($main_class == 4) && ($sub_class == 'D')) ||
-        (($main_class == 4) && ($sub_class == 'E')) ||
-        (($main_class == 5) && ($sub_class == 'B')) ||
-        (($main_class == 5) && ($sub_class == 'C')) ||
-        (($main_class == 5) && ($sub_class == 'D')) ||
-        (($main_class == 5) && ($sub_class == 'E')) ||
-        (($main_class == 5) && ($sub_class == 'F')) ||
-        (($main_class == 6) && ($sub_class == 'F'))
-    ) {
-        $fv_class = !$as_numeric ? 'Humledominerad öl' : '3';
-    } elseif (
-        (($main_class == 6) && ($sub_class != 'F')) ||
-        (($main_class == 9) && ($sub_class == 'A')) ||
-        (($main_class == 9) && ($sub_class == 'C')) ||
-        (($main_class == 9) && ($sub_class == 'D')) ||
-        (($main_class == 9) && ($sub_class == 'F')) ||
-        (($main_class == 9) && ($sub_class == 'G')) ||
-        (($main_class == 9) && ($sub_class == 'H')) ||
-        (($main_class == 9) && ($sub_class == 'I')) ||
-        (($main_class == 9) && ($sub_class == 'J')) ||
-        (($main_class == 9) && ($sub_class == 'K')) ||
-        (($main_class == 9) && ($sub_class == 'L'))
-    ) {
-        $fv_class = !$as_numeric ? 'Jästdominerad öl' : '4';
-    } elseif (
-        ($main_class == 10) ||
-        (($main_class == 11) && ($sub_class == 'C'))
-    ) {
-        $fv_class = !$as_numeric ? 'Syrligt och spontanjäst öl' : '5';
-    } elseif (
-        (($main_class == 11) && ($sub_class == 'A')) ||
-        (($main_class == 11) && ($sub_class == 'B')) ||
-        (($main_class == 11) && ($sub_class == 'D')) ||
-        (($main_class == 11) && ($sub_class == 'F')) ||
-        (($main_class == 11) && ($sub_class == 'G')) ||
-        (($main_class == 11) && ($sub_class == 'H')) ||
-        (($main_class == 11) && ($sub_class == 'I')) ||
-        (($main_class == 11) && ($sub_class == 'J')) ||
-        (($main_class == 11) && ($sub_class == 'L'))
-    ) {
-        $fv_class = !$as_numeric ? 'Övriga öl' : '6';
-    } elseif (($main_class == 12)) {
-        $fv_class = !$as_numeric ? 'Cider och mjöd' : '7';
-    } else {
-        $fv_class = !$as_numeric ? 'Okänd' : '0';
-    }
-
-    return $fv_class;
+        $fv_class = !$as_numeric ? 'Folköl' : '9';
+     } elseif (  ($main_class==1) || 
+             (($main_class==2) && ($sub_class=='A')) ||
+             (($main_class==2) && ($sub_class=='B')) ||
+             (($main_class==2) && ($sub_class=='E')) ) { 
+    $fv_class = !$as_numeric ? 'Klassisk lager' : '1';
+  } elseif (  ($main_class==3) ||
+             (($main_class==4) && ($sub_class=='A')) ||
+             (($main_class==4) && ($sub_class=='B')) ||
+             (($main_class==4) && ($sub_class=='F')) ||
+             (($main_class==4) && ($sub_class=='G')) ||
+              ($main_class==7) ) {
+    $fv_class = !$as_numeric ? 'Maltdominerad öl' : '2';
+  } elseif ( (($main_class==2) && ($sub_class=='C')) ||
+             (($main_class==2) && ($sub_class=='D')) ||
+             (($main_class==4) && ($sub_class=='C')) ||
+             (($main_class==4) && ($sub_class=='D')) ||
+             (($main_class==4) && ($sub_class=='E')) ||
+             (($main_class==5) && ($sub_class=='B')) ||
+             (($main_class==5) && ($sub_class=='C')) ||
+             (($main_class==5) && ($sub_class=='D')) ||
+             (($main_class==5) && ($sub_class=='E')) ||
+             (($main_class==6) && ($sub_class=='F')) ||
+             (($main_class==8) && ($sub_class=='B')) ) {
+    $fv_class = !$as_numeric ? 'Humledominerad öl' : '3';
+  } elseif ( (($main_class==6) && ($sub_class=='A')) ||
+             (($main_class==6) && ($sub_class=='B')) ||
+             (($main_class==6) && ($sub_class=='C')) ||
+             (($main_class==6) && ($sub_class=='D')) ||
+             (($main_class==6) && ($sub_class=='E')) ||
+             (($main_class==6) && ($sub_class=='G')) ||
+             (($main_class==9) && ($sub_class=='A')) ||
+             (($main_class==9) && ($sub_class=='B')) ||
+             (($main_class==9) && ($sub_class=='C')) ||
+             (($main_class==9) && ($sub_class=='D')) ||
+             (($main_class==9) && ($sub_class=='E')) ||
+             (($main_class==9) && ($sub_class=='F')) ||
+             (($main_class==9) && ($sub_class=='H')) ||
+             (($main_class==9) && ($sub_class=='I')) ||
+             (($main_class==9) && ($sub_class=='K')) ) {
+    $fv_class = !$as_numeric ? 'Jästdominerad öl' : '4';
+  } elseif ( (($main_class==5) && ($sub_class=='A')) ||
+             (($main_class==5) && ($sub_class=='F')) ||
+             (($main_class==5) && ($sub_class=='G')) ||
+             (($main_class==5) && ($sub_class=='H')) ||
+             (($main_class==8) && ($sub_class=='A')) ||
+             (($main_class==8) && ($sub_class=='C')) ||
+             (($main_class==8) && ($sub_class=='D')) ||
+             (($main_class==8) && ($sub_class=='E')) ||
+             (($main_class==9) && ($sub_class=='G')) ||
+             (($main_class==9) && ($sub_class=='J')) ||
+             (($main_class==11) && ($sub_class=='I')) ||
+             (($main_class==11) && ($sub_class=='K')) ) {
+    $fv_class = !$as_numeric ? 'Kraftig öl' : '5';
+  } elseif (  ($main_class==10) ||
+             (($main_class==11) && ($sub_class=='A')) ||
+             (($main_class==11) && ($sub_class=='C')) ) {
+    $fv_class = !$as_numeric ? 'Syrligt och spontanjäst öl' : '6';
+  } elseif ( (($main_class==9)  && ($sub_class=='L')) ||
+             (($main_class==11) && ($sub_class=='B')) ||
+             (($main_class==11) && ($sub_class=='D')) ||
+             (($main_class==11) && ($sub_class=='E')) ||
+             (($main_class==11) && ($sub_class=='F')) ||
+             (($main_class==11) && ($sub_class=='G')) ||
+             (($main_class==11) && ($sub_class=='H')) ||
+             (($main_class==11) && ($sub_class=='J')) ||
+             (($main_class==11) && ($sub_class=='L')) ) {
+    $fv_class = !$as_numeric ?  'Övriga öl' : '7';
+  } elseif (  ($main_class==12) ) {
+    $fv_class = !$as_numeric ? 'Cider och mjöd' : '8';
+  } else {
+    $fv_class = 'Okänd';
+  }
+  return $fv_class;
 }

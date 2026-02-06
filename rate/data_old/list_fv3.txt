@@ -1,0 +1,39 @@
+94	 Klass 3	Humledominerad öl
+155	4C - Pale ale (APA)	Apa Nr 7	Gordon Liljegren	5.8	56	12	34
+121	4C - Pale ale (APA)	King Charles	Mats Björkegren	5.1	51	12	32
+170	4C - Pale ale (APA)	Frejas Fröjd Citrulicious	Joel Blom	5.4	55	15	80
+193	4C - Pale ale (APA)	Palth Pilsner	Alvaro Urbano	7.0	57	10	49
+107	4C - Pale ale (APA)	The Missionary - Elder	benny selin, jonatan stolt	5.7	55	15	32
+237	4C - Pale ale (APA)	SMASH pale ale	Paul Thacker	5.9	58	13	58
+257	4C - Pale ale (APA)	Honey High	Viktor Pihl	4.7	1	2	1
+258	4C - Pale ale (APA)	Grimnirs Gris	Daniel Tuftström	6.3	62	14	30
+128	4D - Brown ale (amerikansk)	Brunbälte	Emil Sjöberg, Fredrik Jakobsson	5.6	55	12	49
+222	5B - Strong pale ale	Pale Ale Dot	Matthias Flodström, Helene Winberg	6.6	65	15	45
+152	5C - IPA	lafamilja hoppzan	joel jägestedt, Gogo jägestedt, daniel jägestedt	6.2	1	2	10
+149	5C - IPA	Rapsgate IPA	Fredrik Lindberg, Jimmy.Lindbergh	6.5	57	8	65
+161	5C - IPA	Tribelake AI IPA	Hans Holmberg, Sten-Otto Holmberg, Kenneth Johansson	6.2	57	10	81
+115	5C - IPA	Frostbite	Dan Lundqvist, Andreas Carlgren	6.1	58	11	38
+171	5C - IPA	Ornö IPA	Johan Hannerstam	5.9	57	12	75
+119	5C - IPA	West Coast Hoppy Deluxe	David Broheim, Patrik Lindgren	7.5	75	18	132
+126	5C - IPA	Twisted curse	Drolle	6.4	60	13	60
+137	5D - New England IPA - Vermont IPA	Skälsbo IPA	Eric Norrback	6.0	60	14	29
+204	5D - New England IPA - Vermont IPA	Fröken Ur	T/T Brewery	8.0	20	5	40
+231	5D - New England IPA - Vermont IPA	Liquid remedy	Mikael Näslund, Samuel Mancho	6.6	58	12	57
+199	5D - New England IPA - Vermont IPA	En traktor till	Magnus Hansson Bäckman	6.0	1	1	24
+125	5D - New England IPA - Vermont IPA	nitroneipa	Dennis Augustzen	7.5	70	12	40
+143	5D - New England IPA - Vermont IPA	Brewbusters NEIPA	Tobias Strand, Daniel Markänger, Nils Mannerby, Jonas Saltin, Johan Lövgren	6.6	64	14	30
+190	5D - New England IPA - Vermont IPA	NEIPA- Hazebois gonna haze	Jonatan nygren	6.5	70	18	5
+146	5D - New England IPA - Vermont IPA	Just Another New England IPA	Fredrik Ek	6.3	1	1	36
+252	5D - New England IPA - Vermont IPA	12/12	Tobias Bredenwall, Peter Bergman, Peter Blomberg, Staffan Odenstad, Esko Airas	6.4	59	12	27
+169	5D - New England IPA - Vermont IPA	Josagrogg DDH NEIPA	Martin Björck, Victoria Björck, Kristoffer Björk, Niklas Wilke, Stefan Alexi, Patrik Jargenius, Fredrik Wallerfrost	7.1	63	11	48
+247	5D - New England IPA - Vermont IPA	Lindegaards Tio Jirafa Hazy IPA	sonny Knudsen	7.3	70	14	46
+235	5D - New England IPA - Vermont IPA	Kattpunk NEIPA	Olle Wreede	6.4	58	10	14
+138	5E - Black IPA	Hops in the Dark	Ronny Hagala, Jonas Lööw	7.5	70	14	58
+173	5E - Black IPA	The Mosh Pit	Tor Björnsson, Christoffer Johansson	8.5	79	14	100
+134	5E - Black IPA	AKA Feeling Ignorant Cascadian Dark Ale	Mikael Josefsson	7.7	75	16	109
+135	5E - Black IPA	Ignorant Cascadian Coffee Dark Ale	Mikael Josefsson	7.7	75	16	109
+160	5F - Dubbel IPA	Tribelake Champagne IPA	Sten-Otto Holmberg, Kenneth Johansson, Hans Holmberg	13.5	64	-20	78
+197	5F - Dubbel IPA	8.000$ man IPA	Kimmo Vaveniemi	8.0	78	17	92
+166	5F - Dubbel IPA	Humle	Kathrin Almerfors, Joakim Pettersson	8.0	74	13	75
+185	6F - Hopfenweizen	Korpfenweizen	Jonas Lorenthsson	7.0	69	16	45
+196	6F - Hopfenweizen	Floristen	Kristian Larsson	6.0	60	16	22

@@ -26,7 +26,7 @@ date_default_timezone_set("Europe/Stockholm");
 //-COMPETITION SETUP START
 
 //for testing/used if not set by param
-define("COMPETITION_ID", 46);
+define("COMPETITION_ID", 56);
 define("ENABLE_RATING", true);
 
 /* --------------- ------ BAYESIAN MODE SECTION ---------------------------- */
