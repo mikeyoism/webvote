@@ -26,6 +26,8 @@ var beer_db = function () {
 
 	var vote_status_timer = null;
 	var ENABLE_RATING = true;
+	var ENABLE_BAYESIAN_RATING = false;
+	var RATING_MAX_SCORE = 5;
 	var DEBUGMODE = false;
 	var VOTE_STATUS_INTERVAL = 10000;
 	var VOTE_CODE_LEN = 6;
@@ -54,10 +56,11 @@ var beer_db = function () {
 
 
 	function getRateSettings() {
+		var competitionIdFromUrl = UrlParameters('competitionId') || UrlParameters('cid');
 
 		return $.ajax({
 			type: "POST",
-			url: "../vote/ajax/jssettings.php",
+			url: "../vote/ajax/jssettings.php" + (competitionIdFromUrl ? "?competitionId=" + competitionIdFromUrl : ""),
 			dataType: 'json',
 			cache: false,
 			async: true,
@@ -73,6 +76,31 @@ var beer_db = function () {
 					VOTE_CODE_LEN = response.CONST_SETTING_VOTE_CODE_LENGTH;
 					ENABLE_RATING = response.ENABLE_RATING;
 					HIDE_BEERS_BEFORE_START = response.HIDE_BEERS_BEFORE_START;
+
+					ENABLE_BAYESIAN_RATING = response.ENABLE_BAYESIAN_RATING || false;
+					RATING_MAX_SCORE = response.RATING_MAX_SCORE || 5;
+
+					// Update help text to reflect star range
+					$('#help-star-range').text('1-' + RATING_MAX_SCORE);
+					$('#help-max-stars').text(RATING_MAX_SCORE);
+					$('#help-max-stars-2').text(RATING_MAX_SCORE);
+
+					// Toggle help text and rating interface based on rating mode
+					if (ENABLE_BAYESIAN_RATING) {
+						// Update help text for Bayesian mode
+						$('#help-rating-explanation').text('Tävlingspoängen som systemet beräknar fram görs med hjälp av Bayesiansk viktning. Rösta gärna på alla öl du dricker för att ge ett bra underlag!');
+						// Show slider interface, hide radio button stars
+						$('.rating-standard-only').addClass('d-none');
+						$('.rating-bayesian-only').removeClass('d-none');
+						// Show current rating display in header
+						$('#popup-current-rating-display').removeClass('d-none');
+					} else {
+						// Show radio button stars, hide slider interface
+						$('.rating-standard-only').removeClass('d-none');
+						$('.rating-bayesian-only').addClass('d-none');
+						// Hide current rating display in header
+						$('#popup-current-rating-display').addClass('d-none');
+					}
 
 					//set cssCompetitionTheme (optional)
 					if (response.CSS_COMPETITION_THEME != null && response.CSS_COMPETITION_THEME != "" &&
@@ -128,6 +156,7 @@ var beer_db = function () {
 			}
 		});
 	}
+
 	function init() {
 		getRateSettings().done(function () {
 			get_competition_data().done(function () {
@@ -505,7 +534,7 @@ var beer_db = function () {
 			}
 		});
 
-		//close ths popup on enter key
+		//close the popup on enter key
 		$('#beer-popup').on('keypress', function (e) {
 			if (e.which == 13) {
 				$('#beer-popup').modal('hide');
@@ -516,7 +545,13 @@ var beer_db = function () {
 			$("#popup-style").popover('dispose');
 			if (user_data.vote_code.length == VOTE_CODE_LEN) {
 				var comment = $("#popup-comment").val();
-				var ratingVal = $("input[type='radio'][name='popup-rating']:checked").val()
+				var ratingVal;
+				if (ENABLE_BAYESIAN_RATING) {
+					var sliderValue = parseInt($('#popup-rating-slider').val());
+					ratingVal = (sliderValue === 0) ? '' : sliderValue;
+				} else {
+					ratingVal = $("input[type='radio'][name='popup-rating']:checked").val();
+				}
 
 				var drank = $("input[type='checkbox'][name='popup-drankcheck']").is(":checked");
 
@@ -554,7 +589,7 @@ var beer_db = function () {
 					user_rating_class.push(rating);
 				}
 
-				
+
 				store_ratings().done(function () {
 					//find the validated rating from the server, now in user_data.ratings
 					//(not updated if competition is closed etc)
@@ -591,6 +626,19 @@ var beer_db = function () {
 			skipCarouselFront = true;
 			$('#welcome-popup').modal('show');
 			$('#beer-popup').modal('hide');
+		});
+
+		// Bayesian slider event handlers
+		$('#popup-rating-slider').on('input', function (e) {
+			var value = parseInt($(this).val());
+			updateSliderDisplay(value);
+			// Also mark as drank if rating >= 1
+			if (value >= 1) {
+				if ($("#popup-drank-rot").hasClass('down') === true) {
+					$("#popup-drank-rot").removeClass('down');
+					$("input[type='checkbox'][name='popup-drankcheck']").prop("checked", true);
+				}
+			}
 		});
 
 
@@ -771,15 +819,17 @@ var beer_db = function () {
 					var rating = get_rating(class_id, beer.entry_code);
 
 					items[class_id] = items[class_id] || [];
+					var containerClass = 'rating-drank-container' + (ENABLE_BAYESIAN_RATING ? ' bayesian-mode' : '');
 					items[class_id].push(
 						'<a class="list-group-item list-group-item-action" id="' + entry_id + '" href="#" data-toggle="modal" data-target="#beer-popup">'
-						+ '<span class="float-right" id="rating-display-' + entry_id + '">'
+						+ '<span class="' + containerClass + '">'
+						+ '<span id="rating-display-' + entry_id + '">'
 						+ get_rating_string(rating.ratingScore == null ? 0 : rating.ratingScore)
 						+ '</span>'
-						+ '<span class="float-right" id="drank-display-' + entry_id + '" style="padding-right: 10px;margin-top:5px;">'
+						+ '<span id="drank-display-' + entry_id + '" style="padding-right: 10px;margin-top:5px;">'
 						+ get_drank_string(rating.drankCheck)
 						+ '</span>'
-
+						+ '</span>'
 						+ '<span class="beer-number">' + beer.entry_code + '</span>. '
 						+ '<span class="beer-name">' + beer.name + '</span><br>'
 						+ '<span class="beer-style">' + beer.styleName + ' (' + beer.styleId + ')</span>'
@@ -914,6 +964,14 @@ var beer_db = function () {
 
 
 		$('input[name="popup-rating"][value="' + rating + '"]').prop('checked', true);
+
+		// Initialize Bayesian slider if enabled
+		if (ENABLE_BAYESIAN_RATING) {
+			var sliderValue = (rating === '' || rating === null) ? 0 : parseInt(rating);
+			$('#popup-rating-slider').val(sliderValue);
+			updateSliderDisplay(sliderValue);
+		}
+
 		//drank check
 		$("input[type='checkbox'][name='popup-drankcheck']").prop("checked", drank);
 		if (drank === true) {
@@ -1004,9 +1062,22 @@ var beer_db = function () {
 	}
 
 	function get_rating_string(rating) {
-		return '<span class="gold">' + '&#9733;'.repeat(rating) + '</span>'
-			+ '<span class="grey">' + '&#9734;'.repeat(5 - rating) + '</span>';
+		var maxScore = RATING_MAX_SCORE;
 
+		// For Bayesian rating, show single star icon with numeric rating
+		if (ENABLE_BAYESIAN_RATING) {
+			if (rating == 0 || rating == null || rating === '') {
+				return '';
+			}
+			return '<span class="gold">&#9733;</span> ' + rating + '/' + maxScore;
+		}
+
+		// Standard rating: show filled and empty stars
+		var filled = Math.min(rating, maxScore);
+		var empty = maxScore - filled;
+
+		return '<span class="gold">' + '&#9733;'.repeat(filled) + '</span>'
+			+ '<span class="grey">' + '&#9734;'.repeat(empty) + '</span>';
 	}
 	function update_drank_in_beer_list(entry_id, drank) {
 		var drank_span = $('#drank-display-' + entry_id);
@@ -1016,8 +1087,24 @@ var beer_db = function () {
 		return (drank === 1 || drank === "1" || drank === "true") ? '<span class="fas fa-wine-glass" style="color: #FFD43B;"></span>' : '';
 	}
 
+	// Update slider display value and track fill
+	function updateSliderDisplay(value) {
+		var maxScore = RATING_MAX_SCORE;
+		var displayText = (value === 0) ? 'Ej betygsatt' : value + '/' + maxScore;
+		$('#popup-slider-value').text(displayText);
+		$('#popup-current-rating-value').text((value === 0) ? '-/' + maxScore : value + '/' + maxScore);
 
+		// Show/hide the star based on whether there's a rating
+		if (value === 0) {
+			$('#popup-slider-star').addClass('d-none');
+		} else {
+			$('#popup-slider-star').removeClass('d-none');
+		}
 
+		// Update track fill percentage (0 is "not rated", 1-10 are actual ratings)
+		var percentage = (value / maxScore) * 100;
+		document.getElementById('popup-rating-slider').style.setProperty('--value-percentage', percentage + '%');
+	}
 
 	function update_no_vote_code_alert() {
 		if (vote_code_ok) {
@@ -1288,9 +1375,11 @@ var beer_db = function () {
 
 				if (response.refresh_page != null && response.refresh_page === true) {
 					if (DEBUGMODE) console.log('refresh_page backend request');
-					get_competition_data().done(function () {
-						update_vote_code(user_data.vote_code); // to refresh everything
-						update_ui_competition_status();
+					getRateSettings().done(function () {
+						get_competition_data().done(function () {
+							update_vote_code(user_data.vote_code); // to refresh everything
+							update_ui_competition_status();
+						});
 					});
 
 				}

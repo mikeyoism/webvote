@@ -157,7 +157,7 @@
 													class="fas fa-wine-glass" style="color:#FFD43B;">.</i>
 												Du <strong>röstar</strong> på provsmakade öl genom att betygsätta dem
 												med
-												<strong>1-5 stjärnor</strong> <i class="fas fa-star"
+												<strong><span id="help-star-range">1-5</span> stjärnor</strong> <i class="fas fa-star"
 													style="color: gold;">.</i>
 											</p>
 
@@ -165,17 +165,13 @@
 												<small>Systemet viktar automatiskt dina stjärnor till tävlingspoäng.
 													<a href="#" class="card-link " Id="welcome-popup-morehelp">Mer info
 														<i class="fas fa-arrow-down"></i></a></small>
-											<p class="card-text text-muted " Id="welcome-popup-showmore">
-												<small>5 stjärnor är bästa betyg. Tävlingspoängen som systemet räknar
-													fram baseras
-													på
-													antal öl du betygsatt, fördelningen av dina stjärnor och antal öl i tävlingsklassen
-													(att betygsätta en enstaka öl med 5 stjärnor ger inte
-													mest fördelaktig
-													tävlingspoäng till den
-													ölen)</small>
-											</p>
-											</p>
+											<p class="card-text text-muted" Id="welcome-popup-showmore">
+												<small><span id="help-max-stars">5</span> stjärnor är bästa betyg.
+													<span id="help-rating-explanation">Tävlingspoängen som systemet räknar
+													fram baseras på antal öl du betygsatt, fördelningen av dina stjärnor
+													och antal öl i tävlingsklassen (att betygsätta en enstaka öl med
+													<span id="help-max-stars-2">5</span> stjärnor ger inte mest fördelaktig
+													tävlingspoäng till den ölen)</span></small>
 											</p>
 
 										</div>
@@ -224,8 +220,14 @@
 						<span id="popup-header">XXX Ölnamn</span></br>
 						<span id="popup-style" class="beer-style">Ölklass</span>
 					</h3>
-					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Stäng</button>
-					
+					<div class="float-right d-flex flex-column align-items-end">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
+						<!-- Current rating display for Bayesian mode -->
+						<div id="popup-current-rating-display" class="d-none">
+							<span class="gold">&#9733;</span>
+							<span id="popup-current-rating-value" class="font-weight-bold">-/10</span>
+						</div>
+					</div>
 				</div>
 				<div class="modal-body">
 					<button type="button" id="beer-popup-guide" class="btn btn-outline-secondary btn-sm float-right">Guide</button>
@@ -254,27 +256,54 @@
 											</div>
 										</fieldset>
 									</div>
-									<div class="col-auto">
+									<div class="col-auto rating-standard-only">
+										<!-- Standard rating: radio button stars -->
 										<fieldset class="rating" disabled>
 											<legend id="rating-legend" style="font-size: 1rem;">Betyg:</legend>
 											<input type="radio" id="popup-rating-star-0" name="popup-rating" value="" />
 											<label for="popup-rating-star-0" class="rating-clear-button mr-2">ta
 												bort</label>
-											<input type="radio" id="popup-rating-star-1" name="popup-rating"
-												value="1" />
+											<input type="radio" id="popup-rating-star-1" name="popup-rating" value="1" />
 											<label for="popup-rating-star-1">1</label>
-											<input type="radio" id="popup-rating-star-2" name="popup-rating"
-												value="2" />
+											<input type="radio" id="popup-rating-star-2" name="popup-rating" value="2" />
 											<label for="popup-rating-star-2">2</label>
-											<input type="radio" id="popup-rating-star-3" name="popup-rating"
-												value="3" />
+											<input type="radio" id="popup-rating-star-3" name="popup-rating" value="3" />
 											<label for="popup-rating-star-3">3</label>
-											<input type="radio" id="popup-rating-star-4" name="popup-rating"
-												value="4" />
+											<input type="radio" id="popup-rating-star-4" name="popup-rating" value="4" />
 											<label for="popup-rating-star-4">4</label>
-											<input type="radio" id="popup-rating-star-5" name="popup-rating"
-												value="5" />
+											<input type="radio" id="popup-rating-star-5" name="popup-rating" value="5" />
 											<label for="popup-rating-star-5">5</label>
+										</fieldset>
+									</div>
+								</div>
+								<!-- Bayesian rating: slider in its own full-width row -->
+								<div class="row rating-bayesian-only d-none">
+									<div class="col-12">
+										<fieldset class="rating" disabled>
+											<legend style="font-size: 1rem;">Betyg:</legend>
+											<div class="vote-slider-section">
+												<div class="vote-slider-header">
+													<span id="popup-slider-star" class="gold d-none">&#9733;</span>
+													<span id="popup-slider-value" class="vote-slider-value">Ej betygsatt</span>
+												</div>
+												<div class="vote-slider-container">
+													<div class="slider-wrapper">
+														<div class="slider-track-container">
+															<input type="range"
+																id="popup-rating-slider"
+																min="0"
+																max="10"
+																step="1"
+																value="0"
+																class="vote-slider">
+														</div>
+														<div class="slider-labels">
+															<span class="slider-label slider-label-min">1</span>
+															<span class="slider-label slider-label-max">10</span>
+														</div>
+													</div>
+												</div>
+											</div>
 										</fieldset>
 									</div>
 								</div>

@@ -176,13 +176,15 @@ class DbAccess
             $brewerLoginOpenFrom = new DateTime($row['brewerLoginOpenFrom']);
         }
         //get evetreg event_id's corresponding to our $compentionId
-        $evenreg_event_ids = $this->getEventReg_EventId($id);
         $ids = array();
         $eventInfo = array();
-        foreach ($evenreg_event_ids as $event) {
-            array_push($ids, $event['event_id']);
-            //store event info in array, by id
-            $eventInfo[$event['event_id']] = array('event_name' => $event['event_name'], 'competition' => $event['competition'], 'fv_allow_user_votesys_category_selection' => $event['fv_allow_user_votesys_category_selection']);
+        if (CONNECT_EVENTREG_DB || CONNECT_EVENTREG_DB_VOTING) {
+            $evenreg_event_ids = $this->getEventReg_EventId($id);
+            foreach ($evenreg_event_ids as $event) {
+                array_push($ids, $event['event_id']);
+                //store event info in array, by id
+                $eventInfo[$event['event_id']] = array('event_name' => $event['event_name'], 'competition' => $event['competition'], 'fv_allow_user_votesys_category_selection' => $event['fv_allow_user_votesys_category_selection']);
+            }
         }
 
         return array(
@@ -1355,7 +1357,13 @@ class DbAccess
     //preferably call this function once with $categoryId = null, and use the returned array for further processing, as getBeers is a bit slow
     protected function getBeerCountsPerCategory($categoryId = null)
     {
-        $beers = $this->getBeers(getCompetitionId(), false);
+        // Use cache files if eventreg DB is disabled
+        if (CONNECT_EVENTREG_DB) {
+            $beers = $this->getBeers(getCompetitionId(), false);
+        } else {
+            $catsAndBeers = $this->readEventBeerDataFromCacheFiles(getCompetitionId());
+            $beers = $catsAndBeers[1];
+        }
         $categories = $this->getCategories(getCompetitionId(), true);
         $beerCounts = array();
         foreach ($categories as $class) {
@@ -1617,7 +1625,108 @@ class DbAccess
     }
 
 
+    // ============ BAYESIAN RATING METHODS ============
 
+    /**
+     * Get all Bayesian ratings for a category
+     * Returns ratings grouped by beerEntryId
+     */
+    public function getBayesianRatingsForCategory($categoryId, $voteCountStartTime = null) {
+        $extraCond = '';
+        if ($voteCountStartTime !== null) {
+            $extraCond = ' AND creationTime>="' . $voteCountStartTime->format('Y-m-d G:i:s') . '"';
+        }
+
+        $sql = 'SELECT beerEntryId, ratingScore, voteCodeId
+                FROM ratings
+                WHERE categoryId=' . $this->escape($categoryId) . '
+                AND ratingScore > 0' . $extraCond;
+
+        $result = $this->getConnection()->query($sql)
+            or die("getBayesianRatingsForCategory: Query failed: $sql");
+
+        $ratingsByBeer = [];
+        while ($row = $result->fetch_assoc()) {
+            $beerEntryId = $row['beerEntryId'];
+            if (!isset($ratingsByBeer[$beerEntryId])) {
+                $ratingsByBeer[$beerEntryId] = [];
+            }
+            $ratingsByBeer[$beerEntryId][] = [
+                'beerEntryId' => $beerEntryId,
+                'ratingScore' => (int)$row['ratingScore'],
+                'voteCodeId' => $row['voteCodeId']
+            ];
+        }
+
+        return $ratingsByBeer;
+    }
+
+    /**
+     * Get Bayesian results for a category
+     */
+    public function getBayesianResultsForCategory($categoryId, $voteCountStartTime = null) {
+        require_once 'BayesianRateHelper.php';
+
+        $competitionId = getCompetitionId();
+        $bayesian = new BayesianRateHelper($competitionId);
+
+        // Get all beers in this category - use cache files if eventreg DB is disabled
+        if (CONNECT_EVENTREG_DB) {
+            $allBeers = $this->getBeers($competitionId, false);
+        } else {
+            $catsAndBeers = $this->readEventBeerDataFromCacheFiles($competitionId);
+            $allBeers = $catsAndBeers[1];
+        }
+        $categoryBeers = array_filter($allBeers, function($beer) use ($categoryId) {
+            return $beer['class'] == $categoryId;
+        });
+
+        // Get all ratings for this category
+        $votes = $this->getBayesianRatingsForCategory($categoryId, $voteCountStartTime);
+
+        return $bayesian->calculateClassResults(array_values($categoryBeers), $votes);
+    }
+
+    /**
+     * Get Best In Show results across all categories
+     */
+    public function getBestInShowResults($competitionId, $voteCountStartTime = null) {
+        require_once 'BayesianRateHelper.php';
+
+        $bayesian = new BayesianRateHelper($competitionId);
+        $categories = $this->getCategories($competitionId, true);
+
+        $classResults = [];
+        $allRatingsAllClasses = [];
+
+        foreach ($categories as $category) {
+            $categoryId = $category['id'];
+            $classResults[$categoryId] = $this->getBayesianResultsForCategory($categoryId, $voteCountStartTime);
+            $allRatingsAllClasses[$categoryId] = $this->getBayesianRatingsForCategory($categoryId, $voteCountStartTime);
+        }
+
+        return $bayesian->calculateBestInShow($classResults, $allRatingsAllClasses, $categories);
+    }
+
+    /**
+     * Get all Bayesian results for a competition (all categories)
+     */
+    public function getAllBayesianResults($competitionId, $voteCountStartTime = null) {
+        $categories = $this->getCategories($competitionId, true);
+        $results = [];
+
+        foreach ($categories as $category) {
+            $results[$category['id']] = [
+                'categoryName' => $category['name'],
+                'categoryDescription' => $category['description'],
+                'beers' => $this->getBayesianResultsForCategory($category['id'], $voteCountStartTime)
+            ];
+        }
+
+        return $results;
+    }
+
+    // ============ END BAYESIAN RATING METHODS ============
 
     private function escape($s)
     {

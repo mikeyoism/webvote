@@ -33,6 +33,19 @@ td,th {
 <body>
 <h1>Tävlingsresultat RATING för <?=$competition['name']?></h1>
 
+<?php
+$bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING', false);
+if ($bayesianEnabled): ?>
+<div style="background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>Varning:</strong> Tävlingen använder Bayesian rating (1-10 stjärnor).
+    Denna sida är avsedd för standard rating (1-5 stjärnor) och visar då <strong>felaktiga resultat</strong>.
+    <br><br>
+    <a href="showBayesianResult.php?competitionId=<?=$competitionId?>" style="color: #721c24; font-weight: bold;">
+        &rarr; Gå till Bayesian rating resultat istället
+    </a>
+</div>
+<?php endif; ?>
+
 <p>Senast uppdaterad <?=(new DateTime())->format('Y-m-d H:i')?>.
 
 <p><?=$openTimes['openCloseText']?>

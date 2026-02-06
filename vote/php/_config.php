@@ -29,6 +29,46 @@ date_default_timezone_set("Europe/Stockholm");
 define("COMPETITION_ID", 46);
 define("ENABLE_RATING", true);
 
+/* --------------- ------ BAYESIAN MODE SECTION ---------------------------- */
+// Bayesian rating mode - requires ENABLE_RATING to be true. Please use PER-COMPETITION SETTINGS for bayesian competitions and set ENABLE_RATING, ENABLE_VOTING, ENABLE_BAYESIAN_RATING, BAYESIAN_PSEUDO_VOTE_COUNT, BAYESIAN_MIN_VOTES_THRESHOLD, BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES.
+// When enabled, uses 1-10 star rating scale and Bayesian weighted scoring
+//define("ENABLE_BAYESIAN_RATING", true);
+
+// PseudoVoteCount: Dampens scores for beers with few votes, preventing
+// high scores from just a few ratings
+//define("BAYESIAN_PSEUDO_VOTE_COUNT", 45);
+
+// MinimumVotesThreshold: Minimum votes a brew needs to be considered valid and get a ranking. 
+// If this is a test competition, it can be good to keep this at 0 if low number of voters.
+// Beers with fewer votes will be treated as unranked when threshold is active in a class. 
+// A beer doesn't get a placement in Best In Show in case it doesn't have at least this many votes, even if the threshold didn't get active for that class.
+//define("BAYESIAN_MIN_VOTES_THRESHOLD", 20);
+
+// MinimumBrewsWithEnoughVotes: Number of beers in a class that must meet the threshold
+// before the filter is applied (prevents filtering when vote counts are low)
+//define("BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES", 1);
+
+/* --------------------- END BAYESIAN MODE SECTION ------------------------- */
+
+/* --------------------- PER-COMPETITION SETTINGS -------------------------- */
+// Override settings per competition ID. If not set, falls back to global defines above.
+//
+// Supported settings in code:
+//   ENABLE_RATING
+//   ENABLE_VOTING
+//   ENABLE_BAYESIAN_RATING
+//   BAYESIAN_PSEUDO_VOTE_COUNT
+//   BAYESIAN_MIN_VOTES_THRESHOLD
+//   BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES 
+//
+// Example (Competition ID to the left and all settings for that competition to the right on that row):
+// $COMPETITION_SETTINGS = [
+//     1 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => true, 'BAYESIAN_PSEUDO_VOTE_COUNT' => 45, 'BAYESIAN_MIN_VOTES_THRESHOLD' => 20, 'BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES' => 1],
+//     2 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => false],
+// ];
+
+/* --------------------- END PER-COMPETITION SETTINGS ---------------------- */
+
 //överskrid vissa inställningar i denna fil med värden från db
 //för närvarande överskrids följande: CSS_COMPETITION_THEME
 define("EXTEND_FROM_DB",true);
@@ -98,8 +138,6 @@ define("CONST_SYS_JS_DEBUG", false);
 define("APC_CACHE_ENABLED", true);
 
 
-
-
 //php debugging to JS console, enabled if CONST_SYS_JS_DEBUG
 //(you need a firefox/chrome firephp-addon to see these messages in your console)
 // ob_start();
@@ -116,4 +154,26 @@ define("APC_CACHE_ENABLED", true);
 //     $firephp->registerExceptionHandler();
 //     $firephp->registerAssertionHandler($convertAssertionErrorsToExceptions=true, $throwAssertionExceptions=false);    
 // }
+
+/**
+ * Get a setting for a specific competition, with fallback to global constant
+ *
+ * @param int|null $competitionId - Competition ID (null uses global only)
+ * @param string $key - Setting name (e.g. 'ENABLE_BAYESIAN_RATING')
+ * @param mixed $default - Default value if not found anywhere
+ * @return mixed - Setting value
+ */
+function getCompetitionSetting($competitionId, $key, $default = null) {
+    global $COMPETITION_SETTINGS;
+
+    // Check competition-specific setting first
+    if ($competitionId !== null && isset($COMPETITION_SETTINGS[$competitionId][$key])) {
+        return $COMPETITION_SETTINGS[$competitionId][$key];
+    }
+    // Fall back to global constant
+    if (defined($key)) {
+        return constant($key);
+    }
+    return $default;
+}
 
