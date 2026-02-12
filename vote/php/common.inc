@@ -368,16 +368,17 @@ class DbAccess
             if ($fv_class_id_nr == 0 || $fv_class_id_nr === false)
                 die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
 
-        } else { //deprecated, static FvClass lookup (sm-2024 only)
+        } else { //removed, static FvClass lookup (sm-2024 only) - 
+                die("getBeers Incompatible class id. Beer_data.votesys_category is null or 0 for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " event_id:" . $row['event_id'] . " competitionId:" . $competitionId . "EventReg must not contain beers without votesys_category!");
 
-            //get first/lowest id in categories, 
-            $classOffset = intval($classes[0]['id']) - 1;
+            // //get first/lowest id in categories, 
+            // $classOffset = intval($classes[0]['id']) - 1;
 
-            $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-            if ($fv_class_id_nr == 0)
-                die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
+            // $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+            // if ($fv_class_id_nr == 0)
+            //     die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " beerEntryId:" . $beerEntryId);
 
-            $classIndex = $classOffset + $fv_class_id_nr;
+            // $classIndex = $classOffset + $fv_class_id_nr;
         }
 
 
@@ -488,11 +489,13 @@ class DbAccess
                 if ($fv_class_id_nr == 0 || $fv_class_id_nr === false)
                     die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
 
-            } else { //deprecated, static FvClass lookup (sm-2024 only)
-                $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-                if ($fv_class_id_nr == 0)
-                    die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
-                $classIndex = $classOffset + $fv_class_id_nr;
+            } else { //removed, static FvClass lookup (sm-2024 only) - 
+                die("getBeers Incompatible class id. Beer_data.votesys_category is null or 0 for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " event_id:" . $row['event_id'] . " competitionId:" . $competitionId . "EventReg must not contain beers without votesys_category!");
+
+                // $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+                // if ($fv_class_id_nr == 0)
+                //     die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+                // $classIndex = $classOffset + $fv_class_id_nr;
             }
 
             //find classes.id in $classes
@@ -596,7 +599,8 @@ class DbAccess
             //if Beer_data.votesys_category is set, use that as class id
             if ($row['votesys_category'] != null && $row['votesys_category'] != 0) { //&& ($row['votesys_category'] != 0 är en temp fix tillvidare, pga event_reg ej lirar ihop om fv_allow flaggan är false
                 $classIndex = $row['votesys_category'];
-                
+                //print_r($row);die();
+                //print("getBeers: a id." . $$row['votesys_category'] . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
                 
                 if ($classIndex == 0)
                     die("getBeers: Illegal Beer_data.votesys_category=0 detected for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] );
@@ -609,21 +613,22 @@ class DbAccess
                 if ($fv_class_id_nr == 0 || $fv_class_id_nr === false)
                     die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
 
-            } else { //deprecated, static FvClass lookup (sm-2024 only)
-                //get first/lowest id in categories, 
-                $classOffset = intval($classes[0]['id']) - 1;
-                //store beer info in arrays grouped by FvMainClass
-                if ($row['fv_competition_no'] >= 900) { //etikett tävling (övriga fält lika som för ditto öl) //TODO improve this with more info than just number via $evenreg_event_ids ("ET","FV")
-                    $fv_class_id_nr = 8;
-                    $classIndex = $classOffset + $fv_class_id_nr + 1;
-                } else {
-                    $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-                    if ($fv_class_id_nr == 0)
-                        die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
-                    $classIndex = $classOffset + $fv_class_id_nr;
+            } else { //removed, static FvClass lookup (sm-2024 only) - 
+                die("getBeers Incompatible class id. Beer_data.votesys_category is null or 0 for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " event_id:" . $row['event_id'] . " competitionId:" . $competitionId . "EventReg must not contain beers without votesys_category!");
+                // //get first/lowest id in categories, 
+                // $classOffset = intval($classes[0]['id']) - 1;
+                // //store beer info in arrays grouped by FvMainClass
+                // if ($row['fv_competition_no'] >= 900) { //etikett tävling (övriga fält lika som för ditto öl) //TODO improve this with more info than just number via $evenreg_event_ids ("ET","FV")
+                //     $fv_class_id_nr = 8;
+                //     $classIndex = $classOffset + $fv_class_id_nr + 1;
+                // } else {
+                //     $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+                //     if ($fv_class_id_nr == 0)
+                //         die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+                //     $classIndex = $classOffset + $fv_class_id_nr;
 
 
-                } 
+                // } 
             }
 
             //find classes.id in $classes
