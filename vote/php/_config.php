@@ -62,10 +62,10 @@ define("ENABLE_RATING", true);
 //   BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES 
 //
 // Example (Competition ID to the left and all settings for that competition to the right on that row):
-// $COMPETITION_SETTINGS = [
-//     1 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => true, 'BAYESIAN_PSEUDO_VOTE_COUNT' => 45, 'BAYESIAN_MIN_VOTES_THRESHOLD' => 20, 'BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES' => 1],
-//     2 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => false],
-// ];
+ $COMPETITION_SETTINGS = [
+     56 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => true, 'BAYESIAN_PSEUDO_VOTE_COUNT' => 45, 'BAYESIAN_MIN_VOTES_THRESHOLD' => 20, 'BAYESIAN_MIN_BREWS_WITH_ENOUGH_VOTES' => 1],
+     55 => ['ENABLE_RATING' => true, 'ENABLE_VOTING' => false, 'ENABLE_BAYESIAN_RATING' => false],
+ ];
 
 /* --------------------- END PER-COMPETITION SETTINGS ---------------------- */
 
@@ -133,7 +133,7 @@ define("CONST_SETTING_VOTES_PER_CATEGORY_SAME_REQUIRE_ALL",true);
 
 //output js & php script debug i klient? Viktigt att sätta false i produktion
 //ger extra fel och info rutor för testning 
-define("CONST_SYS_JS_DEBUG", false); 
+define("CONST_SYS_JS_DEBUG", true); 
 //php extension som inte alltid finns installerad, och är depricerad (one.com)
 define("APC_CACHE_ENABLED", true);
 

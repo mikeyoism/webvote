@@ -219,21 +219,34 @@ class BayesianRateHelper {
         }
 
         // Sort by Bayesian score, then tie-breakers
+        //Mj: compability with older PHP versions without spaceship operator
         usort($results, function($a, $b) {
+
             // Primary: Bayesian score (descending)
             if ($a['bayesianScore'] != $b['bayesianScore']) {
-                return $b['bayesianScore'] <=> $a['bayesianScore'];
+                if ($b['bayesianScore'] > $a['bayesianScore']) return 1;
+                if ($b['bayesianScore'] < $a['bayesianScore']) return -1;
             }
+
             // Tie-breaker 1: Vote count (descending)
             if ($a['voteCount'] != $b['voteCount']) {
-                return $b['voteCount'] <=> $a['voteCount'];
+                if ($b['voteCount'] > $a['voteCount']) return 1;
+                if ($b['voteCount'] < $a['voteCount']) return -1;
             }
+
             // Tie-breaker 2: Median score (descending)
             if ($a['medianScore'] != $b['medianScore']) {
-                return $b['medianScore'] <=> $a['medianScore'];
+                if ($b['medianScore'] > $a['medianScore']) return 1;
+                if ($b['medianScore'] < $a['medianScore']) return -1;
             }
+
             // Tie-breaker 3: Standard deviation (ascending - lower is better)
-            return $a['standardDeviation'] <=> $b['standardDeviation'];
+            if ($a['standardDeviation'] != $b['standardDeviation']) {
+                if ($a['standardDeviation'] > $b['standardDeviation']) return 1;
+                if ($a['standardDeviation'] < $b['standardDeviation']) return -1;
+            }
+
+            return 0;
         });
 
         // Assign placings
@@ -353,21 +366,34 @@ class BayesianRateHelper {
         unset($candidate);
 
         // Sort candidates by BIS score (recalculated with global mean) and tie-breakers
+        //Mj: compability with older PHP versions without spaceship operator
         usort($candidates, function($a, $b) {
+
             // Primary: BIS score (descending)
             if ($a['bisScore'] != $b['bisScore']) {
-                return $b['bisScore'] <=> $a['bisScore'];
+                if ($b['bisScore'] > $a['bisScore']) return 1;
+                if ($b['bisScore'] < $a['bisScore']) return -1;
             }
+
             // Tie-breaker 1: Vote count (descending)
             if ($a['voteCount'] != $b['voteCount']) {
-                return $b['voteCount'] <=> $a['voteCount'];
+                if ($b['voteCount'] > $a['voteCount']) return 1;
+                if ($b['voteCount'] < $a['voteCount']) return -1;
             }
+
             // Tie-breaker 2: Median score (descending)
             if ($a['medianScore'] != $b['medianScore']) {
-                return $b['medianScore'] <=> $a['medianScore'];
+                if ($b['medianScore'] > $a['medianScore']) return 1;
+                if ($b['medianScore'] < $a['medianScore']) return -1;
             }
+
             // Tie-breaker 3: Standard deviation (ascending)
-            return $a['standardDeviation'] <=> $b['standardDeviation'];
+            if ($a['standardDeviation'] != $b['standardDeviation']) {
+                if ($a['standardDeviation'] > $b['standardDeviation']) return 1;
+                if ($a['standardDeviation'] < $b['standardDeviation']) return -1;
+            }
+
+            return 0;
         });
 
         return [
