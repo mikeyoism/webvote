@@ -925,7 +925,7 @@ class DbAccess
 
                 $ratingScore = $ratingScore === null ? 'null' : $ratingScore;
                 if ($competitionClosed == true) {
-                    $ratingScore = $row['ratingScore']; //amintain value, no rating changes allowed after competition is closed (comments & drankcheck are still allowed)
+                    $ratingScore = $row['ratingScore'] === null ? 'null' : $row['ratingScore']; //maintain value, no rating changes allowed after competition is closed (comments & drankcheck are still allowed)
                 }
                 $drankCheck = $drankCheck === null ? 'null' : $drankCheck;
                 $ratingComment = $ratingComment === null ? 'null' : "'" . $ratingComment . "'";
@@ -1693,42 +1693,48 @@ class DbAccess
     }
 
     /**
-     * Get Best In Show results across all categories
+     * Get all Bayesian results for a competition
+     * Returns both Best In Show and per-category results
      */
-    public function getBestInShowResults($competitionId, $voteCountStartTime = null) {
+    public function getBayesianResults($competitionId, $voteCountStartTime = null) {
         require_once 'BayesianRateHelper.php';
-
         $bayesian = new BayesianRateHelper($competitionId);
         $categories = $this->getCategories($competitionId, true);
 
+        if (CONNECT_EVENTREG_DB) {
+            $allBeers = $this->getBeers($competitionId, false);
+        } else {
+            $catsAndBeers = $this->readEventBeerDataFromCacheFiles($competitionId);
+            $allBeers = $catsAndBeers[1];
+        }
+
         $classResults = [];
         $allRatingsAllClasses = [];
+        $categoryData = [];
 
         foreach ($categories as $category) {
             $categoryId = $category['id'];
-            $classResults[$categoryId] = $this->getBayesianResultsForCategory($categoryId, $voteCountStartTime);
-            $allRatingsAllClasses[$categoryId] = $this->getBayesianRatingsForCategory($categoryId, $voteCountStartTime);
-        }
+            $categoryBeers = array_values(array_filter($allBeers, function($beer) use ($categoryId) {
+                return $beer['class'] == $categoryId;
+            }));
+            $votes = $this->getBayesianRatingsForCategory($categoryId, $voteCountStartTime);
+            $results = $bayesian->calculateClassResults($categoryBeers, $votes);
 
-        return $bayesian->calculateBestInShow($classResults, $allRatingsAllClasses, $categories);
-    }
-
-    /**
-     * Get all Bayesian results for a competition (all categories)
-     */
-    public function getAllBayesianResults($competitionId, $voteCountStartTime = null) {
-        $categories = $this->getCategories($competitionId, true);
-        $results = [];
-
-        foreach ($categories as $category) {
-            $results[$category['id']] = [
+            $classResults[$categoryId] = $results;
+            $allRatingsAllClasses[$categoryId] = $votes;
+            $categoryData[$categoryId] = [
                 'categoryName' => $category['name'],
                 'categoryDescription' => $category['description'],
-                'beers' => $this->getBayesianResultsForCategory($category['id'], $voteCountStartTime)
+                'beers' => $results
             ];
         }
 
-        return $results;
+        $bestInShow = $bayesian->calculateBestInShow($classResults, $allRatingsAllClasses, $categories);
+
+        return [
+            'bestInShow' => $bestInShow,
+            'categories' => $categoryData
+        ];
     }
 
     // ============ END BAYESIAN RATING METHODS ============
