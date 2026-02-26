@@ -19,6 +19,59 @@ $voteCountStartTime = $openTimes['voteCountStartTime'];
 
 // Check if Bayesian rating is enabled
 $bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING', false);
+
+// Fetch all Bayesian results in a single pass (used by both export and HTML display)
+if ($bayesianEnabled) {
+    $bayesianResults = $dbAccess->getBayesianResults($competitionId, $voteCountStartTime);
+}
+
+// Handle export
+if (isset($_GET['export']) && $bayesianEnabled) {
+    $sep = ";";
+    $csvField = function($val) {
+        return '"' . str_replace('"', '""', $val) . '"';
+    };
+
+    $exportTimestamp = (new DateTime())->format('Y-m-d H:i');
+    $lines = [];
+    $lines[] = $csvField($competition['name']);
+    $lines[] = $csvField('Senast uppdaterad: ' . $exportTimestamp);
+    $lines[] = '';
+
+    // Best In Show
+    $bestInShow = $bayesianResults['bestInShow'];
+    $lines[] = $csvField('Best In Show');
+    $lines[] = implode($sep, [$csvField('Plats'), $csvField('Öl-nr#'), $csvField('Ölets Namn'), $csvField('Bryggare'), $csvField('Klass')]);
+    if ($bestInShow['winner']) {
+        $className = isset($bestInShow['winner']['className']) ? $bestInShow['winner']['className'] : $bestInShow['winner']['classId'];
+        $lines[] = implode($sep, [$csvField('1'), $csvField($bestInShow['winner']['beerEntryId']), $csvField($bestInShow['winner']['beerName']), $csvField($bestInShow['winner']['brewer']), $csvField($className)]);
+        $bisPlacing = 2;
+        foreach ($bestInShow['runnersUp'] as $runner) {
+            $className = isset($runner['className']) ? $runner['className'] : $runner['classId'];
+            $lines[] = implode($sep, [$csvField($bisPlacing++), $csvField($runner['beerEntryId']), $csvField($runner['beerName']), $csvField($runner['brewer']), $csvField($className)]);
+        }
+    }
+
+    // Per-category results
+    foreach ($bayesianResults['categories'] as $categoryId => $catData) {
+        $lines[] = '';
+        $lines[] = $csvField('Kategori ' . $catData['categoryName'] . ' – ' . $catData['categoryDescription']);
+        $lines[] = implode($sep, [$csvField('Plats'), $csvField('Öl-nr#'), $csvField('Ölets Namn'), $csvField('Bryggare')]);
+        foreach ($catData['beers'] as $row) {
+            $place = $row['placing'] == BayesianRateHelper::LAST_PLACING ? '-' : $row['placing'];
+            $lines[] = implode($sep, [$csvField($place), $csvField($row['beerEntryId']), $csvField($row['beerName']), $csvField($row['brewer'])]);
+        }
+    }
+
+    $fileTimestamp = (new DateTime())->format('Ymd_Hi');
+    $filename = 'Resultat_' . $competitionId . '_' . $fileTimestamp . '.csv';
+
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    echo "\xEF\xBB\xBF";
+    echo implode("\r\n", $lines) . "\r\n";
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="sv">
@@ -123,6 +176,22 @@ $bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING
             font-family: monospace;
             font-size: 14px;
         }
+        .export-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #D2C199;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .export-btn:hover {
+            background-color: #c4b080;
+        }
     </style>
 </head>
 <body>
@@ -168,9 +237,11 @@ $bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING
         <?php endif; ?>
     </div>
 
+    <a class="export-btn" href="showBayesianResult.php?competitionId=<?=$competitionId?>&export=1">Exportera resultat</a>
+
     <?php
     // Best In Show
-    $bestInShow = $dbAccess->getBestInShowResults($competitionId, $voteCountStartTime);
+    $bestInShow = $bayesianResults['bestInShow'];
     ?>
     <h2>Best In Show</h2>
     <div class="stats-box">
@@ -235,20 +306,20 @@ $bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING
 
     <?php
     // Per-class results
-    $categories = $dbAccess->getCategories($competition['id']);
+    $showStats = !isset($_GET['skipStats']);
 
-    foreach ($categories as $category):
-        $results = $dbAccess->getBayesianResultsForCategory($category['id'], $voteCountStartTime);
-
-        // Get statistics
-        $beerCount = $dbAccess->getBeerCountForCategory($category['id']);
-        $voteCodeCount = $dbAccess->getVoteCodeCount($category['id'], $voteCountStartTime);
-        $ratingCount = $dbAccess->getRatingCount($category['id'], $voteCountStartTime);
-        $drankCheckCount = $dbAccess->getDrankCheckCount($category['id'], $voteCountStartTime);
+    foreach ($bayesianResults['categories'] as $categoryId => $catData):
+        $results = $catData['beers'];
     ?>
 
-    <h2>Kategori: <?=htmlspecialchars($category['name'])?> - <?=htmlspecialchars($category['description'])?></h2>
+    <h2>Kategori: <?=htmlspecialchars($catData['categoryName'])?> - <?=htmlspecialchars($catData['categoryDescription'])?></h2>
 
+    <?php if ($showStats):
+        $beerCount = $dbAccess->getBeerCountForCategory($categoryId);
+        $voteCodeCount = $dbAccess->getVoteCodeCount($categoryId, $voteCountStartTime);
+        $ratingCount = $dbAccess->getRatingCount($categoryId, $voteCountStartTime);
+        $drankCheckCount = $dbAccess->getDrankCheckCount($categoryId, $voteCountStartTime);
+    ?>
     <div class="stats-box">
         <p>
             Statistik i kategorin:
@@ -258,6 +329,7 @@ $bayesianEnabled = getCompetitionSetting($competitionId, 'ENABLE_BAYESIAN_RATING
             <strong><?=$drankCheckCount?>st</strong> drucken-markeringar
         </p>
     </div>
+    <?php endif; ?>
 
     <table>
         <tr>
