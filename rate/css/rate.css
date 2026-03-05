@@ -8,7 +8,11 @@
     a {
         color: black;
     }
-    
+
+}
+.dropdown-menu .dropdown-divider {
+    margin: 0.15rem 0;
+    border-top-color: #D2C199;
 }
 .navbar input[type="search"] {
 

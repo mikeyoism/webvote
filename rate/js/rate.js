@@ -46,6 +46,10 @@ var beer_db = function () {
 	var activeTab = null; //current active tab of the class dropdown
 	var last_compare_function = null; //stored to localStorage
 
+	// Auto-save state for beer popup
+	var autoSaveInterval = null;
+	var lastAutoSavedRating = null;
+
 	//driver.js offers richer funtionality than bootstrap popovers
 	const driver = window.driver.js.driver;
 	//var beerPopupDriverObj = null;
@@ -434,8 +438,8 @@ var beer_db = function () {
 					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet. OG (Original Gravity, sv. densitet) är uppmätt sockermängd/vörtstyrka innan jäsning. Densiteten efter jäsning anges som FG (Final Gravity)', side: "bottom", align: 'center' } },
 					{ element: '#popup-brewer-data', popover: { title: 'Öldata del 2', description: 'Alkoholhalten mäts eller beräknas utifrån OG/FG och anges i volymprocent (ABV). Ölets beska kommer oftast från alfasyran i humlen och anges i måttenheten IBU (International Bitterness Units) ', side: "bottom", align: 'center' } },
 					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck på texten för att visa stilguide / öltypsdefinition' } },
-					{ element: '#popup-drank legend', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
-					{ element: '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till 5 sjtärnor. Betyget bidrar med poäng i Folkets val.' } },
+					{ element: '#popup-drank legend', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakade öl.' } },
+					{ element: ENABLE_BAYESIAN_RATING ? '#rating-legend-bayesian' : '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till ' + RATING_MAX_SCORE + ' stjärnor. Betyget bidrar med poäng i Folkets val.' } },
 					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
 
 
@@ -465,8 +469,15 @@ var beer_db = function () {
 		// Add items to the nav bar class selection dropdown.
 		var class_dropdown = $('ul #class-dropdown');
 		$.each(classes, function (i, vote_class) {
-			class_dropdown.append('<li class="dropdown-item"><a data-toggle="tab" href="#page-' + vote_class.id
-				+ '" id="menu-item-' + vote_class.id + '">' + vote_class.name + '</a></li>');
+			if (i > 0) {
+				class_dropdown.append('<div class="dropdown-divider"></div>');
+			}
+			var menuLabel = vote_class.name;
+			if (ENABLE_BAYESIAN_RATING && vote_class.description) {
+				menuLabel += ' <small class="text-muted">- ' + vote_class.description + '</small>';
+			}
+			class_dropdown.append('<a class="dropdown-item" data-toggle="tab" href="#page-' + vote_class.id
+				+ '" id="menu-item-' + vote_class.id + '">' + menuLabel + '</a>');
 
 			if (vote_class.id == startupClass) {
 				startupClassIndex = i;
@@ -540,41 +551,52 @@ var beer_db = function () {
 				$('#beer-popup').modal('hide');
 			}
 		});
+		//popup beer open event - start auto-save interval
+		$("#beer-popup").on('shown.bs.modal', function (event) {
+			clearInterval(autoSaveInterval);
+			lastAutoSavedRating = getCurrentPopupRating();
+			autoSaveInterval = setInterval(function () {
+				var current = getCurrentPopupRating();
+				if (current != null && hasPopupRatingChanged(current, lastAutoSavedRating)) {
+					// Update user_data.ratings for this beer
+					var user_rating_class = user_data.ratings[current.categoryId];
+					if (user_rating_class == undefined) {
+						user_rating_class = [];
+						user_data.ratings[current.categoryId] = user_rating_class;
+					}
+					var ratingPos = -1;
+					$.each(user_rating_class, function (i, obj) {
+						if (obj.beerEntryId == current.beerEntryId) {
+							ratingPos = i;
+							user_rating_class[ratingPos] = current;
+							return false;
+						}
+					});
+					if (ratingPos == -1) {
+						user_rating_class.push(current);
+					}
+					store_single_rating(current);
+					lastAutoSavedRating = current;
+				}
+			}, 5000);
+		});
+
 		//popup beer close event
 		$("#beer-popup").on('hidden.bs.modal', function (event) {
+			clearInterval(autoSaveInterval);
+			autoSaveInterval = null;
 			$("#popup-style").popover('dispose');
-			if (user_data.vote_code.length == VOTE_CODE_LEN) {
-				var comment = $("#popup-comment").val();
-				var ratingVal;
-				if (ENABLE_BAYESIAN_RATING) {
-					var sliderValue = parseInt($('#popup-rating-slider').val());
-					ratingVal = (sliderValue === 0) ? '' : sliderValue;
-				} else {
-					ratingVal = $("input[type='radio'][name='popup-rating']:checked").val();
-				}
-
-				var drank = $("input[type='checkbox'][name='popup-drankcheck']").is(":checked");
-
-
-
-				var class_id = beers[current_popup_item_id].class;
-				var beer_entry_id = beers[current_popup_item_id].entry_code;
+			var rating = getCurrentPopupRating();
+			if (rating != null) {
+				var class_id = rating.categoryId;
+				var beer_entry_id = rating.beerEntryId;
 				//one array for each class
 				var user_rating_class = user_data.ratings[class_id];
 				if (user_rating_class == undefined) {
 					user_rating_class = [];
+					user_data.ratings[class_id] = user_rating_class;
 				}
 
-
-
-				var rating = {
-					categoryId: class_id,
-					beerEntryId: beer_entry_id,
-					drankCheck: drank === true ? '1' : '0',
-					ratingScore: ratingVal == "" ? null : ratingVal,
-					ratingComment: comment === "" ? null : comment,
-
-				};
 				var ratingPos = -1;
 				//if the beer is already rated, update the rating
 				$.each(user_rating_class, function (i, obj) {
@@ -589,18 +611,14 @@ var beer_db = function () {
 					user_rating_class.push(rating);
 				}
 
-
 				store_ratings().done(function () {
 					//find the validated rating from the server, now in user_data.ratings
 					//(not updated if competition is closed etc)
 					var rating = get_rating(class_id, beer_entry_id);
 
-
 					update_rating_in_beer_list(current_popup_item_id, rating.ratingScore);
 					update_drank_in_beer_list(current_popup_item_id, rating.drankCheck);
 				});
-
-
 			}
 		});
 
@@ -932,7 +950,7 @@ var beer_db = function () {
 		var beer = beers[item_id];
 		$("#popup-header").html(beer.entry_code + ". " + beer.name);
 		$("#popup-brewer").html(beer.brewer);
-		$("#popup-style").html(beer.styleName + " (" + beer.styleId + ") <i class=\"far fa-question-circle secondary-color\" style=\"vertical-align: middle;\"></i>");
+		$("#popup-style").html(beer.styleName + " (" + beer.styleId + ") <i class=\"fas fa-info-circle secondary-color\" style=\"vertical-align: middle;\"></i>");
 		$("#popup-og").html(parseInt(beer.OG) / 1000 + 1);
 		$("#popup-fg").html(parseInt(beer.FG) / 1000 + 1);
 		$("#popup-alcohol").html(beer.alk);
@@ -1011,6 +1029,9 @@ var beer_db = function () {
 				}
 			});
 
+			if (found) {
+				$('#menu-search-beer').val('');
+			}
 
 		}
 		var trigger = 'hover focus' //opitmized for mobile touchscreen!
@@ -1025,7 +1046,7 @@ var beer_db = function () {
 			container: 'body',
 			boundary: 'viewport', //important for small screens
 			html: true,
-			title: '<i class=\"far fa-question-circle\"></i> Ölstilsbeskrivning',
+			title: '<i class=\"fas fa-info-circle\"></i> Ölstilsbeskrivning',
 			content: function () {
 				var txt = "<h6>" + beer.styleName + " (" + beer.styleId + ") ";
 				//popup-link to  style-guide-popup
@@ -1310,6 +1331,68 @@ var beer_db = function () {
 			error: function (xhr, textStatus, errorThrown) {
 				if (DEBUGMODE) console.log("error: " + textStatus + ", responseText: " + xhr.responseText);
 				if (DEBUGMODE) { console.log("@pre_store_ratings"); console.log(user_data.ratings) };
+			}
+		});
+	}
+
+	// Read the current popup form values and return a rating object, or null if no vote code
+	function getCurrentPopupRating() {
+		if (user_data.vote_code.length != VOTE_CODE_LEN) return null;
+
+		var comment = $("#popup-comment").val();
+		var ratingVal;
+		if (ENABLE_BAYESIAN_RATING) {
+			var sliderValue = parseInt($('#popup-rating-slider').val());
+			ratingVal = (sliderValue === 0) ? '' : sliderValue;
+		} else {
+			ratingVal = $("input[type='radio'][name='popup-rating']:checked").val();
+		}
+		var drank = $("input[type='checkbox'][name='popup-drankcheck']").is(":checked");
+
+		var class_id = beers[current_popup_item_id].class;
+		var beer_entry_id = beers[current_popup_item_id].entry_code;
+
+		return {
+			categoryId: class_id,
+			beerEntryId: beer_entry_id,
+			drankCheck: drank === true ? '1' : '0',
+			ratingScore: ratingVal == "" ? null : ratingVal,
+			ratingComment: comment === "" ? null : comment,
+		};
+	}
+
+	// Compare two rating objects field-by-field to detect changes
+	function hasPopupRatingChanged(current, previous) {
+		if (current == null || previous == null) return current !== previous;
+		return current.drankCheck !== previous.drankCheck ||
+			current.ratingScore !== previous.ratingScore ||
+			current.ratingComment !== previous.ratingComment;
+	}
+
+	// Store a single beer rating to the backend
+	function store_single_rating(rating) {
+		var singleRatings = {};
+		singleRatings[rating.categoryId] = [rating];
+		return $.ajax({
+			type: "POST",
+			url: "../vote/ajax/rate.php",
+			contentType: 'application/json',
+			dataType: 'json',
+			cache: false,
+			data: JSON.stringify({
+				operation: 'setratings',
+				vote_code: user_data.vote_code,
+				competition_id: competition_id,
+				ratings: singleRatings
+			}),
+			success: function (response) {
+				if (response.msgtype == 'OK') {
+					saveToLocalStorage();
+				}
+				if (DEBUGMODE) { console.log("@store_single_rating result"); console.log(response) };
+			},
+			error: function (xhr, textStatus, errorThrown) {
+				if (DEBUGMODE) console.log("store_single_rating error: " + textStatus + ", responseText: " + xhr.responseText);
 			}
 		});
 	}

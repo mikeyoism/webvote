@@ -41,9 +41,11 @@
 					<a href="#" id="sort-dropdown-button" class="nav-link dropdown-toggle"
 						data-toggle="dropdown">Sortera</a>
 					<ul id="sort-dropdown" class="dropdown-menu">
-						<li class="dropdown-item"><a href="#" id="menu-item-sort-by-entry-code">Nummerordning</a></li>
-						<li class="dropdown-item"><a href="#" id="menu-item-sort-by-style">Öltypsordning</a></li>
-						<li class="dropdown-item"><a href="#" id="menu-item-sort-by-rating">Bedömningsordning</a></li>
+						<a class="dropdown-item" href="#" id="menu-item-sort-by-entry-code">Nummerordning</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#" id="menu-item-sort-by-style">Öltypsordning</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="#" id="menu-item-sort-by-rating">Bedömningsordning</a>
 					</ul>
 				</li>
 				<li class="nav-item rate-start">
@@ -57,7 +59,7 @@
 
 
 			<div class="input-group-sm col-xs-1 float-right">
-				<input class="form-control py-2 border-right-0 border" type="search" value="" placeholder="sök..."
+				<input class="form-control py-2 border-right-0 border" type="number" value="" placeholder="sök..."
 					id="menu-search-beer">
 			</div>
 
@@ -280,7 +282,7 @@
 								<div class="row rating-bayesian-only d-none">
 									<div class="col-12">
 										<fieldset class="rating" disabled>
-											<legend style="font-size: 1rem;">Betyg:</legend>
+											<legend id="rating-legend-bayesian" style="font-size: 1rem;">Betyg:</legend>
 											<div class="vote-slider-section">
 												<div class="vote-slider-header">
 													<span id="popup-slider-star" class="gold d-none">&#9733;</span>
