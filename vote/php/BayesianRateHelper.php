@@ -33,45 +33,14 @@ class BayesianRateHelper {
     }
 
     /**
-     * Calculate Bayesian weighted score for a beer
-     *
-     * @param array $brewVotes - All ratings for this specific beer
-     * @param array $allClassVotes - All ratings in the competition class
-     * @return float - Bayesian weighted score
-     */
-    public function calculateWeightedScore($brewVotes, $allClassVotes) {
-        if (empty($allClassVotes) || empty($brewVotes)) {
-            return 0.0;
-        }
-
-        $brewVotesCount = count($brewVotes);
-        if ($brewVotesCount == 0) {
-            return 0.0;
-        }
-
-        // Calculate average rating for this beer
-        $beerAverageRating = array_sum(array_column($brewVotes, 'ratingScore')) / $brewVotesCount;
-
-        // Calculate average rating across all beers in the class
-        $classAverageRating = array_sum(array_column($allClassVotes, 'ratingScore')) / count($allClassVotes);
-
-        // Bayesian estimation formula
-        $weightedRating = ($brewVotesCount / ($brewVotesCount + $this->pseudoVoteCount)) * $beerAverageRating
-                        + ($this->pseudoVoteCount / ($brewVotesCount + $this->pseudoVoteCount)) * $classAverageRating;
-
-        return $weightedRating;
-    }
-
-    /**
      * Calculate Bayesian weighted score using a provided mean
-     * Used for Best In Show calculation where global mean replaces class mean
      *
      * @param array $brewVotes - All votes for this beer
-     * @param float $globalMean - Pre-calculated mean to use (for example global mean across all classes)
+     * @param float $mean - Pre-calculated mean (e.g. class mean or global mean across all classes)
      * @return float - Bayesian weighted score
      */
-    public function calculateWeightedScoreWithMean($brewVotes, $globalMean) {
-        if (empty($brewVotes) || $globalMean <= 0) {
+    public function calculateWeightedScoreWithMean($brewVotes, $mean) {
+        if (empty($brewVotes) || $mean <= 0) {
             return 0.0;
         }
 
@@ -85,7 +54,7 @@ class BayesianRateHelper {
 
         // Bayesian estimation formula using provided mean
         $weightedRating = ($brewVotesCount / ($brewVotesCount + $this->pseudoVoteCount)) * $beerAverageRating
-                        + ($this->pseudoVoteCount / ($brewVotesCount + $this->pseudoVoteCount)) * $globalMean;
+                        + ($this->pseudoVoteCount / ($brewVotesCount + $this->pseudoVoteCount)) * $mean;
 
         return $weightedRating;
     }
@@ -164,10 +133,15 @@ class BayesianRateHelper {
         $results = [];
         $allClassVotes = [];
 
-        // Flatten all votes for class average calculation
+        // Flatten all votes and calculate class average
         foreach ($allVotes as $beerVotes) {
-            $allClassVotes = array_merge($allClassVotes, $beerVotes);
+            foreach ($beerVotes as $vote) {
+                $allClassVotes[] = $vote;
+            }
         }
+        $classMean = !empty($allClassVotes)
+            ? array_sum(array_column($allClassVotes, 'ratingScore')) / count($allClassVotes)
+            : 0;
 
         foreach ($beers as $beer) {
             $beerEntryId = $beer['entry_code'];
@@ -189,7 +163,7 @@ class BayesianRateHelper {
             ];
 
             if (!empty($brewVotes)) {
-                $result['bayesianScore'] = $this->calculateWeightedScore($brewVotes, $allClassVotes);
+                $result['bayesianScore'] = $this->calculateWeightedScoreWithMean($brewVotes, $classMean);
                 $result['medianScore'] = $this->calculateMedianScore($brewVotes);
                 $result['standardDeviation'] = $this->calculateStandardDeviation($brewVotes);
                 $result['meanScore'] = $this->calculateMeanScore($brewVotes);
@@ -342,7 +316,9 @@ class BayesianRateHelper {
             }
 
             foreach ($classVotes as $beerVotes) {
-                $allVotes = array_merge($allVotes, $beerVotes);
+                foreach ($beerVotes as $vote) {
+                    $allVotes[] = $vote;
+                }
             }
         }
         $globalMean = !empty($allVotes)
