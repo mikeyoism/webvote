@@ -553,32 +553,7 @@ var beer_db = function () {
 		});
 		//popup beer open event - start auto-save interval
 		$("#beer-popup").on('shown.bs.modal', function (event) {
-			clearInterval(autoSaveInterval);
-			lastAutoSavedRating = getCurrentPopupRating();
-			autoSaveInterval = setInterval(function () {
-				var current = getCurrentPopupRating();
-				if (current != null && hasPopupRatingChanged(current, lastAutoSavedRating)) {
-					// Update user_data.ratings for this beer
-					var user_rating_class = user_data.ratings[current.categoryId];
-					if (user_rating_class == undefined) {
-						user_rating_class = [];
-						user_data.ratings[current.categoryId] = user_rating_class;
-					}
-					var ratingPos = -1;
-					$.each(user_rating_class, function (i, obj) {
-						if (obj.beerEntryId == current.beerEntryId) {
-							ratingPos = i;
-							user_rating_class[ratingPos] = current;
-							return false;
-						}
-					});
-					if (ratingPos == -1) {
-						user_rating_class.push(current);
-					}
-					store_single_rating(current);
-					lastAutoSavedRating = current;
-				}
-			}, 5000);
+			startAutoSave();
 		});
 
 		//popup beer close event
@@ -587,6 +562,8 @@ var beer_db = function () {
 			autoSaveInterval = null;
 			$("#popup-style").popover('dispose');
 			var rating = getCurrentPopupRating();
+			var popup_item_id = current_popup_item_id;
+			current_popup_item_id = null;
 			if (rating != null) {
 				var class_id = rating.categoryId;
 				var beer_entry_id = rating.beerEntryId;
@@ -616,8 +593,8 @@ var beer_db = function () {
 					//(not updated if competition is closed etc)
 					var rating = get_rating(class_id, beer_entry_id);
 
-					update_rating_in_beer_list(current_popup_item_id, rating.ratingScore);
-					update_drank_in_beer_list(current_popup_item_id, rating.drankCheck);
+					update_rating_in_beer_list(popup_item_id, rating.ratingScore);
+					update_drank_in_beer_list(popup_item_id, rating.drankCheck);
 				});
 			}
 		});
@@ -1003,7 +980,7 @@ var beer_db = function () {
 
 		update_no_vote_code_alert();
 		current_popup_item_id = item_id;
-
+		startAutoSave();
 
 		//find the style info in the styles guide array
 		var style_main = null;
@@ -1335,8 +1312,9 @@ var beer_db = function () {
 		});
 	}
 
-	// Read the current popup form values and return a rating object, or null if no vote code
+	// Read the current popup form values and return a rating object, or null if no vote code or no open popup
 	function getCurrentPopupRating() {
+		if (current_popup_item_id == null) return null;
 		if (user_data.vote_code.length != VOTE_CODE_LEN) return null;
 
 		var comment = $("#popup-comment").val();
@@ -1361,9 +1339,40 @@ var beer_db = function () {
 		};
 	}
 
+	// Start or restart the auto-save interval for the current popup beer and check every 5 seconds.
+	function startAutoSave() {
+		clearInterval(autoSaveInterval);
+		lastAutoSavedRating = getCurrentPopupRating();
+		autoSaveInterval = setInterval(function () {
+			var current = getCurrentPopupRating();
+			if (current != null && hasPopupRatingChanged(current, lastAutoSavedRating)) {
+				// Update user_data.ratings for this beer
+				var user_rating_class = user_data.ratings[current.categoryId];
+				if (user_rating_class == undefined) {
+					user_rating_class = [];
+					user_data.ratings[current.categoryId] = user_rating_class;
+				}
+				var ratingPos = -1;
+				$.each(user_rating_class, function (i, obj) {
+					if (obj.beerEntryId == current.beerEntryId) {
+						ratingPos = i;
+						user_rating_class[ratingPos] = current;
+						return false;
+					}
+				});
+				if (ratingPos == -1) {
+					user_rating_class.push(current);
+				}
+				store_single_rating(current);
+				lastAutoSavedRating = current;
+			}
+		}, 5000);
+	}
+
 	// Compare two rating objects field-by-field to detect changes
 	function hasPopupRatingChanged(current, previous) {
-		if (current == null || previous == null) return current !== previous;
+		if (current == null || previous == null) return false;
+		if (current.categoryId !== previous.categoryId || current.beerEntryId !== previous.beerEntryId) return false;
 		return current.drankCheck !== previous.drankCheck ||
 			current.ratingScore !== previous.ratingScore ||
 			current.ratingComment !== previous.ratingComment;

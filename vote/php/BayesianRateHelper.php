@@ -182,7 +182,6 @@ class BayesianRateHelper {
             foreach ($results as &$result) {
                 if ($result['voteCount'] < $this->minimumVotesThreshold && $result['voteCount'] > 0) {
                     $result['bayesianScore'] = 0.0;
-                    $result['voteCount'] = 0;
                     $result['medianScore'] = 0.0;
                     $result['standardDeviation'] = 0.0;
                     $result['meanScore'] = 0.0;
