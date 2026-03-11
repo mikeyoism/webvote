@@ -359,9 +359,10 @@ class DbAccess
             $classIndex = $row['votesys_category'];
             
             if ($classIndex == 0)
-                die("getBeersByBrewer: Illegal Beer_data.votesys_category=0 detected for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] );
-            
-                //find array position in $classes
+                die("getBeer: Illegal Beer_data.votesys_category=0 detected for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] );
+
+
+            //find array position in $classes
             $fv_class_id_nr = array_search($classIndex, array_column($classes, 'id')) + 1;
 
 
@@ -427,7 +428,8 @@ class DbAccess
             'alk' => $row['alc'],
             'OG' => $row['og'],
             'FG' => $row['fg'],
-            'IBU' => $row['bu']
+            'IBU' => $row['bu'],
+            'recipe' => $this->getRecipeData($row['beer_id'])
         );
 
         return $beer;
@@ -543,7 +545,8 @@ class DbAccess
                 'alk' => $row['alc'],
                 'OG' => $row['og'],
                 'FG' => $row['fg'],
-                'IBU' => $row['bu']
+                'IBU' => $row['bu'],
+                'recipe' => $this->getRecipeData($row['beer_id'])
             );
             //note: no offset in arrayposition, as we use the entryId as key
             $beers[$entryId] = $beer;
@@ -586,7 +589,7 @@ class DbAccess
             die("Invalid getBeers result id=" . $competitionId . " num_rows: " . $result->num_rows . " sql: " . $sql . " event_ids: " . implode(',', $evenreg_event_ids));
 
 
-        //get all brewers participating in this brew from Brewers_of_beer (user_data.name is just the registering brewer))
+        //get all brewers participating in this brew from Brewers_of_beer (user_data.name is just the registering brewer)
 
 
         $classes = $this->getCategories($competitionId, true);
@@ -599,8 +602,6 @@ class DbAccess
             //if Beer_data.votesys_category is set, use that as class id
             if ($row['votesys_category'] != null && $row['votesys_category'] != 0) { //&& ($row['votesys_category'] != 0 är en temp fix tillvidare, pga event_reg ej lirar ihop om fv_allow flaggan är false
                 $classIndex = $row['votesys_category'];
-                //print_r($row);die();
-                //print("getBeers: a id." . $$row['votesys_category'] . " class: " . $class); print_r($class); print( " categories: " ); print_r($classes); die();
                 
                 if ($classIndex == 0)
                     die("getBeers: Illegal Beer_data.votesys_category=0 detected for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] );
@@ -615,20 +616,11 @@ class DbAccess
 
             } else { //removed, static FvClass lookup (sm-2024 only) - 
                 die("getBeers Incompatible class id. Beer_data.votesys_category is null or 0 for beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name'] . " event_id:" . $row['event_id'] . " competitionId:" . $competitionId . "EventReg must not contain beers without votesys_category!");
-                // //get first/lowest id in categories, 
-                // $classOffset = intval($classes[0]['id']) - 1;
-                // //store beer info in arrays grouped by FvMainClass
-                // if ($row['fv_competition_no'] >= 900) { //etikett tävling (övriga fält lika som för ditto öl) //TODO improve this with more info than just number via $evenreg_event_ids ("ET","FV")
-                //     $fv_class_id_nr = 8;
-                //     $classIndex = $classOffset + $fv_class_id_nr + 1;
-                // } else {
-                //     $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
-                //     if ($fv_class_id_nr == 0)
-                //         die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
-                //     $classIndex = $classOffset + $fv_class_id_nr;
 
-
-                // } 
+                // $fv_class_id_nr = FvClass($row['low_alc'], $row['main_class'], $row['sub_class']);
+                // if ($fv_class_id_nr == 0)
+                //     die("FvClass, Incompatible class id. for main:sub class" . $row['main_class'] . ":" . $row['sub_class'] . " low_alc:" . $row['low_alc'] . " beer_id:" . $row['beer_id'] . " beer_name:" . $row['beer_name']);
+                // $classIndex = $classOffset + $fv_class_id_nr;
             }
 
             //find classes.id in $classes
@@ -678,7 +670,8 @@ class DbAccess
                 'alk' => $row['alc'],
                 'OG' => $row['og'],
                 'FG' => $row['fg'],
-                'IBU' => $row['bu']
+                'IBU' => $row['bu'],
+                'recipe' => $this->getRecipeData($row['beer_id'])
             );
             //note: no offset in arrayposition, as we use the entryId as key
             if ($grouped == true) {
@@ -763,6 +756,110 @@ class DbAccess
         $stmt->execute() or die("removeCategoryEntries: Execute failed: $sql");
     }
 
+    //hjälpfunktion för att hämta receptdata
+    private function getRecipeData($beer_id) {
+        $recipe = array(
+            'kokning' => array(),
+            'maskning' => array(),
+            'ovriga' => array(),
+            'jasning' => null,
+            'vatten' => null,
+            'kommentar' => null
+        );
+
+        // Hämta humle/kokning
+        $sql = 'SELECT H.hops_name, HF.hops_form_name, HIB.hops_weight, HIB.hops_boil_time, HIB.hops_comment, H.hops_alpha ' .
+            'FROM Hops_in_beer HIB ' .
+            'INNER JOIN Hops H ON HIB.hops_id = H.hops_id ' .
+            'LEFT JOIN Hops_forms HF ON H.hops_form_id = HF.hops_form_id ' .
+            'WHERE HIB.beer_id = ' . $this->escape($beer_id) . ' AND HIB.deleted = 0 ' .
+            'ORDER BY HIB.hops_boil_time DESC';
+        
+        $result = $this->getConnectionDb2_Eventreg()->query($sql);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $recipe['kokning'][] = array(
+                    'humle' => htmlspecialchars($row['hops_name']),
+                    'form' => htmlspecialchars($row['hops_form_name'] ? $row['hops_form_name'] : '-'),
+                    'vikt' => (int)$row['hops_weight'],
+                    'alfasyra' => (float)$row['hops_alpha'],
+                    'koktid' => (int)$row['hops_boil_time'],
+                    'kommentar' => htmlspecialchars($row['hops_comment'] ? $row['hops_comment'] : '')
+                );
+            }
+        }
+
+        // Hämta malt/mäskning
+        $sql = 'SELECT M.malt_name, MIB.malt_weight, MIB.malt_comment ' .
+            'FROM Malts_in_beer MIB ' .
+            'INNER JOIN Malts M ON MIB.malt_id = M.malt_id ' .
+            'WHERE MIB.beer_id = ' . $this->escape($beer_id) . ' AND MIB.deleted = 0 ' .
+            'ORDER BY MIB.malt_weight DESC';
+        
+        $result = $this->getConnectionDb2_Eventreg()->query($sql);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $recipe['maskning'][] = array(
+                    'malt' => htmlspecialchars($row['malt_name']),
+                    'vikt' => (int)$row['malt_weight'],
+                    'kommentar' => htmlspecialchars($row['malt_comment'] ? $row['malt_comment'] : '')
+                );
+            }
+        }
+
+        // Hämta övriga ingredienser
+        $sql = 'SELECT O.others_name, OS.others_stage_name, OIB.others_weight, OIB.others_comment ' .
+            'FROM Others_in_beer OIB ' .
+            'INNER JOIN Others O ON OIB.others_id = O.others_id ' .
+            'LEFT JOIN Others_stages OS ON O.others_stage_id = OS.others_stage_id ' .
+            'WHERE OIB.beer_id = ' . $this->escape($beer_id) . ' AND OIB.deleted = 0';
+        
+        $result = $this->getConnectionDb2_Eventreg()->query($sql);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $recipe['ovriga'][] = array(
+                    'ingrediens' => htmlspecialchars($row['others_name']),
+                    'tillsatt_vid' => htmlspecialchars($row['others_stage_name'] ? $row['others_stage_name'] : '-'),
+                    'vikt' => (int)$row['others_weight'],
+                    'kommentar' => htmlspecialchars($row['others_comment'] ? $row['others_comment'] : '')
+                );
+            }
+        }
+
+        // Hämta jäsning, vatten och kommentar från Beer_data
+        $sql = 'SELECT ferment, water, comment FROM Beer_data WHERE beer_id = ' . $this->escape($beer_id) . ' AND deleted = 0';
+        $result = $this->getConnectionDb2_Eventreg()->query($sql);
+        if ($result && $row = $result->fetch_assoc()) {
+            $ferment = $this->isDefaultRecipeValue($row['ferment']) ? null : htmlspecialchars($row['ferment']);
+            $water = $this->isDefaultRecipeValue($row['water']) ? null : htmlspecialchars($row['water']);
+            $comment = $this->isDefaultRecipeValue($row['comment']) ? null : htmlspecialchars($row['comment']);
+            
+            $recipe['jasning'] = $ferment;
+            $recipe['vatten'] = $water;
+            $recipe['kommentar'] = $comment;
+        }
+
+        return $recipe;
+    }
+
+    // Hjälpfunktion för att filtrera default-värden
+    private function isDefaultRecipeValue($text) {
+        if (empty($text)) return true;
+        
+        $defaultPatterns = array(
+            '/^Jästsort:\s*xxx.*Jäsning\s*xx\s*°C,\s*xx\s*dagar\s*$/i',
+            '/^Vatten\s+från\s+xx-stad.*Tillsatser:.*xx\s+g\s+någonting\s*$/is',
+            '/^Här\s+ska\s+t\.ex\.\s+öltyp\s+anges\s+för\s+underklasserna\s+Övriga\s+klassiska\.\s*$/i'
+        );
+        
+        foreach ($defaultPatterns as $pattern) {
+            if (preg_match($pattern, trim($text))) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
     // Might change in future -- probably hard coded at some other places too right now.
     public function getVoteWeightAndLabels($categoryId)
     {
@@ -1145,7 +1242,7 @@ class DbAccess
     }
 
 
-    //get weigted results
+    //get weigthed results
     public function getWeightedRatingResult($categoryId, $voteCountStartTime, $beerCountforCategory)
     {
         //reglerna i denna funktion är till för att ta udden av eventuellt taktikröstande, 

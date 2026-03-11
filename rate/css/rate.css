@@ -533,3 +533,73 @@
 }
 
 /* ============ END BAYESIAN STYLES ============ */
+
+/* Recept checkbox styling */
+.recept-toggle input[type="checkbox"] {
+    accent-color: #d1ac55;
+}
+
+/* Om du använder en anpassad checkbox */
+.recept-toggle .form-check-input:checked {
+    background-color: #d1ac55;
+    border-color: #d1ac55;
+}
+
+.recept-toggle .form-check-input:focus {
+    border-color: #d1ac55;
+    box-shadow: 0 0 0 0.2rem rgba(209, 172, 85, 0.25);
+}
+
+/* Recept expanderbar sektion */
+.recept-toggle {
+    cursor: pointer;
+    font-weight: normal;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #333;
+}
+
+.recept-toggle .arrow {
+    color: #d1ac55;
+    transition: transform 0.3s;
+    font-size: 0.9em;
+}
+
+.recept-content {
+    display: none;
+    margin-top: 10px;
+    margin-bottom: 1rem;
+    padding: 15px;
+    border: 2px solid #d1ac55;
+    border-radius: 8px;
+    background-color: #fffef8;
+    font-size: 0.72em;
+}
+
+.recept-content .form-group {
+    margin-bottom: 0.5rem; /* Halverat från Bootstrap default 1rem */
+}
+
+.recept-content .form-group label {
+    font-size: 1em;
+    margin-bottom: 0.25rem; /* Halverat från Bootstrap default 0.5rem */
+}
+
+.recept-content .form-control-plaintext {
+    font-size: 1em;
+    padding-top: 0; /* Tar bort extra padding */
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.recept-content table {
+    font-size: 1em;
+    margin-bottom: 0.25rem; /* Minskat avstånd efter tabeller */
+}
+
+.recept-content th,
+.recept-content td {
+    font-size: 1em;
+}

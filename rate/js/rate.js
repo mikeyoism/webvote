@@ -424,7 +424,10 @@ var beer_db = function () {
 
 		//on beer-popup guide click
 		$('#beer-popup-guide').on('click', function (e) {
-			//Driver for beer-popup
+			// Kolla om Bayesian-läge är aktivt
+			
+			const starRange = ENABLE_BAYESIAN_RATING ? '1 till ' + RATING_MAX_SCORE + ' poäng' : '1 till ' + RATING_MAX_SCORE + ' stjärnor';
+			
 			const beerPopupDriverObj = driver({
 				animate: true,
 				showProgress: true,
@@ -437,19 +440,28 @@ var beer_db = function () {
 				steps: [
 					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet. OG (Original Gravity, sv. densitet) är uppmätt sockermängd/vörtstyrka innan jäsning. Densiteten efter jäsning anges som FG (Final Gravity)', side: "bottom", align: 'center' } },
 					{ element: '#popup-brewer-data', popover: { title: 'Öldata del 2', description: 'Alkoholhalten mäts eller beräknas utifrån OG/FG och anges i volymprocent (ABV). Ölets beska kommer oftast från alfasyran i humlen och anges i måttenheten IBU (International Bitterness Units) ', side: "bottom", align: 'center' } },
+					{ element: '.recept-toggle', popover: { title: 'Recept', description: 'Klicka här för att visa bryggdens receptinformation: malt, humle, övriga ingredienser, jäsning och vattenbehandling.', side: "left", align: 'start' } },
 					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck på texten för att visa stilguide / öltypsdefinition' } },
-					{ element: '#popup-drank legend', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakade öl.' } },
-					{ element: ENABLE_BAYESIAN_RATING ? '#rating-legend-bayesian' : '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med 1 till ' + RATING_MAX_SCORE + ' stjärnor. Betyget bidrar med poäng i Folkets val.' } },
+					{ element: '#popup-drank', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
+					{ element: ENABLE_BAYESIAN_RATING ? '#popup-rating-slider' : '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med ' + starRange + '. Betyget bidrar med poäng i Folkets val.' } },
 					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
-
-
 				]
 			});
 			beerPopupDriverObj.drive();
 
 		});
 
+		$('.recept-toggle').on('click', function (e) {
+			e.preventDefault();
+			toggleRecept(this);
+		});
 
+		$('.recept-toggle').on('keydown', function (e) {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				toggleRecept(this);
+			}
+		});
 		//welcome-popup-lesshelp click
 		$('#welcome-popup-infoheader').on('click', function (e) {
 
@@ -909,6 +921,112 @@ var beer_db = function () {
 			$('#beer-popup').modal('show');
 		}
 	}
+	function toggleRecept(element) {
+		var parent = element.parentElement;
+		var content = parent ? parent.nextElementSibling : null;
+		const arrow = element.querySelector('.arrow');
+
+		if (content && content.classList.contains('recept-content')) {
+			var isExpanded = content.style.display !== 'none' && content.style.display !== '';
+
+			if (!isExpanded) {
+				content.style.display = 'block';
+				if (arrow) {
+					arrow.style.transform = 'rotate(90deg)';
+				}
+				element.setAttribute('aria-expanded', 'true');
+			} else {
+				content.style.display = 'none';
+				if (arrow) {
+					arrow.style.transform = 'rotate(0deg)';
+				}
+				element.setAttribute('aria-expanded', 'false');
+			}
+		}
+	}
+function populateRecipeData(beer) {
+    // Sanitera HTML för att förhindra XSS
+    function escapeHtml(text) {
+        if (text === null || text === undefined || text === '') return '-';
+        var map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    // Avkoda HTML entities (kör två gånger för dubbel-kodade entities)
+    function decodeHtml(text) {
+        if (text === null || text === undefined || text === '') return '';
+        var txt = document.createElement("textarea");
+        txt.innerHTML = text;
+        var decoded = txt.value;
+        // Avkoda en gång till för dubbel-kodade entities
+        txt.innerHTML = decoded;
+        return txt.value;
+    }
+
+    // Kokning / Humle
+    if (beer.recipe && beer.recipe.kokning && beer.recipe.kokning.length > 0) {
+        var kokningHtml = '';
+        beer.recipe.kokning.forEach(function(item) {
+            kokningHtml += '<tr>';
+            kokningHtml += '<td>' + escapeHtml(decodeHtml(item.humle)) + '</td>';
+            kokningHtml += '<td>' + escapeHtml(decodeHtml(item.form)) + '</td>';
+            kokningHtml += '<td>' + escapeHtml(item.vikt) + '</td>';
+            kokningHtml += '<td>' + escapeHtml(item.alfasyra) + '</td>';
+            kokningHtml += '<td>' + escapeHtml(item.koktid) + '</td>';
+            kokningHtml += '<td>' + escapeHtml(decodeHtml(item.kommentar)) + '</td>';
+            kokningHtml += '</tr>';
+        });
+        $('#recept-kokning').html(kokningHtml);
+    } else {
+        $('#recept-kokning').html('<tr><td colspan="6">-</td></tr>');
+    }
+
+    // Mäskning
+    if (beer.recipe && beer.recipe.maskning && beer.recipe.maskning.length > 0) {
+        var maskningHtml = '';
+        beer.recipe.maskning.forEach(function(item) {
+            maskningHtml += '<tr>';
+            maskningHtml += '<td>' + escapeHtml(decodeHtml(item.malt)) + '</td>';
+            maskningHtml += '<td>' + escapeHtml(item.vikt) + '</td>';
+            maskningHtml += '<td>' + escapeHtml(decodeHtml(item.kommentar)) + '</td>';
+            maskningHtml += '</tr>';
+        });
+        $('#recept-maskning').html(maskningHtml);
+    } else {
+        $('#recept-maskning').html('<tr><td colspan="3">-</td></tr>');
+    }
+
+    // Övriga ingredienser
+    if (beer.recipe && beer.recipe.ovriga && beer.recipe.ovriga.length > 0) {
+        var ovrigaHtml = '';
+        beer.recipe.ovriga.forEach(function(item) {
+            ovrigaHtml += '<tr>';
+            ovrigaHtml += '<td>' + escapeHtml(decodeHtml(item.ingrediens)) + '</td>';
+            ovrigaHtml += '<td>' + escapeHtml(decodeHtml(item.tillsatt_vid)) + '</td>';
+            ovrigaHtml += '<td>' + escapeHtml(item.vikt) + '</td>';
+            ovrigaHtml += '<td>' + escapeHtml(decodeHtml(item.kommentar)) + '</td>';
+            ovrigaHtml += '</tr>';
+        });
+        $('#recept-ovriga').html(ovrigaHtml);
+    } else {
+        $('#recept-ovriga').html('<tr><td colspan="4">-</td></tr>');
+    }
+
+    // Jäsning - använd decodeHtml för textfält
+    $('#recept-jasning').text(beer.recipe && beer.recipe.jasning ? decodeHtml(beer.recipe.jasning) : '-');
+
+    // Vattenbehandling
+    $('#recept-vatten').text(beer.recipe && beer.recipe.vatten ? decodeHtml(beer.recipe.vatten) : '-');
+
+    // Kommentar
+    $('#recept-kommentar').text(beer.recipe && beer.recipe.kommentar ? decodeHtml(beer.recipe.kommentar) : '-');
+}
 	function popup_beer(item_id, e, isentry_code = false) {
 		if (isentry_code) {
 			var found = false;
@@ -932,6 +1050,11 @@ var beer_db = function () {
 		$("#popup-fg").html(parseInt(beer.FG) / 1000 + 1);
 		$("#popup-alcohol").html(beer.alk);
 		$("#popup-ibu").html(beer.IBU);
+
+		// Populera receptdata
+		populateRecipeData(beer);
+		$('.recept-content').hide();
+		$('.recept-toggle').attr('aria-expanded', 'false').find('.arrow').css('transform', 'rotate(0deg)');
 
 		var comment = '';
 		var rating = '';

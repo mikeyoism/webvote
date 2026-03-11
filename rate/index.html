@@ -238,7 +238,98 @@
 						<span class="badge  badge-secondary">OG:&nbsp;<span id="popup-og" >1,000</span></span>
 						<span class="badge  badge-secondary">FG:&nbsp;<span id="popup-fg">1,000</span></span>
 						<span class="badge  badge-secondary">Alkohol:&nbsp;<span id="popup-alcohol">0.0</span>&nbsp;%</span>
-						<span class="badge  badge-secondary">Beska:&nbsp;<span id="popup-ibu">0</span>&nbsp;IBU</span></p>
+						<span class="badge  badge-secondary">Beska:&nbsp;<span id="popup-ibu">0</span>&nbsp;IBU</span>
+					</p>
+
+					<div style="text-align: right; margin-top: -5px; margin-bottom: 5px;">
+						<button type="button" class="recept-toggle btn btn-outline-secondary btn-sm" aria-expanded="false">
+							<i class="fa fa-chevron-right arrow"></i>
+							Brygdens recept
+						</button>
+					</div>
+
+					<!-- Expanderbar Recept-innehåll -->
+					<div class="recept-content">
+						<!-- Kommentar -->
+						<div class="form-group">
+							<label><strong>Kommentar</strong></label>
+							<p id="recept-kommentar" class="form-control-plaintext" style="white-space: pre-line;">-</p>
+						</div>
+
+						<!-- Mäskning -->
+						<div class="form-group">
+							<label><strong>Mäskning</strong></label>
+							<div class="table-responsive">
+								<table class="table table-sm">
+									<thead>
+										<tr>
+											<th>Malt / extraktgivare</th>
+											<th>Vikt [g]</th>
+											<th>Kommentar</th>
+										</tr>
+									</thead>
+									<tbody id="recept-maskning">
+										<tr><td colspan="3">-</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<!-- Kokning / Humle -->
+						<div class="form-group">
+							<label><strong>Kokning</strong></label>
+							<div class="table-responsive">
+								<table class="table table-sm">
+									<thead>
+										<tr>
+											<th>Humle / krydda</th>
+											<th>Form</th>
+											<th>Vikt [g]</th>
+											<th>Alfasyra [%]</th>
+											<th>Koktid [min]</th>
+											<th>Kommentar</th>
+										</tr>
+									</thead>
+									<tbody id="recept-kokning">
+										<tr><td colspan="6">-</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<!-- Övriga ingredienser -->
+						<div class="form-group">
+							<label><strong>Övriga ingredienser</strong></label>
+							<div class="table-responsive">
+								<table class="table table-sm">
+									<thead>
+										<tr>
+											<th>Ingrediens</th>
+											<th>Tillsatt vid</th>
+											<th>Vikt [g]</th>
+											<th>Kommentar</th>
+										</tr>
+									</thead>
+									<tbody id="recept-ovriga">
+										<tr><td colspan="4">-</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<!-- Jäsning -->
+						<div class="form-group">
+							<label><strong>Jäsning</strong></label>
+							<p id="recept-jasning" class="form-control-plaintext">-</p>
+						</div>
+
+						<!-- Vattenbehandling -->
+						<div class="form-group">
+							<label><strong>Vattenbehandling</strong></label>
+							<p id="recept-vatten" class="form-control-plaintext" style="white-space: pre-line;">-</p>
+						</div>
+					</div>
+
 					<form>
 
 						<div class="card border-warning mb-3 bg-light">
