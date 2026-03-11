@@ -440,13 +440,13 @@ var beer_db = function () {
 				steps: [
 					{ element: '#popup-brewer-data', popover: { title: 'Öldata', description: 'Nyckelvärden bryggaren angivit för ölet. OG (Original Gravity, sv. densitet) är uppmätt sockermängd/vörtstyrka innan jäsning. Densiteten efter jäsning anges som FG (Final Gravity)', side: "bottom", align: 'center' } },
 					{ element: '#popup-brewer-data', popover: { title: 'Öldata del 2', description: 'Alkoholhalten mäts eller beräknas utifrån OG/FG och anges i volymprocent (ABV). Ölets beska kommer oftast från alfasyran i humlen och anges i måttenheten IBU (International Bitterness Units) ', side: "bottom", align: 'center' } },
-					{ element: '.recept-toggle', popover: { title: 'Recept', description: 'Klicka här för att visa bryggdens receptinformation: malt, humle, övriga ingredienser, jäsning och vattenbehandling.', side: "left", align: 'start' } },
+					{ element: '.recept-toggle', popover: { title: 'Recept', description: 'Klicka här för att visa brygdens receptinformation: malt, humle, övriga ingredienser, jäsning och vattenbehandling.', side: "left", align: 'start' } },
 					{ element: '#popup-style', popover: { title: 'Tävlingsklass', description: 'Ölets tävlingsklass. Tryck på texten för att visa stilguide / öltypsdefinition' } },
 					{ element: '#popup-drank', popover: { title: 'Provsmakat', description: 'Tryck på glaset om du druckit av ölet, för att hålla kolla på provsmakde öl.' } },
 					{ element: ENABLE_BAYESIAN_RATING ? '#popup-rating-slider' : '#rating-legend', popover: { title: 'Betyg', description: 'Betygsätt ölet med ' + starRange + '. Betyget bidrar med poäng i Folkets val.' } },
 					{ element: '#popup-comment', popover: { title: 'Kommentar', description: 'Skriv en valfri kommentar, tex positiv feedback om ölet till bryggaren.' } },
 				]
-			});
+			}); 
 			beerPopupDriverObj.drive();
 
 		});
