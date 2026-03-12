@@ -5,6 +5,41 @@ require_once '../../vote/php/common.inc';
 $competitionId = getCompetitionId();
 $dbAccess = new DbAccess();
 
+$operation = isset($_GET['operation']) ? $_GET['operation'] : '';
+
+if ($operation === 'getRecipeDetails') {
+    $entryCode = isset($_GET['entryCode']) ? intval($_GET['entryCode']) : 0;
+
+    if ($entryCode <= 0) {
+        http_response_code(400);
+        header('Content-Type: application/json', true);
+        echo json_encode(array(
+            'msgtype' => 'error',
+            'message' => 'Invalid entryCode'
+        ));
+        exit;
+    }
+
+    $recipe = null;
+
+    // Recipe details are only available from the live eventreg database.
+    if (CONNECT_EVENTREG_DB) {
+        $beer = $dbAccess->getBeer($competitionId, $entryCode, true);
+        if (is_array($beer) && array_key_exists('recipe', $beer)) {
+            $recipe = $beer['recipe'];
+        }
+    }
+
+    header('Content-Type: application/json', true);
+    echo json_encode(array(
+        'msgtype' => 'ok',
+        'competition_id' => $competitionId,
+        'entry_code' => $entryCode,
+        'recipe' => $recipe
+    ));
+    exit;
+}
+
 if (!CONNECT_EVENTREG_DB) {
     //Read from cached files (updated/created in admin-page)
     

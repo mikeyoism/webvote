@@ -49,6 +49,8 @@ var beer_db = function () {
 	// Auto-save state for beer popup
 	var autoSaveInterval = null;
 	var lastAutoSavedRating = null;
+	var recipeDetailsCache = {};
+	var recipeDetailsPending = {};
 
 	//driver.js offers richer funtionality than bootstrap popovers
 	const driver = window.driver.js.driver;
@@ -931,6 +933,26 @@ var beer_db = function () {
 
 			if (!isExpanded) {
 				content.style.display = 'block';
+				var entryCode = content.getAttribute('data-entry-code');
+				var recipeLoaded = content.getAttribute('data-recipe-loaded') === 'true';
+
+				if (entryCode && !recipeLoaded) {
+					setRecipeLoadingState();
+					fetchRecipeDetails(entryCode).done(function (recipe) {
+						if (content.getAttribute('data-entry-code') !== String(entryCode)) {
+							return;
+						}
+						populateRecipeData(recipe);
+						content.setAttribute('data-recipe-loaded', 'true');
+					}).fail(function () {
+						if (content.getAttribute('data-entry-code') !== String(entryCode)) {
+							return;
+						}
+						populateRecipeData(null);
+						content.setAttribute('data-recipe-loaded', 'true');
+					});
+				}
+
 				if (arrow) {
 					arrow.style.transform = 'rotate(90deg)';
 				}
@@ -944,7 +966,55 @@ var beer_db = function () {
 			}
 		}
 	}
-function populateRecipeData(beer) {
+
+	function fetchRecipeDetails(entryCode) {
+		if (recipeDetailsCache.hasOwnProperty(entryCode)) {
+			if (DEBUGMODE) console.log('@fetchRecipeDetails cache hit, entryCode=' + entryCode);
+			return $.Deferred().resolve(recipeDetailsCache[entryCode]).promise();
+		}
+
+		if (recipeDetailsPending[entryCode]) {
+			if (DEBUGMODE) console.log('@fetchRecipeDetails pending request reused, entryCode=' + entryCode);
+			return recipeDetailsPending[entryCode];
+		}
+
+		if (DEBUGMODE) console.log('@fetchRecipeDetails request, entryCode=' + entryCode + ', competition_id=' + competition_id);
+
+		recipeDetailsPending[entryCode] = $.ajax({
+			type: 'GET',
+			cache: false,
+			url: 'php/ajax.php',
+			dataType: 'json',
+			data: {
+				operation: 'getRecipeDetails',
+				entryCode: entryCode,
+				competitionId: competition_id
+			}
+		}).then(function (response) {
+			if (DEBUGMODE) { console.log('@fetchRecipeDetails response'); console.log(response); }
+			var recipe = (response && response.msgtype === 'ok' && response.recipe) ? response.recipe : null;
+			recipeDetailsCache[entryCode] = recipe;
+			return recipe;
+		}, function (xhr, textStatus) {
+			if (DEBUGMODE) console.log('@fetchRecipeDetails error: ' + textStatus + ', responseText: ' + (xhr && xhr.responseText ? xhr.responseText : ''));
+			return $.Deferred().reject(xhr, textStatus).promise();
+		}).always(function () {
+			delete recipeDetailsPending[entryCode];
+		});
+
+		return recipeDetailsPending[entryCode];
+	}
+
+	function setRecipeLoadingState() {
+		$('#recept-kokning').html('<tr><td colspan="6">Laddar...</td></tr>');
+		$('#recept-maskning').html('<tr><td colspan="3">Laddar...</td></tr>');
+		$('#recept-ovriga').html('<tr><td colspan="4">Laddar...</td></tr>');
+		$('#recept-jasning').text('Laddar...');
+		$('#recept-vatten').text('Laddar...');
+		$('#recept-kommentar').text('Laddar...');
+	}
+
+function populateRecipeData(recipeData) {
     // Sanitera HTML för att förhindra XSS
     function escapeHtml(text) {
         if (text === null || text === undefined || text === '') return '-';
@@ -970,9 +1040,9 @@ function populateRecipeData(beer) {
     }
 
     // Kokning / Humle
-    if (beer.recipe && beer.recipe.kokning && beer.recipe.kokning.length > 0) {
+	if (recipeData && recipeData.kokning && recipeData.kokning.length > 0) {
         var kokningHtml = '';
-        beer.recipe.kokning.forEach(function(item) {
+		recipeData.kokning.forEach(function(item) {
             kokningHtml += '<tr>';
             kokningHtml += '<td>' + escapeHtml(decodeHtml(item.humle)) + '</td>';
             kokningHtml += '<td>' + escapeHtml(decodeHtml(item.form)) + '</td>';
@@ -988,9 +1058,9 @@ function populateRecipeData(beer) {
     }
 
     // Mäskning
-    if (beer.recipe && beer.recipe.maskning && beer.recipe.maskning.length > 0) {
+	if (recipeData && recipeData.maskning && recipeData.maskning.length > 0) {
         var maskningHtml = '';
-        beer.recipe.maskning.forEach(function(item) {
+		recipeData.maskning.forEach(function(item) {
             maskningHtml += '<tr>';
             maskningHtml += '<td>' + escapeHtml(decodeHtml(item.malt)) + '</td>';
             maskningHtml += '<td>' + escapeHtml(item.vikt) + '</td>';
@@ -1003,9 +1073,9 @@ function populateRecipeData(beer) {
     }
 
     // Övriga ingredienser
-    if (beer.recipe && beer.recipe.ovriga && beer.recipe.ovriga.length > 0) {
+	if (recipeData && recipeData.ovriga && recipeData.ovriga.length > 0) {
         var ovrigaHtml = '';
-        beer.recipe.ovriga.forEach(function(item) {
+		recipeData.ovriga.forEach(function(item) {
             ovrigaHtml += '<tr>';
             ovrigaHtml += '<td>' + escapeHtml(decodeHtml(item.ingrediens)) + '</td>';
             ovrigaHtml += '<td>' + escapeHtml(decodeHtml(item.tillsatt_vid)) + '</td>';
@@ -1019,13 +1089,13 @@ function populateRecipeData(beer) {
     }
 
     // Jäsning - använd decodeHtml för textfält
-    $('#recept-jasning').text(beer.recipe && beer.recipe.jasning ? decodeHtml(beer.recipe.jasning) : '-');
+	$('#recept-jasning').text(recipeData && recipeData.jasning ? decodeHtml(recipeData.jasning) : '-');
 
     // Vattenbehandling
-    $('#recept-vatten').text(beer.recipe && beer.recipe.vatten ? decodeHtml(beer.recipe.vatten) : '-');
+	$('#recept-vatten').text(recipeData && recipeData.vatten ? decodeHtml(recipeData.vatten) : '-');
 
     // Kommentar
-    $('#recept-kommentar').text(beer.recipe && beer.recipe.kommentar ? decodeHtml(beer.recipe.kommentar) : '-');
+	$('#recept-kommentar').text(recipeData && recipeData.kommentar ? decodeHtml(recipeData.kommentar) : '-');
 }
 	function popup_beer(item_id, e, isentry_code = false) {
 		if (isentry_code) {
@@ -1051,8 +1121,9 @@ function populateRecipeData(beer) {
 		$("#popup-alcohol").html(beer.alk);
 		$("#popup-ibu").html(beer.IBU);
 
-		// Populera receptdata
-		populateRecipeData(beer);
+		// Reset recipe section, load details on demand when expanded
+		populateRecipeData(null);
+		$('.recept-content').attr('data-entry-code', beer.entry_code).attr('data-recipe-loaded', 'false');
 		$('.recept-content').hide();
 		$('.recept-toggle').attr('aria-expanded', 'false').find('.arrow').css('transform', 'rotate(0deg)');
 
