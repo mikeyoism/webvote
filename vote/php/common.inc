@@ -323,7 +323,7 @@ class DbAccess
 
 
     //get beer info from eventreg database, for a single beerEntryId
-    public function getBeer($competitionId, $beerEntryId)
+    public function getBeer($competitionId, $beerEntryId, $getRecipeDetails = false)
     {
         $events = $this->getEventReg_EventId($competitionId);
         $evenreg_event_ids = array();
@@ -429,13 +429,13 @@ class DbAccess
             'OG' => $row['og'],
             'FG' => $row['fg'],
             'IBU' => $row['bu'],
-            'recipe' => $this->getRecipeData($row['beer_id'])
+            'recipe' => $getRecipeDetails ? $this->getRecipeData($row['beer_id']) : null
         );
 
         return $beer;
     }
     //get beer info from eventreg database, for a single brewer_id / (user_id in eventreg database)
-    public function getBeersByBrewer($competitionId, $event_id, $brewer_id)
+    public function getBeersByBrewer($competitionId, $event_id, $brewer_id, $getRecipeDetails = false)
     {
         if ($event_id == null) {
             $events = $this->getEventReg_EventId($competitionId);
@@ -546,7 +546,7 @@ class DbAccess
                 'OG' => $row['og'],
                 'FG' => $row['fg'],
                 'IBU' => $row['bu'],
-                'recipe' => $this->getRecipeData($row['beer_id'])
+                'recipe' => $getRecipeDetails ? $this->getRecipeData($row['beer_id']) : null
             );
             //note: no offset in arrayposition, as we use the entryId as key
             $beers[$entryId] = $beer;
@@ -557,7 +557,7 @@ class DbAccess
 
 
     //get beer info from eventreg database
-    public function getBeers($competitionId, $grouped = false)
+    public function getBeers($competitionId, $grouped = false, $getRecipeDetails = false)
     {
 
         $events = $this->getEventReg_EventId($competitionId);
@@ -671,7 +671,7 @@ class DbAccess
                 'OG' => $row['og'],
                 'FG' => $row['fg'],
                 'IBU' => $row['bu'],
-                'recipe' => $this->getRecipeData($row['beer_id'])
+                'recipe' => $getRecipeDetails ? $this->getRecipeData($row['beer_id']) : null
             );
             //note: no offset in arrayposition, as we use the entryId as key
             if ($grouped == true) {
