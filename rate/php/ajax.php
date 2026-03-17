@@ -8,6 +8,9 @@ $dbAccess = new DbAccess();
 $operation = isset($_GET['operation']) ? $_GET['operation'] : '';
 
 if ($operation === 'getRecipeDetails') {
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Pragma: no-cache');
+
     $entryCode = isset($_GET['entryCode']) ? intval($_GET['entryCode']) : 0;
 
     if ($entryCode <= 0) {

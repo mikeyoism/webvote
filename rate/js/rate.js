@@ -944,12 +944,16 @@ var beer_db = function () {
 						}
 						populateRecipeData(recipe);
 						content.setAttribute('data-recipe-loaded', 'true');
-					}).fail(function () {
+						// TEMP DEBUG
+						//showRecipeDebug('OK', entryCode, recipe);
+					}).fail(function (xhr) {
 						if (content.getAttribute('data-entry-code') !== String(entryCode)) {
 							return;
 						}
 						populateRecipeData(null);
 						content.setAttribute('data-recipe-loaded', 'true');
+						// TEMP DEBUG
+						//showRecipeDebug('FAIL', entryCode, xhr ? xhr.responseText : 'no xhr');
 					});
 				}
 
@@ -980,7 +984,10 @@ var beer_db = function () {
 
 		if (DEBUGMODE) console.log('@fetchRecipeDetails request, entryCode=' + entryCode + ', competition_id=' + competition_id);
 
-		recipeDetailsPending[entryCode] = $.ajax({
+		var deferred = $.Deferred();
+		recipeDetailsPending[entryCode] = deferred.promise();
+
+		$.ajax({
 			type: 'GET',
 			cache: false,
 			url: 'php/ajax.php',
@@ -990,14 +997,15 @@ var beer_db = function () {
 				entryCode: entryCode,
 				competitionId: competition_id
 			}
-		}).then(function (response) {
+		}).done(function (response) {
 			if (DEBUGMODE) { console.log('@fetchRecipeDetails response'); console.log(response); }
 			var recipe = (response && response.msgtype === 'ok' && response.recipe) ? response.recipe : null;
 			recipeDetailsCache[entryCode] = recipe;
-			return recipe;
-		}, function (xhr, textStatus) {
+			deferred.resolve(recipe);
+		}).fail(function (xhr, textStatus) {
 			if (DEBUGMODE) console.log('@fetchRecipeDetails error: ' + textStatus + ', responseText: ' + (xhr && xhr.responseText ? xhr.responseText : ''));
-			return $.Deferred().reject(xhr, textStatus).promise();
+			recipeDetailsCache[entryCode] = null;
+			deferred.reject(xhr, textStatus);
 		}).always(function () {
 			delete recipeDetailsPending[entryCode];
 		});
@@ -1012,6 +1020,20 @@ var beer_db = function () {
 		$('#recept-jasning').text('Laddar...');
 		$('#recept-vatten').text('Laddar...');
 		$('#recept-kommentar').text('Laddar...');
+	}
+
+	// TEMP DEBUG – visa raw receptsvar i popup (avkommentera anropen ovan för att aktivera)
+	function showRecipeDebug(status, entryCode, data) {
+		$('#recept-debug-panel').remove();
+		var json = '';
+		try { json = JSON.stringify(data, null, 2); } catch(e) { json = String(data); }
+		var panel = $('<div id="recept-debug-panel">'
+			+ '<strong>RECEPT DEBUG – ' + status + ' (öl ' + entryCode + ')</strong>'
+			+ '<pre style="max-height:200px;overflow:auto;font-size:0.7em;background:#f8f8f8;border:1px solid #ccc;padding:6px;margin-top:4px;white-space:pre-wrap;word-break:break-all;">' + $('<div/>').text(json).html() + '</pre>'
+			+ '<button onclick="$(\"#recept-debug-panel\").remove()" style="font-size:0.75em;">Stäng debug</button>'
+			+ '</div>');
+		panel.css({'border':'2px solid red','padding':'8px','margin-top':'8px','background':'#fff9c4','border-radius':'6px'});
+		$('.recept-content').prepend(panel);
 	}
 
 function populateRecipeData(recipeData) {

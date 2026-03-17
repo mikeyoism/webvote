@@ -2,12 +2,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 	<meta http-equiv="content-language" content="sv">
-	<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-	<meta http-equiv="Pragma" content="no-cache">
-	<meta http-equiv="Expires" content="0">
-	<script>
-		window.location.replace('index.php' + window.location.search + window.location.hash);
-	</script>
 	<title>SHBF Ölträff</title>
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
@@ -481,7 +475,7 @@
 		crossorigin="anonymous"></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
-	<script src="js/rate.js" type="text/javascript"></script>
+	<script src="js/rate.js?v=<?php echo rawurlencode((string) filemtime(__DIR__ . '/js/rate.js')); ?>" type="text/javascript"></script>
 </body>
 
 </html>
