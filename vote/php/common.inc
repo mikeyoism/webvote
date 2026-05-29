@@ -1192,18 +1192,19 @@ class DbAccess
                     }
                     if (!array_key_exists($beerEntryId, $ratingResults)) {
                         $ratingResults[$beerEntryId] = array('beerEntryId' => $beerEntryId, 'ratingScore' => 0, 'weightedScore' => 0, 'weightedScoreNorm' => 0, 'votersCount' => 0, 'weightedMeanValue' => 0);
+                        // Fetch beer metadata once per unique beer (on first encounter).
+                        // getBeer() is only called here, inside the first-seen guard, so each
+                        // beer is fetched exactly once regardless of how many voters rated it.
+                        $beer = $this->getBeer($competitionId, $beerEntryId);
+                        $ratingResults[$beerEntryId]['beerName'] = $beer['name'];
+                        $ratingResults[$beerEntryId]['brewer'] = $beer['brewer'];
+                        $ratingResults[$beerEntryId]['styleName'] = $beer['styleName'];
+                        $ratingResults[$beerEntryId]['styleId'] = $beer['styleId'];
                     }
                     $ratingResults[$beerEntryId]['ratingScore'] += $score['ratingScore'];
                     $ratingResults[$beerEntryId]['weightedScore'] += $score['weightedScore'];
                     $ratingResults[$beerEntryId]['weightedScoreNorm'] += $score['weightedScoreNorm'];
                     $ratingResults[$beerEntryId]['votersCount']++;
-                    //Grab beername, brewer and style from eventreg database
-
-                    $beer = $this->getBeer($competitionId, $beerEntryId);
-                    $ratingResults[$beerEntryId]['beerName'] = $beer['name'];
-                    $ratingResults[$beerEntryId]['brewer'] = $beer['brewer'];
-                    $ratingResults[$beerEntryId]['styleName'] = $beer['styleName'];
-                    $ratingResults[$beerEntryId]['styleId'] = $beer['styleId'];
                 }
             }
 
@@ -1263,31 +1264,31 @@ class DbAccess
 
 
 
-        //each voteCodeId is a unique voter (participating user)
-        //get a list of all unique voteCodeId:s for this $categoryId
-        $sql = 'select distinct voteCodeId from ratings where categoryId=' . $this->escape($categoryId) . $extraCond;
+        // Fetch all ratings for this category in a single query. ORDER BY voteCodeId keeps
+        // each voter's rows contiguous; ORDER BY ratingScore DESC within that preserves the
+        // highest-score-first ordering the algorithm expects.
+        $sql = 'SELECT voteCodeId, ratingScore, drankCheck, beerEntryId ' .
+            'FROM ratings WHERE categoryId=' . $this->escape($categoryId) .
+            ' AND ratingScore > 0' . $extraCond .
+            ' ORDER BY voteCodeId, ratingScore DESC';
         $result = $this->getConnection()->query($sql) or die("getRatingResults: Query failed: $sql");
-        $voteCodeIds = array();
+
+        // Group rows by voteCodeId in PHP (replaces the per-voter query loop)
+        $rowsByVoter = [];
         while ($row = $result->fetch_assoc()) {
-            array_push($voteCodeIds, $row['voteCodeId']);
+            $rowsByVoter[$row['voteCodeId']][] = $row;
         }
-        $voteCodeCount = count($voteCodeIds);
+        $voteCodeCount = count($rowsByVoter);
+
         //for each voteCodeId, get all ratingScores and beerEntryId sorted by ratingScore
         $weightedScores = array();
-        foreach ($voteCodeIds as $voteCodeId) {
-            $sql = 'select ratingScore, drankCheck, beerEntryId ' .
-                '  from ratings where categoryId=' . $this->escape($categoryId) . ' and ratingscore>0 and voteCodeId=' . $voteCodeId . $extraCond . ' order by ratingScore desc';
-            $result = $this->getConnection()->query($sql) or die("getRatingResults: Query failed: $sql");
-            //Create a list of ratingScores  and calculated WeigthedScores for this voteCodeId (voter)
+        foreach ($rowsByVoter as $voteCodeId => $rows) {
+            //Create a list of ratingScores and calculated WeigthedScores for this voteCodeId (voter)
             //ratingScore is a number between 1 and 5 for each beerEntryId
             //a ratingScore score of 5 is given to the highest rated beer(s), 4 to the second highest etc.
 
-            $ratingCount = 0;
-
             $weightedScoreCount = 0;
-            //get rowcount in $result
-            $ratingCount = mysqli_num_rows($result);
-
+            $ratingCount = count($rows); // number of rated beers for this voter
 
             $weightedScores[$voteCodeId] = array();
             $ratingScoreCount = array();
@@ -1295,7 +1296,7 @@ class DbAccess
                 $ratingScoreCount[$i] = 0;
             }
 
-            while ($row = $result->fetch_assoc()) {
+            foreach ($rows as $row) {
                 //insert or update weigthedScore for this beerEntryId 
                 $weightedScoreCount++;
                 //count number of equal ratingScores for each voteCodeId
