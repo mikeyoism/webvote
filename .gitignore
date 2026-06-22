@@ -239,3 +239,4 @@ vote/php/config.ini
 vote/php/config_shbf.ini
 rate/php/error_log
 rate/data/*
+vote/php/_config.php
